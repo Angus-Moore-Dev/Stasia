@@ -14,9 +14,9 @@ export default function AppNavbar()
             {
                 user &&
                 <section className="flex-grow flex justify-end items-center gap-4">
-                {
-                    user.email
-                }
+                    {
+                        user.email
+                    }
                     <Link href='/me'>
                         <Image src='/profile.JPG' alt='profile' className="rounded-xl hover:shadow-sm hover:shadow-primary hover:cursor-pointer" width='64' height='64' />
                     </Link>

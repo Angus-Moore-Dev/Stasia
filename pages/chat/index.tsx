@@ -17,16 +17,14 @@ interface LeadsPageProps
 
 export default function LeadsPage({ chat }: LeadsPageProps)
 {
-    console.log(chat);
     return (
         <div className="w-full h-full flex flex-col items-center justify-center">
             {
-                chat &&
                 chat.map(message => 
-                    <div>
+                    <div key={message.id}>
                         <br />
                         <p>{message.name} That is a user id</p>
-                        <small>Sent at: {new Date(Date.parse(message.created_at)).toLocaleDateString('en-au', { second: 'numeric', minute: 'numeric', hour: 'numeric' })}</small>
+                        <small>Sent at: {message.created_at}</small>
                         <p>{message.message}</p>
                     </div>
                 )
@@ -38,10 +36,15 @@ export default function LeadsPage({ chat }: LeadsPageProps)
 
 export const getServerSideProps = async () => {
     const { data, error} = await supabase.from('chat').select('*');
-    console.log(data);
+
+    const chatData = data as ChatMessage[];
+    for (const chat of chatData)
+    {
+        chat.created_at = new Date(chat.created_at).toLocaleString();
+    }
     return {
         props: {
-            chat: data as ChatMessage[]
+            chat: chatData
         }
     }
 }
