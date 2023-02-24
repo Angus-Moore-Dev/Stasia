@@ -6,15 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function HomePage()
 {
-	const audioRef = useRef<HTMLAudioElement>(null);
 	const session = useSession();
 	const supabase = useSupabaseClient();
 	const user = useUser();
-
-	useEffect(() => {
-		audioRef.current?.click();
-		audioRef.current?.play();
-	}, []);
 
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center bg-secondary">
