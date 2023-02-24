@@ -6,3 +6,5 @@ Currently only in use for Jensen Labs internal operations, we are planning on ma
 
 # How do I run this?
 You will need to create your own Supabase instance, it's pretty easy, just go to https://supabase.com/ to get started.
+
+More docs will be written about this shortly
