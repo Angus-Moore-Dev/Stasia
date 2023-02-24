@@ -1,4 +1,3 @@
-import { UserProfile } from "@auth0/nextjs-auth0/client";
 import { useUser } from "@supabase/auth-helpers-react";
 import Image from "next/image";
 import Link from "next/link";
