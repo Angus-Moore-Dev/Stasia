@@ -1,5 +1,4 @@
 import { Link } from "@mui/material";
-import { useUser } from "@supabase/auth-helpers-react";
 
 export default function AppFooter()
 {

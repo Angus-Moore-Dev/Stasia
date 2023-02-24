@@ -1,4 +1,3 @@
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface ChatMessage
@@ -35,7 +34,7 @@ export default function LeadsPage({ chat }: LeadsPageProps)
 
 
 export const getServerSideProps = async () => {
-    const { data, error} = await supabase.from('chat').select('*');
+    const { data, error } = await supabase.from('chat').select('*');
 
     const chatData = data as ChatMessage[];
     for (const chat of chatData)

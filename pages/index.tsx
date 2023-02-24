@@ -1,20 +1,15 @@
-import LoadingBox from '@/components/LoadingBox';
-import { Session, useSession, useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
 
 export default function HomePage()
 {
-	const session = useSession();
 	const supabase = useSupabaseClient();
 	const user = useUser();
-
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center bg-secondary">
 			{/* <LoadingBox content={<Image src='/favicon.png' width='128' height='128' alt='logo' />} /> */}
 			{
-				!session &&
+				!user &&
 				<Auth supabaseClient={supabase} appearance={
 					{ 
 						style: {
@@ -26,10 +21,10 @@ export default function HomePage()
 				} theme="dark" />
 			}
 			{
-				session &&
+				user &&
 				<div className='flex-grow flex flex-col items-center justify-center'>
 					{
-						session.user.email
+						user.email
 					}
 				</div>
 			}
