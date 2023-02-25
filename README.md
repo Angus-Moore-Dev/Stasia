@@ -6,5 +6,11 @@ Currently only in use for Jensen Labs internal operations, we are planning on ma
 
 # How do I run this?
 You will need to create your own Supabase instance, it's pretty easy, just go to https://supabase.com/ to get started.
+We use Doppler for our keys, however you will just need the following environment variables:
+
+`NEXT_PUBLIC_SUPABASE_ANON_KEY=[key]`
+`NEXT_PUBLIC_SUPABASE_URL=[url]`
+
+Once you've done that, in your instance run `npm install && npm run dev` and things should be up and running at `http://localhost:3000/`
 
 More docs will be written about this shortly
