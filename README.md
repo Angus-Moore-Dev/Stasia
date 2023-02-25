@@ -1,6 +1,6 @@
 ![image](https://user-images.githubusercontent.com/99398403/221100014-1ef41c24-ec70-4cff-985b-1febfafd9df5.png)
 
-A better way to organise your files, customer relationships, internal communications and project management. No need to use external services like Jira, Monday, Copper, Salesforce or some Cloud storage workaround, this is the place to manage the business and growth side of your startup/business.
+A better way to organise your files, customer relationships, internal communications and project management. No need to use external services like Jira, Monday, Copper, Salesforce or some Cloud storage workaround to organise your files, this is the place to manage the business and growth side of your startup/business. Psychostasia will simply eliminate any need for you to use 8-10+ platforms and SaaS products when you can do it all here.
 
 Currently only in use for Jensen Labs internal operations, we are planning on making it more available to the wider community at a later date.
 
