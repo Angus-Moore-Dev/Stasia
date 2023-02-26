@@ -5,12 +5,26 @@ A better way to organise your files, customer relationships, internal communicat
 Currently only in use for Jensen Labs internal operations, we are planning on making it more available to the wider community at a later date.
 
 # How do I run this?
-You will need to create your own Supabase instance, it's pretty easy, just go to https://supabase.com/ to get started.
-We use Doppler for our keys, however you will just need the following environment variables:
+You will need to create your own Supabase instance, it's pretty easy, just go to https://supabase.com/ to get started. Supabase is a fantastic service and is FOSS, which is even cooler.
+
+To get started, you will need the following environment variables:
 
 `NEXT_PUBLIC_SUPABASE_ANON_KEY=[key]`
 `NEXT_PUBLIC_SUPABASE_URL=[url]`
 
 Once you've done that, in your instance run `npm install && npm run dev` and things should be up and running at `http://localhost:3000/`
 
-More docs will be written about this shortly
+## Setting up Your Supabase Instance
+todo
+
+## Customer Relationship Management
+todo
+
+## Project Management
+todo
+
+## Internal Communications
+todo
+
+## File Storage
+todo
