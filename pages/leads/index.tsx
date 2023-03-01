@@ -18,11 +18,6 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
         <div className="w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto">
             <section className="w-full flex flex-row items-center">
                 <span>Overview</span>
-                <Link href='/leads/new' className="ml-auto">
-                    <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold">
-                        New Lead
-                    </button>
-                </Link>
             </section>
             <div className="w-full rounded-xl p-4 flex flex-row flex-wrap items-center justify-center">
                 <div className="flex-1 min-w-[300px] h-96 border-r-[1px] border-primary">
@@ -57,8 +52,13 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                 </div>
             </div>
             <div className="w-full flex-grow flex flex-col">
-                <section className="w-full flex flex-row items-center">
+                <section className="w-full flex flex-row items-center mb-1">
                     <span>Manage Leads</span>
+                    <Link href='/leads/new' className="ml-auto">
+                        <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold">
+                            New Lead
+                        </button>
+                    </Link>
                 </section>
                 <section className="w-full flex-grow flex flex-col">
                     {
