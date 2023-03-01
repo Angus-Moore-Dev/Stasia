@@ -1,6 +1,7 @@
 import { Lead } from "@/models/Lead";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
+import { useRouter } from "next/router";
 
 interface SpecificLeadManagementPageProps
 {
@@ -9,9 +10,14 @@ interface SpecificLeadManagementPageProps
 
 export default function SpecificLeadManagementPage({ user }: SpecificLeadManagementPageProps)
 {
+    const router = useRouter();
+    const { leadId } = router.query;
+    const id = leadId as string;
+    console.log(router.query);
+
     return <div className="w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto">
         {
-            user.email
+            id
         }
     </div>
 }

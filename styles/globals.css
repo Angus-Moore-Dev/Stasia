@@ -3,10 +3,37 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+      width: 20px;
+      height: 20px;
+      direction: rtl;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+      background: #090909;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+      background: #00fe49;
+      border-radius: 8px;
+      border: 6px solid #090909;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #00fe49;
+  }
+}
+
 :root {
   font-family: 'Rajdhani', sans-serif;
   font-size: large;
   background-color: #090909;
   margin: 0;
   color: white;
+}
+
+textarea
+{
+  resize: none;
 }

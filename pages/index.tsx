@@ -6,6 +6,7 @@ import PersonSharpIcon from '@mui/icons-material/PersonSharp';
 import ChatBubbleSharpIcon from '@mui/icons-material/ChatBubbleSharp';
 import CalendarMonthSharpIcon from '@mui/icons-material/CalendarMonthSharp';
 import ManageAccountsSharpIcon from '@mui/icons-material/ManageAccountsSharp';
+import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
 import Link from 'next/link';
 
 export default function HomePage()
@@ -33,16 +34,18 @@ export default function HomePage()
 					<div className='flex-grow flex flex-col gap-3 items-center justify-center'>
 						<p className=''>Services</p>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
+							<InteractiveBox title='Customers' icon={<AttachMoneySharpIcon fontSize='large' />}  />
+							<Link href='/contacts'>
+								<InteractiveBox title='Contacts' icon={<PersonSharpIcon fontSize='large' />} />
+							</Link>
 							<Link href='/leads'>
 								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
 							</Link>
-							<InteractiveBox title='Customers' icon={<PersonSharpIcon fontSize='large' />}  />
-							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
 						</div>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
-							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
-							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
-							<InteractiveBox title='Account (coming soon)' icon={<ManageAccountsSharpIcon fontSize='large' />} />
+							<InteractiveBox title='Projects (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
+							<InteractiveBox title='Chat (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
+							<InteractiveBox title='Calendar (coming soon)' icon={<ManageAccountsSharpIcon fontSize='large' />} />
 						</div>
 					</div>
 				</div>
