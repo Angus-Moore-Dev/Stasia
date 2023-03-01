@@ -18,8 +18,8 @@ export default function LoadingBox({ content }: LoadingBoxProps)
     return (
         <Box position="relative" display="inline-flex">
         <ThemeProvider theme={theme}>
-            <CircularProgress size={content ? 96 : 32} color="primary" disableShrink sx={{
-                animationDuration: '550ms',
+            <CircularProgress size={content ? 72 : 32} color="primary" disableShrink sx={{
+                animationDuration: '750ms',
             }} />
         </ThemeProvider>
         <Box
@@ -31,7 +31,7 @@ export default function LoadingBox({ content }: LoadingBoxProps)
             display="flex"
             alignItems="center"
             justifyContent="center"
-            padding={4}
+            padding={1}
         >
             <Typography variant="caption" component="div" color="textSecondary">
                 {content}

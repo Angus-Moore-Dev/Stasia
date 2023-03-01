@@ -30,16 +30,16 @@ export default function HomePage()
 			{
 				user &&
 				<div className='flex-grow flex flex-col p-8 w-full max-w-[1920px]'>
-					<div className='flex-grow flex flex-col gap-4 items-center justify-center'>
+					<div className='flex-grow flex flex-col gap-3 items-center justify-center'>
 						<p className=''>Services</p>
-						<div className='flex flex-row flex-wrap gap-4 items-center justify-center'>
+						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
 							<Link href='/leads'>
 								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
 							</Link>
 							<InteractiveBox title='Customers' icon={<PersonSharpIcon fontSize='large' />}  />
 							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
 						</div>
-						<div className='flex flex-row flex-wrap gap-4 items-center justify-center'>
+						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
 							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Account (coming soon)' icon={<ManageAccountsSharpIcon fontSize='large' />} />
@@ -62,7 +62,7 @@ interface InteractiveBoxProps
 function InteractiveBox({title, icon}: InteractiveBoxProps)
 {
 	return (
-		<div className='group w-64 h-64 bg-tertiary p-4 rounded-xl drop-shadow-sm flex flex-col  items-center justify-center transition hover:bg-primary hover:text-secondary hover:shadow-md hover:shadow-primary hover:cursor-pointer hover:font-medium'>
+		<div className='group w-64 h-64 bg-tertiary p-4 rounded-md drop-shadow-sm flex flex-col items-center justify-center transition hover:bg-primary hover:text-secondary hover:shadow-md hover:shadow-primary hover:cursor-pointer hover:font-medium'>
 			<div className='p-2 rounded-xl text-primary group-hover:text-secondary group-hover:animate-pulse'>
 				{icon}
 			</div>
