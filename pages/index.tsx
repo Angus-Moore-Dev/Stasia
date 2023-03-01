@@ -38,14 +38,15 @@ export default function HomePage()
 							<Link href='/contacts'>
 								<InteractiveBox title='Contacts' icon={<PersonSharpIcon fontSize='large' />} />
 							</Link>
+							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
+						</div>
+						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
+							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
 							<Link href='/leads'>
 								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
 							</Link>
-						</div>
-						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
-							<InteractiveBox title='Projects (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
-							<InteractiveBox title='Chat (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
-							<InteractiveBox title='Calendar (coming soon)' icon={<ManageAccountsSharpIcon fontSize='large' />} />
+							
+							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
 						</div>
 					</div>
 				</div>
