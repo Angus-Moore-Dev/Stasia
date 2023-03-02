@@ -26,7 +26,7 @@ export default function NewLeadPage({ user, contacts }: NewLeadPageProps)
         <p></p>
         <div className="flex-grow w-full flex flex-row flex-wrap gap-2">
         {
-            contacts && contacts.map(contact => <Link href={`/leads/new/${contact.id}`} className="h-96 w-80"><NewLeadBox contact={contact} /></Link>)
+            contacts && contacts.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map(contact => <Link href={`/leads/new/${contact.id}`} className="h-96 w-80"><NewLeadBox contact={contact} /></Link>)
         }
         </div>
     </div>

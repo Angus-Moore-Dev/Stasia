@@ -20,6 +20,7 @@ export default function ContactBox({ contact }: ContactBoxProps)
                 beforeLoadImage && beforeLoadImage
             } */}
             <Image 
+            priority={true}
             src={contact.previewImageURL} 
             alt='profile' 
             width='600' height='400' 
@@ -45,6 +46,7 @@ export function NewLeadBox({ contact }: ContactBoxProps)
             beforeLoadImage && beforeLoadImage
         } */}
         <Image 
+        priority={true}
         src={contact.previewImageURL} 
         alt='profile' 
         width='600' height='400' 

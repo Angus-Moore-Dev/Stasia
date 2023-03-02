@@ -31,7 +31,7 @@ export default function ContactPage({ user, contacts }: ContactPageProps)
             placeholder="Search Contact List" />
             <div className="flex-grow flex flex-row flex-wrap gap-2">
             {
-                contacts && contacts.filter(x => x.name.toLowerCase().startsWith(searchForProfile.toLowerCase())).map(contact => <ContactBox contact={contact} />)
+                contacts && contacts.filter(x => x.name.toLowerCase().startsWith(searchForProfile.toLowerCase())).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map(contact => <ContactBox key={contact.id} contact={contact} />)
             }
             </div>
         </div>

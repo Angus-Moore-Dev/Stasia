@@ -23,6 +23,7 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
     const [imagePreview, setImagePreview] = useState('');
     const [name, setName] = useState(contact.name);
     const [shortDescription, setShortDescription] = useState(contact.description);
+    const [selectedType, setSelectedType] = useState<number | undefined>();
 
     return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row justify-between">
@@ -55,7 +56,7 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                     <span className="text-primary h-full"><BusinessSharpIcon fontSize="small" /></span>
                     <div className="flex flex-col flex-wrap gap-[2p1] w-64">
                     {
-                        contact.organisations.map(organisation => <span className="font-medium">{organisation}</span>)
+                        contact.organisations.map(organisation => <span key={organisation} className="font-medium">{organisation}</span>)
                     }
                     </div>
                 </div>
@@ -86,11 +87,47 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                 <span className="font-medium text-neutral-300">{contact.location}</span>
             }
         </div>
-        <div className="flex-grow mx-auto max-w-6xl w-full">
-            Projects go here
-        </div>
-        <div className="flex-grow mx-auto max-w-6xl w-full">
-            Calender / Events go here
+        <div className="flex-grow w-full max-w-6xl flex flex-col gap-2">
+            <section className="w-full h-10 flex flex-row gap-2">
+                <button className="w-64 rounded bg-tertiary text-zinc-100 font-medium transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-zinc-100"
+                aria-selected={selectedType === 0} onClick={() => setSelectedType(0)}>
+                    Files
+                </button>
+                <button className="w-64 rounded bg-tertiary text-zinc-100 font-medium transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-zinc-100"
+                aria-selected={selectedType === 1} onClick={() => setSelectedType(1)}>
+                    Calender/Events
+                </button>
+                <button className="w-64 rounded bg-tertiary text-zinc-100 font-medium transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-zinc-100"
+                aria-selected={selectedType === 2} onClick={() => setSelectedType(2)}>
+                    Comments
+                </button>
+            </section>
+            <section className="flex-grow">
+                {
+                    selectedType === undefined &&
+                    <div className="flex-grow h-full flex flex-col items-center justify-center">
+                        Select a category for more
+                    </div>
+                }
+                {
+                    selectedType === 0 &&
+                    <div className="flex-grow h-full flex flex-col items-center justify-center">
+                        Files
+                    </div>
+                }
+                {
+                    selectedType === 1 &&
+                    <div className="flex-grow h-full flex flex-col items-center justify-center">
+                        Calendar/Events
+                    </div>
+                }
+                {
+                    selectedType === 2 &&
+                    <div className="flex-grow h-full flex flex-col items-center justify-center">
+                        Comments
+                    </div>
+                }
+            </section>
         </div>
     </div>
 }
