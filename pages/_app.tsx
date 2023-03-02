@@ -39,7 +39,7 @@ export default function App({ Component, pageProps }: AppProps) {
 			</Head>
 			<div className='w-screen h-screen flex flex-col bg-secondary'>
 			<AppNavbar  />
-			<div className='flex-grow'>
+			<div className='flex-grow overflow-x-hidden'>
 				{
 					loading && 
 					<div className='flex-grow h-full flex flex-col gap-2 items-center justify-center'>

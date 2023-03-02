@@ -24,8 +24,12 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
     const [name, setName] = useState(contact.name);
     const [shortDescription, setShortDescription] = useState(contact.description);
 
-    return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-6xl p-8 mx-auto">
-        <div className="flex flex-row gap-4 justify-center items-center mx-auto w-full">
+    return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
+        <div className="w-full flex flex-row justify-between">
+        <Link href='/contacts' className="px-2 py-1 rounded-lg transition hover:bg-primary font-semibold hover:text-secondary">Back to Contacts</Link>
+        <Link href={`/contacts/edit?id=${contact.id}`} className="px-2 py-1 rounded-lg transition hover:bg-primary font-semibold hover:text-secondary">Edit Contact</Link>
+        </div>
+        <div className="flex flex-row gap-4 justify-center items-center mx-auto max-w-6xl w-full">
             <Image 
             src={contact.previewImageURL} 
             alt='Contact Image' 
@@ -42,7 +46,7 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                 </div>
             </section>
         </div>
-        <div className="flex flex-col gap-2 mx-auto w-full">
+        <div className="flex flex-col gap-2 mx-auto max-w-6xl w-full">
             {
                 contact.organisations &&
                 <div className="flex flex-row gap-2 items-center relative">
@@ -80,10 +84,10 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                 <span className="font-medium text-neutral-300">{contact.location}</span>
             }
         </div>
-        <div className="flex-grow w-full bg-red-500">
+        <div className="flex-grow mx-auto max-w-6xl w-full">
             Projects go here
         </div>
-        <div className="flex-grow w-full bg-blue-500">
+        <div className="flex-grow mx-auto max-w-6xl w-full">
             Calender / Events go here
         </div>
     </div>

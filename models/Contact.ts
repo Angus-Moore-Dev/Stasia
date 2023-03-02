@@ -11,4 +11,5 @@ export interface Contact
     discordHandle: string;
     phoneNumber: string;
     previewImageURL: string;
+    useablePreviewImageURL: string; // Only used for display purposes.
 }

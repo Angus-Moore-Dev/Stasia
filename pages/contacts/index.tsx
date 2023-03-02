@@ -26,13 +26,13 @@ export default function ContactPage({ user, contacts }: ContactPageProps)
                 </button>
             </Link>
         </div>
-        <div className="flex-grow h-full w-full flex flex-col gap-4">
+        <div className="min-h-full w-full flex flex-col gap-4">
             <input value={searchForProfile} onChange={(e) => setSearchForProfile(e.target.value)} className="p-2 bg-tertiary text-zinc-100 font-medium border-b-[1px] border-b-primary outline-none w-1/2 rounded"
             placeholder="Search Contact List" />
-            <div className="flex-grow flex flex-row flex-wrap gap-4">
-                {
-                    contacts && contacts.map(contact => <ContactBox contact={contact} />)
-                }
+            <div className="flex-grow flex flex-row flex-wrap gap-2">
+            {
+                contacts && contacts.filter(x => x.name.toLowerCase().startsWith(searchForProfile.toLowerCase())).map(contact => <ContactBox contact={contact} />)
+            }
             </div>
         </div>
     </div>
@@ -45,11 +45,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     const supabase = createServerSupabaseClient(context);
     const { data: { session }} = await supabase.auth.getSession();
     const { data, error } = await supabase.from('contacts').select('*');
-    const contacts = data as Contact[];
+    const contacts: Contact[] = [];
 
-    for (const contact of contacts)
+    for (const contact of data ?? [])
     {
         contact.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contact.previewImageURL, 60)).data?.signedUrl ?? '';
+        contacts.push(contact as Contact);
     }
 
     if (!session)
