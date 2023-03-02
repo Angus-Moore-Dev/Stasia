@@ -1,13 +1,15 @@
 import { Contact } from "@/models/Contact";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from 'next/image';
 import EmailSharpIcon from '@mui/icons-material/EmailSharp';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import LocalPhoneSharpIcon from '@mui/icons-material/LocalPhoneSharp';
 import BusinessSharpIcon from '@mui/icons-material/BusinessSharp';
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
+import LoadingBox from "@/components/LoadingBox";
 
 interface SpecificContactPageProps
 {
@@ -22,9 +24,14 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
     const [name, setName] = useState(contact.name);
     const [shortDescription, setShortDescription] = useState(contact.description);
 
-    return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
-        <div className="w-full flex flex-row gap-4 justify-center items-center">
-            <Image src={contact.previewImageURL} alt='Lead Image' width='500' height='500' className="w-64 h-64 min-w-[256px] min-h-[256px] rounded-md border-4 border-primary object-cover shadow-md shadow-primary" />
+    return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-6xl p-8 mx-auto">
+        <div className="flex flex-row gap-4 justify-center items-center mx-auto w-full">
+            <Image 
+            src={contact.previewImageURL} 
+            alt='Contact Image' 
+            width='500' height='500' 
+            className="w-64 h-64 min-w-[256px] min-h-[256px] rounded-md border-2 border-primary object-cover" 
+            />
             <section className="w-full h-64 flex flex-row">
                 <div className="w-full flex flex-col">
                     <input value={name} onChange={(e) => setName(e.target.value)} className="p-2 bg-transparent text-zinc-100 font-semibold text-4xl outline-none border-b-2 border-b-primary w-96 h-10" placeholder="Lead Name" />
@@ -35,12 +42,12 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                 </div>
             </section>
         </div>
-        <div className="mx-auto flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2 mx-auto w-full">
             {
                 contact.organisations &&
-                <div className="flex flex-row gap-2 items-center">
-                    <span className="text-primary"><BusinessSharpIcon fontSize="small" /></span>
-                    <div className="flex flex-row flex-wrap gap-2 w-64">
+                <div className="flex flex-row gap-2 items-center relative">
+                    <span className="text-primary h-full"><BusinessSharpIcon fontSize="small" /></span>
+                    <div className="flex flex-col flex-wrap gap-[2p1] w-64">
                     {
                         contact.organisations.map(organisation => <span className="font-medium">{organisation}</span>)
                     }
@@ -73,6 +80,12 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                 <span className="font-medium text-neutral-300">{contact.location}</span>
             }
         </div>
+        <div className="flex-grow w-full bg-red-500">
+            Projects go here
+        </div>
+        <div className="flex-grow w-full bg-blue-500">
+            Calender / Events go here
+        </div>
     </div>
 }
 
@@ -82,6 +95,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     const supabase = createServerSupabaseClient(context);
     const { data: { session }} = await supabase.auth.getSession();
     const { data, error } = await supabase.from('contacts').select("*").eq('id', context.query['contactId'] as string).single();
+
+    const contact = data as Contact;
+    // console.log(contact);
+    contact.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contact.previewImageURL, 60)).data?.signedUrl ?? '';
 
     return {
         props: {

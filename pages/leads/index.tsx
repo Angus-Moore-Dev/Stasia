@@ -143,7 +143,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     return {
         props: {
             user: session?.user,
-            leads: JSON.parse(JSON.stringify(leads)) as Lead[]
+            leads: JSON.parse(JSON.stringify(leads)) as Lead[] // fucking terrible. Find a better way to do this.
         }
     }
 }

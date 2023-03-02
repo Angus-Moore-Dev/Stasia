@@ -1,4 +1,4 @@
-import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
+import { User, useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import CodeSharpIcon from '@mui/icons-material/CodeSharp';
 import PersonOutlineSharpIcon from '@mui/icons-material/PersonOutlineSharp';
@@ -8,11 +8,19 @@ import CalendarMonthSharpIcon from '@mui/icons-material/CalendarMonthSharp';
 import ManageAccountsSharpIcon from '@mui/icons-material/ManageAccountsSharp';
 import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabaseClient';
+import { GetServerSidePropsContext } from 'next';
+import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
-export default function HomePage()
+
+interface HomePageProps
 {
-	const supabase = useSupabaseClient();
-	const user = useUser();
+	user: User | null;
+}
+
+
+export default function HomePage({ user }: HomePageProps)
+{
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center bg-secondary">
 			{/* <LoadingBox content={<Image src='/favicon.png' width='128' height='128' alt='logo' />} /> */}
@@ -34,18 +42,17 @@ export default function HomePage()
 					<div className='flex-grow flex flex-col gap-3 items-center justify-center'>
 						<p className=''>Services</p>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
-							<InteractiveBox title='Customers' icon={<AttachMoneySharpIcon fontSize='large' />}  />
+							<InteractiveBox title='Customers (coming soon)' icon={<AttachMoneySharpIcon fontSize='large' />}  />
 							<Link href='/contacts'>
 								<InteractiveBox title='Contacts' icon={<PersonSharpIcon fontSize='large' />} />
 							</Link>
-							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
-						</div>
-						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
-							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
 							<Link href='/leads'>
 								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
 							</Link>
-							
+						</div>
+						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
+							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
+							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
 						</div>
 					</div>
@@ -53,6 +60,19 @@ export default function HomePage()
 			}
 		</div>
 	)
+}
+
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) =>
+{
+	const supabaseClient = createServerSupabaseClient(context);
+	const { data: { session }} = await supabaseClient.auth.getSession();
+
+	return {
+		props: {
+			user: session?.user ?? null
+		}
+	}
 }
 
 
