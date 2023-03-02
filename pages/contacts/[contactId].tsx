@@ -38,9 +38,11 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
             />
             <section className="w-full h-64 flex flex-row">
                 <div className="w-full flex flex-col">
-                    <input value={name} onChange={(e) => setName(e.target.value)} className="p-2 bg-transparent text-zinc-100 font-semibold text-4xl outline-none border-b-2 border-b-primary w-96 h-10" placeholder="Lead Name" />
+                    <p className="pb-2 bg-transparent text-zinc-100 font-semibold text-4xl outline-none border-b-2 border-b-primary w-96 h-10">
+                        {name}
+                    </p>
                     <div className="w-full flex flex-col">
-                        <textarea value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} 
+                        <textarea value={shortDescription}
                         className="px-2 pb-2 pt-4 bg-transparent text-zinc-100 outline-none font-medium w-2/3 h-[250px] max-h-[250px] min-h-[250px] scrollbar" placeholder="short description" />
                     </div>
                 </div>
