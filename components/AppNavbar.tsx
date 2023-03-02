@@ -6,7 +6,7 @@ export default function AppNavbar()
 {
 	const user = useUser();
     return (
-        <div className="w-full h-16 p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start">
+        <div className="w-full h-16 min-h-[64px] p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start">
             <Link href='/'>
                 <Image src='/logo.png' width='400' height='250' alt='logo' className="" />
             </Link>
@@ -17,7 +17,7 @@ export default function AppNavbar()
                         user.email
                     }
                     <Link href='/me'>
-                        <Image src='/profile.JPG' alt='profile' className="rounded-xl hover:shadow-sm hover:shadow-primary hover:cursor-pointer" width='64' height='64' />
+                        <Image src='/profile.JPG' alt='profile' className="rounded transition hover:border-[1px] hover:border-primary" width='64' height='64' />
                     </Link>
                 </section>
             }
