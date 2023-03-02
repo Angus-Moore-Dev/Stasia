@@ -1,13 +1,13 @@
-export class Lead
+import { Contact } from "./Contact";
+
+export class Lead extends Contact
 {
     id: string;
-    name: string;
-    previewImageURL: string;
-    created_at: string;
     stage: LeadStage;
 
     constructor(id: string, name: string, previewImageURL: string, created_at: string, leadStage: LeadStage)
     {
+        super();
         this.id = id;
         this.name = name;
         this.stage = leadStage;

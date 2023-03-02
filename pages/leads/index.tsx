@@ -16,23 +16,23 @@ interface LeadsPageProps
 export default function LeadsPage({ user, leads }: LeadsPageProps)
 {
     return (
-        <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
-            <section className="w-full flex flex-row items-center">
+        <div className="w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto">
+            <div className="w-full flex flex-row items-center">
                 <span>Leads Overview</span>
                 <Link href='/leads/new' className="ml-auto">
                     <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold">
                         New Lead
                     </button>
                 </Link>
-            </section>
-            <div className="w-full h-full rounded-xl p-4 flex flex-row flex-wrap items-center justify-center">
+            </div>
+            <div className="flex-grow w-full rounded-xl p-4 flex flex-row flex-wrap items-center justify-center">
                 <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary">
                     <p className="text-center font-medium">
                         Preparing
                     </p>
                     {
                         leads.filter(x => x.stage === LeadStage.PreparingForContact).map(lead => {
-                            return <Link key={lead.id} href={`/contacts/${lead.id}`} className="h-14 w-full text-zinc-100 bg-tertiary font-semibold px-4 flex flex-row items-center gap-2 rounded transition hover:text-secondary hover:bg-primary">
+                            return <Link key={lead.id} href={`/leads/edit/${lead.id}`} className="h-14 w-full text-zinc-100 bg-tertiary font-semibold px-4 flex flex-row items-center gap-2 rounded transition hover:text-secondary hover:bg-primary">
                                 <Image priority={true} src={lead.previewImageURL} alt={lead.name} width='40' height='40' className="object-cover" />
                                 <p>{lead.name}</p>
                             </Link>
@@ -45,7 +45,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                     </p>
                     {
                         leads.filter(x => x.stage === LeadStage.PossibleLead).map(lead => {
-                            return <Link key={lead.id} href={`/contacts/${lead.id}`} className="h-14 w-full text-zinc-100 bg-tertiary font-semibold px-4 flex flex-row items-center gap-2 rounded transition hover:text-secondary hover:bg-primary">
+                            return <Link key={lead.id} href={`/leads/edit/${lead.id}`} className="h-14 w-full text-zinc-100 bg-tertiary font-semibold px-4 flex flex-row items-center gap-2 rounded transition hover:text-secondary hover:bg-primary">
                                 <Image priority={true} src={lead.previewImageURL} alt={lead.name} width='40' height='40' className="object-cover" />
                                 <p>{lead.name}</p>
                             </Link>
@@ -58,7 +58,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                     </p>
                     {
                         leads.filter(x => x.stage === LeadStage.ProbableLead).map(lead => {
-                            return <Link key={lead.id} href={`/contacts/${lead.id}`} className="h-14 w-full text-zinc-100 bg-tertiary font-semibold px-4 flex flex-row items-center gap-2 rounded transition hover:text-secondary hover:bg-primary">
+                            return <Link key={lead.id} href={`/leads/edit/${lead.id}`} className="h-14 w-full text-zinc-100 bg-tertiary font-semibold px-4 flex flex-row items-center gap-2 rounded transition hover:text-secondary hover:bg-primary">
                                 <Image priority={true} src={lead.previewImageURL} alt={lead.name} width='40' height='40' className="object-cover" />
                                 <p>{lead.name}</p>
                             </Link>
@@ -73,10 +73,10 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                         {
                             leads.filter(x => x.stage === LeadStage.ContractSigned).map(lead => 
                             {
-                                return <div key={lead.id} className="h-14 w-full bg-primary text-secondary font-semibold px-4 flex flex-row items-center gap-2 rounded">
+                                return <Link href={`/leads/edit/${lead.id}`} key={lead.id} className="h-14 w-full bg-primary text-secondary font-semibold px-4 flex flex-row items-center gap-2 rounded">
                                     <Image priority={true} src={lead.previewImageURL} alt={lead.name} width='40' height='40' className="object-cover" />
                                     <p>{lead.name}</p>
-                                </div>
+                                </Link>
                             })
                         }
                     </div>

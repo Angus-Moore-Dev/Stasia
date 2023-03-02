@@ -26,7 +26,7 @@ export default function ContactPage({ user, contacts }: ContactPageProps)
                 </button>
             </Link>
         </div>
-        <div className="min-h-full w-full flex flex-col gap-4">
+        <div className="flex-grow w-full flex flex-col gap-4">
             <input value={searchForProfile} onChange={(e) => setSearchForProfile(e.target.value)} className="p-2 bg-tertiary text-zinc-100 font-medium border-b-[1px] border-b-primary outline-none w-1/2 rounded"
             placeholder="Search Contact List" />
             <div className="flex-grow flex flex-row flex-wrap gap-2">

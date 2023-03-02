@@ -1,28 +1,28 @@
 import Button from "@/components/common/Button";
 import { Contact } from "@/models/Contact";
-import { LeadStage } from "@/models/Lead";
+import { Lead, LeadStage } from "@/models/Lead";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
 import Image from 'next/image';
 import Link from "next/link";
 import { useState } from "react";
 
-interface CreateNewLeadProps
+interface EditLeadPageProps
 {
     user: User;
-    contact: Contact
+    contact: Lead;
 }
 
-export default function CreateNewLead({ user, contact }: CreateNewLeadProps)
+export default function EditLeadPage({ user, contact }: EditLeadPageProps)
 {
-    const [leadStage, setLeadStage] = useState<LeadStage>();
+    const [leadStage, setLeadStage] = useState<LeadStage>(contact.stage);
 
 
     return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row justify-between">
-            <Link href='/leads/new' className="mr-auto">
+            <Link href='/leads' className="mr-auto">
                 <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold">
-                    Back to Lead Selection
+                    Back to Leads
                 </button>
             </Link>
             {
@@ -109,9 +109,9 @@ export default function CreateNewLead({ user, contact }: CreateNewLeadProps)
             </section>
             <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold ml-auto mb-10"
             onClick={async () => {
-
+                alert('update existing lead');
             }}>
-                Create New Lead
+                Update Existing Lead
             </button>
         </div>
     </div>
@@ -121,15 +121,27 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 {
     const supabase = createServerSupabaseClient(context);
     const { data: { session }} = await supabase.auth.getSession();
-    const { data, error } = await supabase.from('contacts').select(`*`).eq('id', context.query['newLeadId'] as string).single();
-    const contact = data as Contact;
+    const { data, error } = await supabase.from('contacts').select(`*, leads ( stage )`).eq('id', context.query['leadId'] as string).single();
+    if (error || !data)
+    {
+        return {
+            redirect: {
+                permanent: false,
+                destination: '/leads'
+            }
+        }
+    }
+    const contact = data as Lead;
+    contact.stage = data?.leads.stage;
     console.log(data);
     contact.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contact.previewImageURL, 60)).data?.signedUrl ?? '';
+
+    
 
     return {
         props: {
             user: session?.user,
-            contact: data as Contact,
+            contact: data as Lead,
         }
     }
 }
