@@ -38,7 +38,7 @@ export default function NewContactPage({ user }: NewLeadPageProps)
     const imageButtonRef = useRef<HTMLInputElement>(null);
 
     return <div className="w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto">
-        <Link href='/contacts' className="">
+        <Link href='/contacts' className="mr-auto">
             <button className="px-2 py-1 rounded-lg text-primary font-semibold transition hover:text-secondary hover:bg-primary">
                 Back to Contacts
             </button>

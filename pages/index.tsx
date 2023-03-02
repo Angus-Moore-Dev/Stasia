@@ -5,13 +5,13 @@ import PersonOutlineSharpIcon from '@mui/icons-material/PersonOutlineSharp';
 import PersonSharpIcon from '@mui/icons-material/PersonSharp';
 import ChatBubbleSharpIcon from '@mui/icons-material/ChatBubbleSharp';
 import CalendarMonthSharpIcon from '@mui/icons-material/CalendarMonthSharp';
-import ManageAccountsSharpIcon from '@mui/icons-material/ManageAccountsSharp';
 import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import { GetServerSidePropsContext } from 'next';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
-
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import BadgeIcon from '@mui/icons-material/Badge';
 
 interface HomePageProps
 {
@@ -49,8 +49,10 @@ export default function HomePage({ user }: HomePageProps)
 							<Link href='/leads'>
 								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
 							</Link>
+							<InteractiveBox title='Staff (coming soon)' icon={<BadgeIcon fontSize='large' />}  />
 						</div>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
+							<InteractiveBox title='Files (coming soon)' icon={<AccountTreeIcon fontSize='large' />} />
 							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
@@ -61,6 +63,7 @@ export default function HomePage({ user }: HomePageProps)
 		</div>
 	)
 }
+
 
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) =>

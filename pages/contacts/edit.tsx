@@ -40,8 +40,6 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
     const [imagePreview, setImagePreview] = useState(contact ? contact.useablePreviewImageURL : '');
     const imageButtonRef = useRef<HTMLInputElement>(null);
 
-    
-
     return <div className="w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row justify-between">
             <Link href='/contacts'>
@@ -156,7 +154,7 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
                         <input value={location} onChange={(e) => setLocation(e.target.value)} className="text-zinc-100 bg-transparent p-2 outline-none w-full border-b-primary border-b-2" placeholder="Location (City, Country)" />
                     </div>
                     {
-                        imagePreview && name && shortDescription && (image && image.name !== contact?.previewImageURL) &&
+                        imagePreview && name && shortDescription && (image && image.name !== contact?.previewImageURL || (!image)) &&
                         <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold ml-auto"
                         onClick={async () => {
                             const newId = v4();

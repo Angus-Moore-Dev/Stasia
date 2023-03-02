@@ -18,15 +18,15 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
     return (
         <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
             <section className="w-full flex flex-row items-center">
-                <span>Overview</span>
+                <span>Leads Overview</span>
                 <Link href='/leads/new' className="ml-auto">
                     <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold">
                         New Lead
                     </button>
                 </Link>
             </section>
-            <div className="w-full rounded-xl p-4 flex flex-row flex-wrap items-center justify-center my-auto">
-                <div className="flex-1 min-w-[300px] h-96 border-r-[1px] border-primary">
+            <div className="w-full h-full rounded-xl p-4 flex flex-row flex-wrap items-center justify-center">
+                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary">
                     <p className="text-center font-medium">
                         Preparing
                     </p>
@@ -39,7 +39,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                         })
                     }
                 </div>
-                <div className="flex-1 min-w-[300px] h-96 border-r-[1px] border-primary px-1">
+                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary px-1">
                     <p className="text-center font-medium">
                         Possible Lead
                     </p>
@@ -52,7 +52,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                         })
                     }
                 </div>
-                <div className="flex-1 min-w-[300px] h-96 border-r-[1px] border-primary px-1">
+                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary px-1">
                     <p className="text-center font-medium">
                         Probable Lead
                     </p>
@@ -65,13 +65,14 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                         })
                     }
                 </div>
-                <div className="flex-1 min-w-[300px] h-96 flex flex-col">
+                <div className="flex-1 min-w-[300px] h-full flex flex-col">
                     <p className="text-center font-medium">
                         Contract Signed
                     </p>
                     <div className="w-full flex-grow px-1">
                         {
-                            leads.filter(x => x.stage === LeadStage.ContractSigned).map(lead => {
+                            leads.filter(x => x.stage === LeadStage.ContractSigned).map(lead => 
+                            {
                                 return <div className="h-14 w-full bg-primary text-secondary font-semibold px-4 flex flex-row items-center gap-2 rounded">
                                     <Image src={lead.previewImageURL} alt={lead.name} width='40' height='40' className="object-cover" />
                                     <p>{lead.name}</p>
@@ -119,7 +120,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     const leads: Lead[] = [];
     for (const lead of data as {stage: string, contacts: {id: string, name: string, previewImageURL: string, created_at: string}}[] ?? [])
     {
-        console.log('LOADING IN LEAD');
+        console.log('LOADING IN LEAD', lead);
         const existingLead = new Lead(lead.contacts.id, lead.contacts.name, lead.contacts.previewImageURL, lead.contacts.created_at, lead.stage as LeadStage);
         console.log(JSON.stringify(existingLead));
         leads.push(existingLead);
@@ -128,6 +129,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     for (const lead of leads)
     {
         lead.created_at = new Date(lead.created_at).toLocaleDateString();
+        lead.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(lead.previewImageURL, 10)).data?.signedUrl as string;
     }
 
     if (!session)
