@@ -14,22 +14,9 @@ To get started, you will need the following environment variables:
 
 Once you've done that, in your instance run `npm install && npm run dev` and things should be up and running at `http://localhost:3000/`
 
-## Setting up Your Supabase Instance
-todo
+# Adding New Customers
+Psychostasia's core logic surrounds contacts. Contacts are people that you have interacted with and want to document their existance in relation to your business.
 
-## File Storage
-todo
-
-## Project Management
-todo
-
-## Internal Communications
-todo
-
-## Customer Relationship Management
-todo
-
-## Customisation
-
+INSERT GIF HERE FOR CREATING A CONTACT
 
 
