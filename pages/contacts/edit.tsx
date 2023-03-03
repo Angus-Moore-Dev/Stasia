@@ -42,7 +42,7 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
 
     return <div className="w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row justify-between">
-            <Link href='/contacts'>
+            <Link href={`/contacts/${contact?.id}`}>
                 <button className="px-2 py-1 rounded-lg text-primary font-semibold transition hover:text-secondary hover:bg-primary">
                     Back to Contacts
                 </button>
@@ -242,7 +242,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     if (!context.query['id'])
     {
         return {
-            notFound: true
+            redirect: {
+                destination: '/contacts',
+                permanent: false
+            }
         }
     }
     if (context.query['id'])

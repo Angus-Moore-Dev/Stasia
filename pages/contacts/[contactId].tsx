@@ -137,12 +137,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 {
     const supabase = createServerSupabaseClient(context);
     const { data: { session }} = await supabase.auth.getSession();
-    const { data, error } = await supabase.from('contacts').select("*").eq('id', context.query['contactId'] as string).single();
-
-    const contact = data as Contact;
-    // console.log(contact);
-    contact.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL)).data?.publicUrl ?? '';
-
     if (!session)
     {
         return {
@@ -152,6 +146,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
             }
         }
     }
+    const { data, error } = await supabase.from('contacts').select("*").eq('id', context.query['contactId'] as string).single();
+
+    const contact = data as Contact;
+    // console.log(contact);
+    contact.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL)).data?.publicUrl ?? '';
+
+    
 
     return {
         props: {
