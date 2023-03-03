@@ -12,6 +12,7 @@ import PublicSharpIcon from '@mui/icons-material/PublicSharp';
 import { v4 } from "uuid";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 interface NewLeadPageProps
 {
@@ -36,7 +37,6 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
     const [linkedInURL, setLinkedInURL] = useState(contact ? contact.linkedInURL : '');
     const [location, setLocation] = useState(contact ? contact.location : '');
     const [associations, setAssociations] = useState(contact ? contact.organisations.join(',') : '');
-    const [currentStage, setcurrentStage] = useState<LeadStage>();
     const [imagePreview, setImagePreview] = useState(contact ? contact.useablePreviewImageURL : '');
     const imageButtonRef = useRef<HTMLInputElement>(null);
 
@@ -69,7 +69,7 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
             </div>
         </div>
         {
-            !imagePreview && !name && !shortDescription && !currentStage &&
+            !imagePreview && !name && !shortDescription &&
             <div className="flex-grow flex flex-col items-center justify-center">
                 <input ref={imageButtonRef} hidden type="file" accept="image/*" onChange={(e) => 
                 {
@@ -87,7 +87,7 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
             </div>
         }
         {
-            (imagePreview || name || shortDescription || currentStage) && 
+            (imagePreview || name || shortDescription) && 
             <section className="flex-grow flex flex-col w-full items-center justify-start">
                 <div className="flex flex-row gap-6 justify-center items-start pt-24">
                     <section>
@@ -173,6 +173,8 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
                                 }
                                 else
                                 {
+                                    // TODO: Switch this over to a Supabase trigger.
+                                    await supabase.storage.from('contacts.pictures').remove([contact?.previewImageURL as string]);
                                     imageURL = imageResponse.data.path;
                                 }
                             }
@@ -192,7 +194,18 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
 
                             if (response.status === 201 || response.status === 204)
                             {
-                                router.push(`/contacts/${contact?.id}`);
+                                toast.success('Contact Updated Successfully.', 
+                                {
+                                    position: "bottom-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                    theme: "colored",
+                                    style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
+                                });
                             }
                             else
                             {
@@ -218,8 +231,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     if (!session)
     {
         return {
-            redirect: '/401',
-            permanent: false
+            redirect: {
+                destination: '/sign-in',
+                permanent: false
+            }
         }
     }
 
@@ -235,8 +250,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
         contactData = await (await supabase.from('contacts').select('*').eq('id', context.query['id'] as string).single()).data as Contact;
         contactData.useablePreviewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contactData.previewImageURL, 60)).data?.signedUrl as string;
     }
-
-    console.log(contactData);
 
     return {
         props: {

@@ -1,6 +1,7 @@
 import { useUser } from "@supabase/auth-helpers-react";
 import Image from "next/image";
 import Link from "next/link";
+import logo from '../public/logo.png';
 
 export default function AppNavbar()
 {
@@ -8,7 +9,7 @@ export default function AppNavbar()
     return (
         <div className="w-full h-16 min-h-[64px] p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start">
             <Link href='/'>
-                <Image src='/logo.png' width='400' height='250' alt='logo' className="" />
+                <Image src={logo} placeholder="blur" width='400' height='250' alt='logo' className="" />
             </Link>
             {
                 user &&

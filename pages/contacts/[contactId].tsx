@@ -143,6 +143,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     // console.log(contact);
     contact.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contact.previewImageURL, 60)).data?.signedUrl ?? '';
 
+    if (!session)
+    {
+        return {
+            redirect: {
+                destination: '/sign-in',
+                permanent: false
+            }
+        }
+    }
+
     return {
         props: {
             user: session?.user,

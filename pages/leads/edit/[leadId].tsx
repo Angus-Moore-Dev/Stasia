@@ -1,4 +1,5 @@
 import Button from "@/components/common/Button";
+import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
 import { Lead, LeadStage } from "@/models/Lead";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
@@ -6,6 +7,8 @@ import { GetServerSidePropsContext } from "next";
 import Image from 'next/image';
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import css from "styled-jsx/css";
 
 interface EditLeadPageProps
 {
@@ -15,8 +18,7 @@ interface EditLeadPageProps
 
 export default function EditLeadPage({ user, contact }: EditLeadPageProps)
 {
-    const [leadStage, setLeadStage] = useState<LeadStage>(contact.stage);
-
+    const [contactData, setContactData] = useState(contact);
 
     return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row justify-between">
@@ -26,7 +28,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 </button>
             </Link>
             {
-                leadStage === LeadStage.ContractSigned &&
+                contactData.stage === LeadStage.ContractSigned &&
                 <div className="animate-pulse">
                     <Button text='Upgrade to Customer' onClick={() => {
                         alert('upgrade!');
@@ -47,7 +49,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                         {contact.name}
                     </p>
                     <div className="w-full flex flex-col">
-                        <textarea value={contact.description}
+                        <textarea value={contact.description} readOnly={true}
                         className="px-2 pb-2 pt-4 bg-transparent text-zinc-100 outline-none font-medium w-2/3 h-[250px] max-h-[250px] min-h-[250px] scrollbar" placeholder="short description" />
                     </div>
                 </div>
@@ -78,9 +80,9 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                     ].map(stage => {
                         return (
                             <button className="w-64 py-4 bg-tertiary text-zinc-100 transition hover:bg-primary hover:text-secondary font-semibold rounded aria-selected:bg-primary aria-selected:text-secondary"
-                            aria-selected={stage.stage === leadStage}
+                            aria-selected={stage.stage === contactData.stage}
                             onClick={() => {
-                                setLeadStage(stage.stage);
+                                setContactData({...contactData, stage: stage.stage});
                             }}>
                                 {
                                     stage.text
@@ -93,23 +95,48 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
             </section>
             <section className="flex flex-col">
                 <span>Initial Lead Contact</span>
-                <textarea value={'todo'} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
+                <textarea value={contactData.initialContact} onChange={(e) => setContactData({...contactData, initialContact: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
             </section>
             <section className="flex flex-col">
                 <span>Primary Lead Elevation Approach</span>
-                <textarea value={'todo'} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
+                <textarea value={contactData.primaryElevationApproach} onChange={(e) => setContactData({...contactData, primaryElevationApproach: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
             </section>
             <section className="flex flex-col">
                 <span>Secondary Lead Elevation Approach</span>
-                <textarea value={'todo'} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
+                <textarea value={contactData.secondaryElevationApproach} onChange={(e) => setContactData({...contactData, secondaryElevationApproach: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
             </section>
             <section className="flex flex-col">
                 <span>Other Comments (Tips for Interaction)</span>
-                <textarea value={'todo'} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
+                <textarea value={contactData.otherComments} onChange={(e) => setContactData({...contactData, otherComments: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
             </section>
             <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold ml-auto mb-10"
             onClick={async () => {
-                alert('update existing lead');
+                const result = await supabase.from('leads').update([
+                    {
+                        stage: contactData.stage,
+                        initialContact: contactData.initialContact,
+                        primaryElevationApproach: contactData.primaryElevationApproach,
+                        secondaryElevationApproach: contactData.secondaryElevationApproach,
+                        otherComments: contactData.otherComments
+                    }
+                ]).eq('id', contactData.id);
+                console.log(result);
+                if (result.status === 204)
+                {
+                    toast.success('Lead Updated Successfully.', 
+                    {
+                        position: "bottom-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
+                    });
+                }
+                
             }}>
                 Update Existing Lead
             </button>
@@ -121,8 +148,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 {
     const supabase = createServerSupabaseClient(context);
     const { data: { session }} = await supabase.auth.getSession();
-    const { data, error } = await supabase.from('contacts').select(`*, leads ( stage )`).eq('id', context.query['leadId'] as string).single();
-    if (error || !data)
+    const { data, error } = await supabase.from('contacts').select(`*, leads ( stage, initialContact, primaryElevationApproach, secondaryElevationApproach, otherComments )`).eq('id', context.query['leadId'] as string).single();
+    if (error)
+    {
+        return {
+            redirect: {
+                permanent: false,
+                destination: '/500'
+            }
+        }
+    }
+
+    if (!data)
     {
         return {
             redirect: {
@@ -131,13 +168,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
             }
         }
     }
+
     const contact = data as Lead;
-    contact.stage = data?.leads.stage;
-    console.log(data);
+    console.log(data.leads);
+    contact.initialContact = data.leads.initialContact as string;
+    contact.primaryElevationApproach = data.leads.primaryElevationApproach as string;
+    contact.secondaryElevationApproach = data.leads.secondaryElevationApproach as string;
+    contact.otherComments = data.leads.otherComments as string;
+    contact.stage = data.leads.stage as LeadStage;
     contact.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contact.previewImageURL, 60)).data?.signedUrl ?? '';
-
-    
-
+    // console.log(contact);
     return {
         props: {
             user: session?.user,

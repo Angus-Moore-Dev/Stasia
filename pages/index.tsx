@@ -12,6 +12,7 @@ import { GetServerSidePropsContext } from 'next';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import BadgeIcon from '@mui/icons-material/Badge';
+import SignInPage from '@/components/SignInPage';
 
 interface HomePageProps
 {
@@ -24,18 +25,6 @@ export default function HomePage({ user }: HomePageProps)
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center bg-secondary">
 			{/* <LoadingBox content={<Image src='/favicon.png' width='128' height='128' alt='logo' />} /> */}
-			{
-				!user &&
-				<Auth supabaseClient={supabase} appearance={
-					{ 
-						style: {
-							container: { width: '25vw', minWidth: '350px', maxWidth: '50vw' },
-							button: { background: '#00ff48', color: '#0e0e0e', fontWeight: '900'}
-						},
-						theme: ThemeSupa,
-					}
-				} theme="dark" />
-			}
 			{
 				user &&
 				<div className='flex-grow flex flex-col p-8 w-full max-w-[1920px]'>
@@ -70,7 +59,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 {
 	const supabaseClient = createServerSupabaseClient(context);
 	const { data: { session }} = await supabaseClient.auth.getSession();
-
+	if (!session)
+	{
+		return {
+			redirect: {
+				destination: '/sign-in',
+				permanent: false
+			}
+		}
+	}
 	return {
 		props: {
 			user: session?.user ?? null

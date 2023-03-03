@@ -3,6 +3,10 @@ import { Contact } from "./Contact";
 export class Lead extends Contact
 {
     id: string;
+    initialContact: string = '';
+    primaryElevationApproach: string = '';
+    secondaryElevationApproach: string = '';
+    otherComments: string = '';
     stage: LeadStage;
 
     constructor(id: string, name: string, previewImageURL: string, created_at: string, leadStage: LeadStage)

@@ -26,7 +26,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                 </Link>
             </div>
             <div className="flex-grow w-full rounded-xl p-4 flex flex-row flex-wrap items-center justify-center">
-                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary">
+                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary px-1 flex flex-col gap-2">
                     <p className="text-center font-medium">
                         Preparing
                     </p>
@@ -39,7 +39,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                         })
                     }
                 </div>
-                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary px-1">
+                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary px-1 flex flex-col gap-2">
                     <p className="text-center font-medium">
                         Possible Lead
                     </p>
@@ -52,7 +52,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                         })
                     }
                 </div>
-                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary px-1">
+                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary px-1 flex flex-col gap-2">
                     <p className="text-center font-medium">
                         Probable Lead
                     </p>
@@ -69,7 +69,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                     <p className="text-center font-medium">
                         Contract Signed
                     </p>
-                    <div className="w-full flex-grow px-1">
+                    <div className="w-full flex-grow px-1 flex flex-col gap-2">
                         {
                             leads.filter(x => x.stage === LeadStage.ContractSigned).map(lead => 
                             {
@@ -123,7 +123,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     {
         return {
             redirect: {
-                destination: '/401',
+                destination: '/sign-in',
                 permanent: false
             }
         }
