@@ -51,7 +51,7 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
         </div>
         <div className="flex flex-col gap-2 mx-auto max-w-6xl w-full">
             {
-                contact.organisations &&
+                contact.organisations.length > 0 && contact.organisations.filter(x => x !== '').length > 0 &&
                 <div className="flex flex-row gap-2 items-center relative">
                     <span className="text-primary h-full"><BusinessSharpIcon fontSize="small" /></span>
                     <div className="flex flex-col flex-wrap gap-[2p1] w-64">

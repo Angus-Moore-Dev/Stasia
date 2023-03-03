@@ -60,6 +60,7 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
                     <button className="px-2 py-1 rounded-lg text-red-500 font-semibold transition hover:text-zinc-100 hover:bg-red-500"
                     onMouseLeave={() => {setDeleteHover(false)}}
                     onClick={async () => {
+                        await supabase.storage.from('contacts.pictures').remove([contact?.previewImageURL as string]);
                         const res = await supabase.from('contacts').delete().eq('id', contact?.id);
                         if (res.error)
                         {
