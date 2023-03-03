@@ -42,7 +42,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 
     for (const contact of data?.filter(x => x.leads === null) ?? [])
     {
-        contact.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contact.previewImageURL, 60)).data?.signedUrl ?? '';
+        contact.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL)).data?.publicUrl ?? '';
         contacts.push(contact as Contact);
     }
 

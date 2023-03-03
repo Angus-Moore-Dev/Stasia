@@ -176,7 +176,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     contact.secondaryElevationApproach = data.leads.secondaryElevationApproach as string;
     contact.otherComments = data.leads.otherComments as string;
     contact.stage = data.leads.stage as LeadStage;
-    contact.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contact.previewImageURL, 60)).data?.signedUrl ?? '';
+    contact.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL)).data?.publicUrl ?? '';
     // console.log(contact);
     return {
         props: {

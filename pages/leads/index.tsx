@@ -116,7 +116,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     for (const lead of leads)
     {
         lead.created_at = new Date(lead.created_at).toLocaleDateString();
-        lead.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(lead.previewImageURL, 10)).data?.signedUrl as string;
+        lead.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(lead.previewImageURL)).data?.publicUrl as string;
     }
 
     if (!session)

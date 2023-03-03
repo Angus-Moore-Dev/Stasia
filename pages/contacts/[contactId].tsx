@@ -141,7 +141,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 
     const contact = data as Contact;
     // console.log(contact);
-    contact.previewImageURL = (await supabase.storage.from('contacts.pictures').createSignedUrl(contact.previewImageURL, 60)).data?.signedUrl ?? '';
+    contact.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL)).data?.publicUrl ?? '';
 
     if (!session)
     {
