@@ -6,6 +6,7 @@ import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs"
 import { GetServerSidePropsContext } from "next";
 import Image from 'next/image';
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import css from "styled-jsx/css";
@@ -18,6 +19,7 @@ interface EditLeadPageProps
 
 export default function EditLeadPage({ user, contact }: EditLeadPageProps)
 {
+    const router = useRouter();
     const [contactData, setContactData] = useState(contact);
 
     return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
@@ -55,7 +57,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 </div>
             </section>
         </div>
-        <div className="w-full max-w-6xl flex-grow flex flex-col gap-6">
+        <div className="w-full max-w-6xl flex-grow flex flex-col gap-4">
             <section>
                 <span>Lead Stage</span>
                 <div className="flex flex-row flex-wrap gap-2 items-center">
@@ -109,37 +111,77 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 <span>Other Comments (Tips for Interaction)</span>
                 <textarea value={contactData.otherComments} onChange={(e) => setContactData({...contactData, otherComments: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
             </section>
-            <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold ml-auto mb-10"
-            onClick={async () => {
-                const result = await supabase.from('leads').update([
+            <div className="w-full flex flex-row justify-between">
+                <button className="px-4 py-1 rounded-lg bg-secondary text-red-500 transition hover:bg-red-500 hover:text-zinc-100 font-bold mb-10"
+                onClick={async () => {
+                    const res = await supabase.from('leads').delete().eq('id', contactData.id);
+                    console.log('deletion lead::', res);
+                    if (res.status !== 204)
                     {
-                        stage: contactData.stage,
-                        initialContact: contactData.initialContact,
-                        primaryElevationApproach: contactData.primaryElevationApproach,
-                        secondaryElevationApproach: contactData.secondaryElevationApproach,
-                        otherComments: contactData.otherComments
+                        toast.error(res?.error?.message, 
+                        {
+                            position: "bottom-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "colored",
+                            style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
+                        });
                     }
-                ]).eq('id', contactData.id);
-                console.log(result);
-                if (result.status === 204)
-                {
-                    toast.success('Lead Updated Successfully.', 
+                    else
                     {
-                        position: "bottom-right",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "colored",
-                        style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
-                    });
-                }
-                
-            }}>
-                Update Existing Lead
-            </button>
+                        toast.success('Lead Deleted Successfully.', 
+                        {
+                            position: "bottom-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "colored",
+                            style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
+                        });
+                        router.push('/leads');
+                    }
+                }}>
+                    Delete Lead
+                </button>
+                <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold mb-10"
+                onClick={async () => {
+                    const result = await supabase.from('leads').update([
+                        {
+                            stage: contactData.stage,
+                            initialContact: contactData.initialContact,
+                            primaryElevationApproach: contactData.primaryElevationApproach,
+                            secondaryElevationApproach: contactData.secondaryElevationApproach,
+                            otherComments: contactData.otherComments
+                        }
+                    ]).eq('id', contactData.id);
+                    console.log(result);
+                    if (result.status === 204)
+                    {
+                        toast.success('Lead Updated Successfully.', 
+                        {
+                            position: "bottom-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                            theme: "colored",
+                            style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
+                        });
+                    }
+                    
+                }}>
+                    Update Existing Lead
+                </button>
+            </div>
         </div>
     </div>
 }
@@ -148,7 +190,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 {
     const supabase = createServerSupabaseClient(context);
     const { data: { session }} = await supabase.auth.getSession();
-    const { data, error } = await supabase.from('contacts').select(`*, leads ( stage, initialContact, primaryElevationApproach, secondaryElevationApproach, otherComments )`).eq('id', context.query['leadId'] as string).single();
+    const { data, error } = await supabase.from('contacts').select(`*, leads ( id, stage, initialContact, primaryElevationApproach, secondaryElevationApproach, otherComments )`).eq('id', context.query['leadId'] as string).single();
     if (error)
     {
         return {
@@ -170,7 +212,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     }
 
     const contact = data as Lead;
-    console.log(data.leads);
+    console.log('leads::', data.leads);
+    contact.id = data.leads.id as string;
     contact.initialContact = data.leads.initialContact as string;
     contact.primaryElevationApproach = data.leads.primaryElevationApproach as string;
     contact.secondaryElevationApproach = data.leads.secondaryElevationApproach as string;

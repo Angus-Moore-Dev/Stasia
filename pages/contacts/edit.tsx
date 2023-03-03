@@ -60,8 +60,26 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
                     <button className="px-2 py-1 rounded-lg text-red-500 font-semibold transition hover:text-zinc-100 hover:bg-red-500"
                     onMouseLeave={() => {setDeleteHover(false)}}
                     onClick={async () => {
-                        await supabase.from('contacts').delete().eq('id', contact?.id);
-                        router.push('/contacts');
+                        const res = await supabase.from('contacts').delete().eq('id', contact?.id);
+                        if (res.error)
+                        {
+                            toast.error(res.error.message, 
+                            {
+                                position: "bottom-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored",
+                                style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
+                            });
+                        }
+                        else
+                        {
+                            router.push('/contacts');
+                        }
                     }}>
                         Warning, this is permanent!
                     </button>
