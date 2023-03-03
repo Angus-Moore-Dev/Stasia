@@ -15,7 +15,7 @@ export default function SignInPage()
     const [isSigningIn, setIsSigningIn] = useState(false);
 
     return <div className="h-full w-full max-w-6xl flex flex-col items-center justify-center mx-auto">
-        <form className="flex flex-col gap-4 p-4 rounded-lg bg-tertiary h-1/2 justify-start">
+        <form className="flex flex-col gap-4 p-4 rounded-lg bg-tertiary  justify-start">
             <div>
                 <Image placeholder="blur" src={logo} alt='logo' height='600' width='500' className="mb-24" />
             </div>
