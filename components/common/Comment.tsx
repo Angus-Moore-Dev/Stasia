@@ -38,11 +38,11 @@ export function CommentBox({ comment }: CommentBoxProps)
             </div>
             {
                 !editComment &&
-                <p style={{ fontFamily: 'Rajdhani', display: 'inline' }} className="">
+                <pre style={{ fontFamily: 'Rajdhani', display: 'inline' }} className="">
                     {
                         comment.message
                     }
-                </p>
+                </pre>
             }
             {
                 editComment &&
