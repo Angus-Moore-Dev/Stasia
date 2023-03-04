@@ -77,6 +77,7 @@ export default function File({ file, setFolderListId, activeContextMenu, setActi
                 }
             </div>
         </div>
+        {/* This is the popup box that appears on a given file */}
         <div hidden={!showContextMenu || activeContextMenu !== divId} className='w-64 h-96 absolute bg-quaternary z-40 rounded'
         style={{
             top: mousePositionOnScreen.y + 2,

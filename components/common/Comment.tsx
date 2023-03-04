@@ -25,6 +25,7 @@ export function CommentBox({ comment }: CommentBoxProps)
                     <div className="flex-grow flex justify-end items-center gap-4 -mt-1">
                         <button className="rounded font-medium text-zinc-100 transition hover:text-primary text-xs px-2" onClick={() => {
                             setEditComment(true);
+                            setEditCommentText(comment.message);
                         }}>
                             Edit
                         </button>
@@ -47,8 +48,17 @@ export function CommentBox({ comment }: CommentBoxProps)
             {
                 editComment &&
                 <>
-                    <textarea value={editCommentText} onChange={(e) => setEditCommentText(e.target.value)} className="bg-transparent outline-none"/>
-                    <small>press <button onClick={() => setEditComment(false)}><b>escape</b></button> to cancel, <button><b>enter</b></button> to save.</small>
+                    <textarea value={editCommentText} onChange={(e) => setEditCommentText(e.target.value)} className="bg-transparent outline-none h-48"/>
+                    <small>press <button onClick={() => {setEditComment(false); setEditCommentText('');}}><b>escape</b></button> to cancel, <button onClick={async () => {
+                        // update the message.
+                        if (editCommentText !== comment.message)
+                        {
+                            await supabase.from('lead_comments').update([{
+                                message: editCommentText
+                            }]).eq('id', comment.id);
+                            setEditComment(false);
+                        }
+                    }}><b>enter</b></button> to save.</small>
                 </>
             }
         </div>

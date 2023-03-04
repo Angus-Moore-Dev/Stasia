@@ -48,7 +48,6 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 setCommentsIsLoading(false);
                 const channel = supabase.channel('table-db-changes')
                 .on('postgres_changes', {event: '*', schema: 'public', table: 'lead_comments'}, (payload) => {
-                    console.log(payload);
                     if (payload.eventType === 'INSERT')
                     {
                         const message = payload.new as Comment;
@@ -57,6 +56,12 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                             // ADD THIS MESSAGE ONTO THE LIST!
                             updateMessage(message);
                         }
+                    }
+                    else if (payload.eventType === 'UPDATE')
+                    {
+                        let commentsTmp = [...comments];
+                        commentsTmp[commentsTmp.findIndex(x => x.id === payload.new.id)].message = payload.new.message;
+                        setComments(commentsTmp);
                     }
                     else if (payload.eventType === 'DELETE')
                     {
