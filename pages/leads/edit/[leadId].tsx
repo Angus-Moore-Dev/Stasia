@@ -42,7 +42,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
         const fetchComments = async() => {
             if (viewComments && !comments)
             {
-                const { data, error } = await supabase.from('lead_comments').select('*');
+                const { data, error } = await supabase.from('lead_comments').select('*').eq('leadId', contact.id);
                 const comments =  data as Comment[];
                 setComments(comments);
                 setCommentsIsLoading(false);
