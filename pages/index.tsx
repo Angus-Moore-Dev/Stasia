@@ -24,7 +24,6 @@ export default function HomePage({ user }: HomePageProps)
 {
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center bg-secondary">
-			{/* <LoadingBox content={<Image src='/favicon.png' width='128' height='128' alt='logo' />} /> */}
 			{
 				user &&
 				<div className='min-h-full flex-grow flex flex-col p-8 w-full max-w-[1920px]'>
@@ -40,12 +39,12 @@ export default function HomePage({ user }: HomePageProps)
 							<Link href='/leads'>
 								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
 							</Link>
-							<Link href='chat'>
-								<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
-							</Link>
+							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
 						</div>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
-							<InteractiveBox title='Files (coming soon)' icon={<AccountTreeIcon fontSize='large' />} />
+							<Link href='/files'>
+								<InteractiveBox title='Files (coming soon)' icon={<AccountTreeIcon fontSize='large' />} />
+							</Link>
 							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Staff (coming soon)' icon={<BadgeIcon fontSize='large' />}  />

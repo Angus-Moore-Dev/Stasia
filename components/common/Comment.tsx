@@ -48,7 +48,7 @@ export function CommentBox({ comment }: CommentBoxProps)
                 editComment &&
                 <>
                     <textarea value={editCommentText} onChange={(e) => setEditCommentText(e.target.value)} className="bg-transparent outline-none"/>
-                    <small>press <b>escape</b> to cancel, <b>enter</b> to save.</small>
+                    <small>press <button onClick={() => setEditComment(false)}><b>escape</b></button> to cancel, <button><b>enter</b></button> to save.</small>
                 </>
             }
         </div>
