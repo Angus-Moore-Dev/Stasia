@@ -18,7 +18,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
     return (
         <div className="w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto">
             <div className="w-full flex flex-row items-center">
-                <span>Leads Overview</span>
+                <span>Leads - All Prospective Contacts</span>
                 <Link href='/leads/new' className="ml-auto">
                     <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold">
                         New Lead

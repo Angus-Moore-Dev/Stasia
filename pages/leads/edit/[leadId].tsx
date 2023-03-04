@@ -1,15 +1,19 @@
+import LoadingBox from "@/components/LoadingBox";
 import Button from "@/components/common/Button";
+import { CommentBox } from "@/components/common/Comment";
 import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
 import { Lead, LeadStage } from "@/models/Lead";
+import { Comment } from "@/models/chat/Comment";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
 import Image from 'next/image';
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import css from "styled-jsx/css";
+import { v4 } from "uuid";
 
 interface EditLeadPageProps
 {
@@ -21,6 +25,55 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
 {
     const router = useRouter();
     const [contactData, setContactData] = useState(contact);
+    const [viewComments, setViewComments] = useState(false);
+    const [messagetoSendContents, setMessagetoSendContents] = useState('');
+    const [comments, setComments] = useState<Comment[]>();
+    const [commentsIsLoading, setCommentsIsLoading] = useState(true);
+    const updateMessage = useCallback((comment: Comment) => 
+    {
+        setComments(comments => [...comments ?? [], comment]);
+    }, []);
+    const removeMessage = useCallback((id: string) => 
+    {
+        setComments(comments => [...comments?.filter(x => x.id !== id) ?? []]);
+    }, []);
+
+    useEffect(() => {
+        const fetchComments = async() => {
+            if (viewComments && !comments)
+            {
+                const { data, error } = await supabase.from('lead_comments').select('*');
+                const comments =  data as Comment[];
+                setComments(comments);
+                setCommentsIsLoading(false);
+                const channel = supabase.channel('table-db-changes')
+                .on('postgres_changes', {event: '*', schema: 'public', table: 'lead_comments'}, (payload) => {
+                    console.log(payload);
+                    if (payload.eventType === 'INSERT')
+                    {
+                        const message = payload.new as Comment;
+                        if (message.leadId === contact.id)
+                        {
+                            // ADD THIS MESSAGE ONTO THE LIST!
+                            updateMessage(message);
+                        }
+                    }
+                    else if (payload.eventType === 'DELETE')
+                    {
+                        const deletedId = payload.old.id as string;
+                        removeMessage(deletedId);
+                    }
+                }).subscribe((status) => {
+                    console.log(status);
+                    if (status === 'CLOSED')
+                    {
+                        channel.subscribe();
+                    }
+                });
+            }
+        }
+        fetchComments();
+    }, [viewComments]);
 
     return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row justify-between">
@@ -38,14 +91,14 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 </div>
             }
         </div>
-        <div className="flex flex-row gap-4 justify-center items-center mx-auto max-w-6xl w-full">
+        <div className="flex flex-row flex-wrap gap-4 justify-center items-center mx-auto max-w-6xl w-full">
             <Image 
             src={contact.previewImageURL} 
             alt='Contact Image' 
             width='500' height='500' 
             className="w-64 h-64 min-w-[256px] min-h-[256px] rounded-md border-2 border-primary object-cover" 
             />
-            <section className="w-full h-64 flex flex-row">
+            <section className="flex-grow h-64 flex flex-row">
                 <div className="w-full flex flex-col">
                     <p className="pb-2 bg-transparent text-zinc-100 font-semibold text-4xl outline-none border-b-2 border-b-primary w-96 h-10">
                         {contact.name}
@@ -95,22 +148,75 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 }
                 </div>
             </section>
-            <section className="flex flex-col">
-                <span>Initial Lead Contact</span>
-                <textarea value={contactData.initialContact} onChange={(e) => setContactData({...contactData, initialContact: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
-            </section>
-            <section className="flex flex-col">
-                <span>Primary Lead Elevation Approach</span>
-                <textarea value={contactData.primaryElevationApproach} onChange={(e) => setContactData({...contactData, primaryElevationApproach: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
-            </section>
-            <section className="flex flex-col">
-                <span>Secondary Lead Elevation Approach</span>
-                <textarea value={contactData.secondaryElevationApproach} onChange={(e) => setContactData({...contactData, secondaryElevationApproach: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
-            </section>
-            <section className="flex flex-col">
-                <span>Other Comments (Tips for Interaction)</span>
-                <textarea value={contactData.otherComments} onChange={(e) => setContactData({...contactData, otherComments: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
-            </section>
+            <div className="w-full flex flex-row gap-2">
+                <Button text='Manage' onClick={() => {setViewComments(false)}} className="aria-selected:bg-primary aria-selected:text-secondary w-44" ariaSelected={!viewComments} />
+                <Button text='Comments' onClick={() => {setViewComments(true)}} className="aria-selected:bg-primary aria-selected:text-secondary w-44" ariaSelected={viewComments} />
+            </div>
+            {
+                viewComments &&
+                <div className="w-full flex-grow flex flex-col">
+                    <section className="flex-grow flex flex-col gap-1 overflow-y-auto max-h-[40vh] scrollbar mb-4">
+                        {
+                            commentsIsLoading &&
+                            <div className="flex-grow flex items-center justify-center">
+                                <LoadingBox />
+                            </div>
+                        }
+                        {
+                            comments && comments.length > 0 && !commentsIsLoading && comments.map(comment => <CommentBox comment={comment} />)
+                        }
+                        {
+                            comments && comments.length === 0 && !commentsIsLoading &&
+                            <div className='flex-grow flex items-center justify-center'>
+                                <p>No comments.</p>
+                            </div>
+                        }
+                    </section>
+                    <section className="h-14 flex flex-row items-center">
+                    <textarea 
+                        value={messagetoSendContents} 
+                        onChange={(e) => setMessagetoSendContents(e.target.value)} 
+                        className="p-2 w-full bg-tertiary text-zinc-100 font-medium rounded outline-none"
+                        placeholder={`Comment on ${contact.name}`} 
+                        onKeyDown={async (e) => {
+                            if (e.key === 'Enter' && !e.shiftKey)
+                            {
+                                e.preventDefault();
+                                const messageData = `${messagetoSendContents}`;
+                                setMessagetoSendContents('');
+                                const res = await supabase.from('lead_comments').insert([{
+                                    id: v4(),
+                                    senderId: user.id,
+                                    leadId: contact.id,
+                                    message: messageData
+                                }]);
+                            }
+                        }}
+                    />
+                    </section>
+                </div>
+            }
+            {
+                !viewComments &&
+                <>
+                <section className="flex flex-col">
+                    <span>Initial Lead Contact</span>
+                    <textarea value={contactData.initialContact} onChange={(e) => setContactData({...contactData, initialContact: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
+                </section>
+                <section className="flex flex-col">
+                    <span>Primary Lead Elevation Approach</span>
+                    <textarea value={contactData.primaryElevationApproach} onChange={(e) => setContactData({...contactData, primaryElevationApproach: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
+                </section>
+                <section className="flex flex-col">
+                    <span>Secondary Lead Elevation Approach</span>
+                    <textarea value={contactData.secondaryElevationApproach} onChange={(e) => setContactData({...contactData, secondaryElevationApproach: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
+                </section>
+                <section className="flex flex-col">
+                    <span>Other Comments (Tips for Interaction)</span>
+                    <textarea value={contactData.otherComments} onChange={(e) => setContactData({...contactData, otherComments: e.target.value})} className="p-4 rounded bg-tertiary text-zinc-100 font-medium outline-none resize-none h-80 w-full border-b-primary border-b-2 scrollbar" />
+                </section>
+                </>
+            }
             <div className="w-full flex flex-row justify-between">
                 <button className="px-4 py-1 rounded-lg bg-secondary text-red-500 transition hover:bg-red-500 hover:text-zinc-100 font-bold mb-10"
                 onClick={async () => {

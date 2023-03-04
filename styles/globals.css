@@ -5,19 +5,19 @@
 
 @layer utilities {
   .scrollbar::-webkit-scrollbar {
-      width: 20px;
+      width: 10px;
       height: 20px;
       direction: rtl;
   }
 
   .scrollbar::-webkit-scrollbar-track {
-      background: #090909;
+      background: transparent;
   }
 
   .scrollbar::-webkit-scrollbar-thumb {
       background: #00fe49;
       border-radius: 8px;
-      border: 6px solid #090909;
+      border: 6px solid transparent;
   }
 
   .scrollbar::-webkit-scrollbar-thumb:hover {

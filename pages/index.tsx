@@ -31,20 +31,24 @@ export default function HomePage({ user }: HomePageProps)
 					<div className='flex-grow flex flex-col gap-3 items-center justify-center'>
 						<p className=''>Services</p>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
-							<InteractiveBox title='Customers (coming soon)' icon={<AttachMoneySharpIcon fontSize='large' />}  />
+							<Link href='/customers'>
+								<InteractiveBox title='Customers (coming soon)' icon={<AttachMoneySharpIcon fontSize='large' />}  />
+							</Link>
 							<Link href='/contacts'>
 								<InteractiveBox title='Contacts' icon={<PersonSharpIcon fontSize='large' />} />
 							</Link>
 							<Link href='/leads'>
 								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
 							</Link>
-							<InteractiveBox title='Staff (coming soon)' icon={<BadgeIcon fontSize='large' />}  />
+							<Link href='chat'>
+								<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
+							</Link>
 						</div>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
 							<InteractiveBox title='Files (coming soon)' icon={<AccountTreeIcon fontSize='large' />} />
 							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
-							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
+							<InteractiveBox title='Staff (coming soon)' icon={<BadgeIcon fontSize='large' />}  />
 						</div>
 					</div>
 				</div>
