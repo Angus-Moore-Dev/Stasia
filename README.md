@@ -16,7 +16,9 @@ Once you've done that, in your instance run `npm install && npm run dev` and thi
 
 # Adding New Contacts
 Psychostasia's core logic surrounds contacts. Contacts are people that you have interacted with and want to document their existance in relation to your business.
+
 ![ezgif-1-d3849ff91d](https://user-images.githubusercontent.com/99398403/222891295-12925e83-1297-42d7-85c9-cb8f6ee3c05f.gif)
+
 The purpose of doing this is to create a digital repository of any contact you've had with your business associates, partners or anyone that you want to keep details in a central and aesthetic place (more work is being done on this for customers, relationship types, organisations, however this will be coming soon).
 
 
