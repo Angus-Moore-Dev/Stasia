@@ -16,18 +16,26 @@ import { ToastContainer } from 'react-toastify';
 export default function App({ Component, pageProps }: AppProps) {
 	const [supabase] = useState(() => createBrowserSupabaseClient());
 	const [loading, setLoading] = useState(false);
+	const [pageName, setPageName] = useState('');
 
 	useEffect(() => 
 	{
-		const start = () => {
+		const start = (url: string) => {
+			setPageName(url.split('/')[1]);
 			setLoading(true);
 		};
-		const end = () => {
+		const end = (url: string) => {
 			setLoading(false);
 		};
 		Router.events.on("routeChangeStart", start);
 		Router.events.on("routeChangeComplete", end);
 		Router.events.on("routeChangeError", end);
+
+		window.onbeforeunload = function() {
+			// Currently sessionStorage is only being used for Blob URL caching, so it's safe to use this to revoke URLs
+			sessionStorage.clear();
+		}
+
 		return () => {
 			Router.events.off("routeChangeStart", start);
 			Router.events.off("routeChangeComplete", end);
@@ -47,7 +55,7 @@ export default function App({ Component, pageProps }: AppProps) {
 						loading && 
 						<div className='flex-grow h-full flex flex-col gap-2 items-center justify-center'>
 							<LoadingBox content={<Image src='/favicon.ico' alt='logo' width='40' height='40' />} />
-							<small>Hold tight choom...</small>
+							<small className='capitalize'>Loading {pageName}</small>
 						</div>
 					}
 					{

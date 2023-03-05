@@ -1,6 +1,7 @@
 import LoadingBox from "@/components/LoadingBox";
 import Button from "@/components/common/Button";
 import File from "@/components/files/File";
+import FileUploadModal from "@/components/files/FileUploadModal";
 import { supabase } from "@/lib/supabaseClient";
 import { FileData } from "@/models/files/FileMetadata";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
@@ -20,6 +21,11 @@ export default function FilesPage({ user }: FilesPageProps)
 	const [currentFolderId, setCurrentFolderId] = useState('');
 	const [activeContextMenu, setactiveContextMenu] = useState(''); // always set away
 	const [isLoading, setIsLoading] = useState(true);
+
+	// Modals
+	const [showNewFolderModal, setShowNewFolderModal] = useState(false);
+	const [showFileUploadModal, setShowFileUploadModal] = useState(false);
+	const [showNewFileModal, setShowNewFileModal] = useState(false);
 
 	const listFiles = async () => 
 	{
@@ -48,8 +54,9 @@ export default function FilesPage({ user }: FilesPageProps)
 		<div className="w-full flex items-center gap-2">
 			<span className="mr-auto">Files</span>
 			<Button text='New Folder' onClick={() => { }} />
-			<Button text='Upload File' onClick={() => { }} />
+			<Button text='Upload File' onClick={() => setShowFileUploadModal(true)} />
 			<Button text='New File' onClick={() => { }} />
+			<FileUploadModal show={showFileUploadModal} setShow={setShowFileUploadModal} filePath={currentFolderId} />
 		</div>
 		<div className="w-full mx-auto flex-grow flex flex-col bg-tertiary rounded">
 			<span className="px-8 bg-quaternary py-4 rounded-t font-medium">

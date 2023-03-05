@@ -10,6 +10,9 @@ import EditSharpIcon from '@mui/icons-material/EditSharp';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import DeleteSharpIcon from '@mui/icons-material/DeleteSharp';
 import VisibilitySharpIcon from '@mui/icons-material/VisibilitySharp';
+import ImagePreviewModal from './ImagePreviewModal';
+import VideoPreviewModal from './VideoPreviewModal';
+import InsertDriveFileSharpIcon from '@mui/icons-material/InsertDriveFileSharp';
 
 interface FileProps
 {
@@ -26,9 +29,13 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
     const [isFolder] = useState(!file.metadata || file.metadata === null);
     const [showContextMenu, setShowContextMenu] = useState(false);
     const [mousePositionOnScreen, setMousePositionOnScreen] = useState<{x: number, y: number}>({x: 0, y: 0});
-    console.log(file.metadata);
+
+    const [imageModal, setImageModal] = useState(false);
+    const [videoModal, setVideoModal] = useState(false);
     const readableFileType = isFolder ? 'Folder' : file.metadata?.mimetype.includes('video') ? 'Video' : file.metadata?.mimetype.includes('image') ? 'Image' : 'File';
     return <>
+        <ImagePreviewModal show={imageModal} setShow={setImageModal} file={file} filePath={currentFolderId} />
+        <VideoPreviewModal show={videoModal} setShow={setVideoModal} file={file} filePath={currentFolderId} />
         <div className={`relative select-none w-full px-8 py-4 flex flex-row gap-4 flex-wrap items-center transition hover:bg-quaternary hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
         onContextMenuCapture={(e) => e.preventDefault()}
         onDoubleClick={async () => {
@@ -42,8 +49,10 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
             }
             else
             {
-                alert('not folder clicked!');
-                // Trigger image preview.
+                if (file.metadata.mimetype.includes('image/'))
+                    setImageModal(true);
+                else if (file.metadata.mimetype.includes('video/'))
+                    setVideoModal(true);
             }
         }}
         onMouseDown={(e) => {
@@ -58,16 +67,20 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
         }}
         >
             {
-                !file.metadata && 
+                readableFileType === 'Folder' &&
                 <FolderSharpIcon fontSize='medium' />
             }
             {
-                file.metadata && file.metadata?.mimetype.includes("image/") &&
+                readableFileType === 'Image' &&
                 <ImageSharpIcon fontSize='medium' />
             }
             {
-                file.metadata && file.metadata?.mimetype.includes("video/") &&
+                readableFileType === 'Video' &&
                 <MovieSharpIcon fontSize='medium' />
+            }
+            {
+                readableFileType === 'File' &&
+                <InsertDriveFileSharpIcon fontSize='medium' />
             }
             <div className='flex-grow flex flex-row justify-start gap-4'>
                 <p className='w-3/5'>{file.name.replaceAll('_', ' ').slice(0, 48)}{file.name.length >= 48 ? '...' : ''}</p>
