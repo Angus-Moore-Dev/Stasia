@@ -1,7 +1,7 @@
 import { Contact } from "@/models/Contact";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Image from 'next/image';
 import EmailSharpIcon from '@mui/icons-material/EmailSharp';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -10,7 +10,9 @@ import BusinessSharpIcon from '@mui/icons-material/BusinessSharp';
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import LoadingBox from "@/components/LoadingBox";
-
+import { CommentBox } from "@/components/common/Comment";
+import { v4 } from "uuid";
+import { Comment } from '@/models/chat/Comment';
 interface SpecificContactPageProps
 {
     user: User;
@@ -24,6 +26,66 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
     const [name, setName] = useState(contact.name);
     const [shortDescription, setShortDescription] = useState(contact.description);
     const [selectedType, setSelectedType] = useState<number | undefined>();
+
+    // for comments
+    const [messagetoSendContents, setMessagetoSendContents] = useState('');
+    const [comments, setComments] = useState<Comment[]>();
+    const [commentsIsLoading, setCommentsIsLoading] = useState(true);
+    const updateMessage = useCallback((comment: Comment) => 
+    {
+        setComments(comments => [...comments ?? [], comment]);
+    }, []);
+    const removeMessage = useCallback((id: string) => 
+    {
+        setComments(comments => [...comments?.filter(x => x.id !== id) ?? []]);
+    }, []);
+
+    useEffect(() => {
+        if (selectedType === 2)
+        {
+            const fetchComments = async() => 
+            {
+                if (!comments)
+                {
+                    const { data, error } = await supabase.from('contact_comments').select('*').eq('contactId', contact.id);
+                    const comments =  data as Comment[];
+                    setComments(comments);
+                    setCommentsIsLoading(false);
+                    const channel = supabase.channel('table-db-changes')
+                    .on('postgres_changes', {event: '*', schema: 'public', table: 'contact_comments'}, (payload) => {
+                        console.log(payload);
+                        if (payload.eventType === 'INSERT')
+                        {
+                            const message = payload.new as Comment;
+                            if (message.contactId === contact.id)
+                            {
+                                // ADD THIS MESSAGE ONTO THE LIST!
+                                updateMessage(message);
+                            }
+                        }
+                        else if (payload.eventType === 'UPDATE')
+                        {
+                            let commentsTmp = [...comments];
+                            commentsTmp[commentsTmp.findIndex(x => x.id === payload.new.id)].message = payload.new.message;
+                            setComments(commentsTmp);
+                        }
+                        else if (payload.eventType === 'DELETE')
+                        {
+                            const deletedId = payload.old.id as string;
+                            removeMessage(deletedId);
+                        }
+                    }).subscribe((status) => {
+                        console.log(status);
+                        if (status === 'CLOSED')
+                        {
+                            // channel.subscribe();
+                        }
+                    });
+                }
+            }
+            fetchComments();
+        }
+    }, [selectedType]);
 
     return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row justify-between">
@@ -102,7 +164,7 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                     Comments
                 </button>
             </section>
-            <section className="flex-grow">
+            <section className="flex-grow flex">
                 {
                     selectedType === undefined &&
                     <div className="flex-grow h-full flex flex-col items-center justify-center">
@@ -123,8 +185,50 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                 }
                 {
                     selectedType === 2 &&
-                    <div className="flex-grow h-full flex flex-col items-center justify-center">
-                        Comments
+                    <div className="w-full flex-grow flex flex-col">
+                        <section className="flex-grow flex flex-col gap-1 overflow-y-auto max-h-[30vh] scrollbar mb-4">
+                            {
+                                commentsIsLoading &&
+                                <div className="flex-grow flex items-center justify-center">
+                                    <LoadingBox />
+                                </div>
+                            }
+                            {
+                                comments && comments.length > 0 && !commentsIsLoading && comments.map(comment => <CommentBox comment={comment} />)
+                            }
+                            {
+                                comments && comments.length === 0 && !commentsIsLoading &&
+                                <div className='flex-grow flex items-center justify-center'>
+                                    <p>No comments.</p>
+                                </div>
+                            }
+                        </section>
+                        <section className="h-14 flex flex-row items-center">
+                        <textarea 
+                            value={messagetoSendContents} 
+                            onChange={(e) => setMessagetoSendContents(e.target.value)} 
+                            className="p-2 w-full bg-tertiary text-zinc-100 font-medium rounded outline-none"
+                            placeholder={`Comment on ${contact.name}`} 
+                            onKeyDown={async (e) => {
+                                if (e.key === 'Enter' && !e.shiftKey)
+                                {
+                                    e.preventDefault();
+                                    const messageData = `${messagetoSendContents}`;
+                                    setMessagetoSendContents('');
+                                    const res = await supabase.from('contact_comments').insert([{
+                                        senderId: user.id,
+                                        contactId: contact.id,
+                                        message: messageData
+                                    }]);
+
+                                    if (res.error)
+                                    {
+                                        console.log(res.error);
+                                    }
+                                }
+                            }}
+                        />
+                        </section>
                     </div>
                 }
             </section>
@@ -147,12 +251,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
         }
     }
     const { data, error } = await supabase.from('contacts').select("*").eq('id', context.query['contactId'] as string).single();
-
     const contact = data as Contact;
-    // console.log(contact);
     contact.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL)).data?.publicUrl ?? '';
-
-    
 
     return {
         props: {

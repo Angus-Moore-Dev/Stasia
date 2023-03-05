@@ -59,7 +59,7 @@ export default function ChatPage({ user }: ChatPageProps)
             }
             else if (status === 'CLOSED')
             {
-                channel.subscribe();
+                // channel.subscribe();
             }
         });
         setupFunc();
@@ -90,7 +90,7 @@ export default function ChatPage({ user }: ChatPageProps)
                     # general
                 </button>
             </div>
-            <div className="w-3/4 bg-[#0e0e0e] rounded-r flex-grow flex flex-col overflow-y-auto scrollbar">
+            <div className="w-3/4 bg-quaternary rounded-r flex-grow flex flex-col overflow-y-auto scrollbar">
                 <div className="h-14 w-full flex flex-row px-8 items-center bg-tertiary border-l-secondary border-l-4">
                     <p>{selectedChannelName}</p>
                 </div>

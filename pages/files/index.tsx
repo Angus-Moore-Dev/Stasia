@@ -7,7 +7,7 @@ import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { User } from "@supabase/supabase-js";
 import { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
-import { v4 } from "uuid";
+
 
 interface FilesPageProps
 {
@@ -17,9 +17,23 @@ interface FilesPageProps
 export default function FilesPage({ user }: FilesPageProps)
 {
 	const [files, setFiles] = useState<FileData[]>();
-	const [currentDirectory, setCurrentDirectory] = useState('/');
 	const [currentFolderId, setCurrentFolderId] = useState('');
 	const [activeContextMenu, setactiveContextMenu] = useState(''); // always set away
+	const [isLoading, setIsLoading] = useState(true);
+
+	const listFiles = async () => 
+	{
+		setIsLoading(true);
+		// This is called for the base directory, and is then called again for each subfolder it's in.
+		const { data, error } = await supabase.storage.from('general.files').list(currentFolderId);
+		setFiles(data as unknown as FileData[]);
+		setIsLoading(false);
+	}
+
+	useEffect(() => {
+		console.log(currentFolderId);
+		listFiles();
+	}, [currentFolderId]);
 
 	useEffect(() => {
 		const listener = () => 
@@ -30,17 +44,6 @@ export default function FilesPage({ user }: FilesPageProps)
 		return () => window.removeEventListener('click', listener);
 	}, []);
 
-	useEffect(() => {
-		const listFiles = async () => 
-		{
-			// This is called for the base directory, and is then called again for each subfolder it's in.
-			const { data, error } = await supabase.storage.from('general.files').list();
-			setFiles(data as unknown as FileData[]);
-			console.log(data);
-		}
-		listFiles();
-	}, []);
-
     return <div className='w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
 		<div className="w-full flex items-center gap-2">
 			<span className="mr-auto">Files</span>
@@ -49,7 +52,22 @@ export default function FilesPage({ user }: FilesPageProps)
 			<Button text='New File' onClick={() => { }} />
 		</div>
 		<div className="w-full mx-auto flex-grow flex flex-col bg-tertiary rounded">
-			<span className="px-8 bg-[#0e0e0e] py-4 rounded-t font-medium">jensen_labs{currentDirectory}</span>
+			<span className="px-8 bg-quaternary py-4 rounded-t font-medium">
+				<button className="transition hover:text-primary" onClick={() => setCurrentFolderId('')}>jensen_labs</button>{
+					currentFolderId.split('/').map((folderName, index) => {
+						return (
+							<>
+							/
+							<button className="transition hover:text-primary" onClick={() => {
+								setCurrentFolderId(currentFolderId.split('/').slice(0, index + 1).map(x => x).join('/'));
+							}}>
+								{folderName.toLowerCase()}
+							</button>
+							</>
+						)
+					})
+				}
+			</span>
 			<div className="w-full flex flex-row flex-wrap items-center px-8 mt-4 pb-4">
 				<span className="">Type</span>
 				<span className="w-3/5 pl-5">Name</span>
@@ -59,12 +77,12 @@ export default function FilesPage({ user }: FilesPageProps)
 				</div>
 			</div>
 			{
-				!files && <div className="flex-grow flex justify-center items-center">
+				(!files || isLoading) && <div className="flex-grow flex justify-center items-center">
 					<LoadingBox />
 				</div>
 			}
 			{
-				files?.map(file => <File file={file} setFolderListId={setCurrentFolderId} activeContextMenu={activeContextMenu} setActiveContextMenu={setactiveContextMenu} />)
+				files && !isLoading && files?.map(file => <File file={file} currentFolderId={currentFolderId} setFolderListId={setCurrentFolderId} activeContextMenu={activeContextMenu} setActiveContextMenu={setactiveContextMenu} />)
 			}
 		</div>
     </div>

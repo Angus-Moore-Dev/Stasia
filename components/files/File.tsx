@@ -6,40 +6,43 @@ import FolderSharpIcon from '@mui/icons-material/FolderSharp';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { v4 } from 'uuid';
-import CreateNewFolderSharpIcon from '@mui/icons-material/CreateNewFolderSharp';
 import EditSharpIcon from '@mui/icons-material/EditSharp';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import DeleteSharpIcon from '@mui/icons-material/DeleteSharp';
+import VisibilitySharpIcon from '@mui/icons-material/VisibilitySharp';
 
 interface FileProps
 {
     file: FileData;
+    currentFolderId: string; // So we can track where we are in the file list.
     setFolderListId: Dispatch<SetStateAction<string>>;
     activeContextMenu: string;
     setActiveContextMenu: Dispatch<SetStateAction<string>>;
 }
 
-export default function File({ file, setFolderListId, activeContextMenu, setActiveContextMenu }: FileProps)
+export default function File({ file, currentFolderId, setFolderListId, activeContextMenu, setActiveContextMenu }: FileProps)
 {
     const [divId] = useState(v4()); // This is because folders do not have ids, so we must create our own.
-    const [isFolder, setIsFolder] = useState(!file.metadata);
+    const [isFolder] = useState(!file.metadata || file.metadata === null);
     const [showContextMenu, setShowContextMenu] = useState(false);
     const [mousePositionOnScreen, setMousePositionOnScreen] = useState<{x: number, y: number}>({x: 0, y: 0});
-    const readableFileType = isFolder ? 'Folder' : file.metadata.mimetype.includes('video') ? 'Video' : file.metadata.mimetype.includes('image') ? 'Image' : 'File';
+    console.log(file.metadata);
+    const readableFileType = isFolder ? 'Folder' : file.metadata?.mimetype.includes('video') ? 'Video' : file.metadata?.mimetype.includes('image') ? 'Image' : 'File';
     return <>
-        <div className={`relative w-full px-8 py-4 flex flex-row gap-4 flex-wrap items-center transition hover:bg-[#0e0e0e] hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
+        <div className={`relative select-none w-full px-8 py-4 flex flex-row gap-4 flex-wrap items-center transition hover:bg-quaternary hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
         onContextMenuCapture={(e) => e.preventDefault()}
         onDoubleClick={async () => {
             if (isFolder)
             {
-                setFolderListId(file.name);
-                console.log(file);
-                const { data, error } = await supabase.storage.from(`general.files`).list('Test_Files/test_subfolder');
-                console.log('subfolder data::', data);
-                // console.log(data);
+                // Because we're going into a sub-folder, the string formatting is applied in that scenario.
+                // for instance, '' becomes /Test_Files.
+                // If clicking a folder within that, it becomes /Test_Files/Subtest_Files/..., son and so forth. 
+                // There are other mechanisms in place for upwards in the list.
+                setFolderListId(currentFolderId ? `${currentFolderId}/${file.name}` : file.name);
             }
             else
             {
+                alert('not folder clicked!');
                 // Trigger image preview.
             }
         }}
@@ -88,6 +91,11 @@ export default function File({ file, setFolderListId, activeContextMenu, setActi
                 Select an Action
             </div>
             <div className='w-full flex flex-col'>
+                <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4
+                mb-2 border-b-[1px] border-b-primary'>
+                    <VisibilitySharpIcon fontSize='small' />
+                    <span className='pl-4'>Open {readableFileType}</span>
+                </button>
                 <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4'>
                     <EditSharpIcon fontSize='small' />
                     <span className='pl-4'>Rename {readableFileType}</span>

@@ -72,7 +72,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                     console.log(status);
                     if (status === 'CLOSED')
                     {
-                        channel.subscribe();
+                        // channel.subscribe();
                     }
                 });
             }

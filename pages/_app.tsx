@@ -38,7 +38,7 @@ export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<SessionContextProvider supabaseClient={supabase} initialSession={pageProps.initialSession}>
 			<Head>
-			<title>Psychostasia</title>
+				<title>Stasia</title>
 			</Head>
 			<div className='w-screen h-screen flex flex-col bg-secondary'>
 				<AppNavbar  />

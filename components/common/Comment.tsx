@@ -16,7 +16,7 @@ export function CommentBox({ comment }: CommentBoxProps)
     const [editComment, setEditComment] = useState(false);
 
     return <div className="w-full py-1 px-4 flex flex-row gap-4 transition hover:bg-tertiary rounded" onMouseOver={() => setShowButtons(true)} onMouseLeave={() => setShowButtons(false)} >
-    <Image src='/profile.JPG' alt={comment.senderId} height='40' width='40' className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full object-cover" style={{ overflow: 'hidden'}} />
+    <Image src='/profile.JPG' alt={comment.senderId} height='40' width='40' className="w-10 h-10 min-w-[40px] min-h-[40px] rounded object-cover" style={{ overflow: 'hidden'}} />
         <div className="w-full flex flex-col -mt-1">
             <div className="w-full flex flex-row items-center">
                 <span className="text-primary font-medium pb-1 text-base">{comment.senderId} <small className="text-neutral-400 text-xs">{new Date(comment.created_at).toLocaleString('en-au', {timeStyle: 'short', dateStyle: 'short', hour12: false})}</small></span>
