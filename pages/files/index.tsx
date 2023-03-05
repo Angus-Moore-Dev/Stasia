@@ -77,10 +77,10 @@ export default function FilesPage({ user }: FilesPageProps)
 			</span>
 			<div className="w-full flex flex-row flex-wrap items-center px-8 mt-4 pb-4">
 				<span className="">Type</span>
-				<span className="w-3/5 pl-5">Name</span>
+				<span className="w-3/5 pl-6">Name</span>
 				<div className="flex-grow flex flex-row justify-between">
-					<span className="pl-1">Last Modified</span>
-					<span>Size</span>
+					<span className="">Last Modified</span>
+					<span className="pr-2">Size</span>
 				</div>
 			</div>
 			{

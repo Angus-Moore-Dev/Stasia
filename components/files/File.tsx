@@ -36,7 +36,7 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
     return <>
         <ImagePreviewModal show={imageModal} setShow={setImageModal} file={file} filePath={currentFolderId} />
         <VideoPreviewModal show={videoModal} setShow={setVideoModal} file={file} filePath={currentFolderId} />
-        <div className={`relative select-none w-full px-8 py-4 flex flex-row gap-4 flex-wrap items-center transition hover:bg-quaternary hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
+        <div className={`relative select-none w-full px-8 py-4 flex flex-row gap-8 flex-wrap items-center transition hover:bg-quaternary hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
         onContextMenuCapture={(e) => e.preventDefault()}
         onDoubleClick={async () => {
             if (isFolder)
