@@ -51,10 +51,6 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
         onDoubleClick={async () => {
             if (isFolder)
             {
-                // Because we're going into a sub-folder, the string formatting is applied in that scenario.
-                // for instance, '' becomes /Test_Files.
-                // If clicking a folder within that, it becomes /Test_Files/Subtest_Files/..., son and so forth. 
-                // There are other mechanisms in place for upwards in the list.
                 setFolderListId(currentFolderId ? `${currentFolderId}/${file.name}` : file.name);
             }
             else
@@ -64,7 +60,7 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                 else if (file.metadata.mimetype.includes('video/'))
                     setVideoModal(true);
                 else if (file.name.endsWith('.stasia'))
-                    router.push(`/files/edit/${file.name}`);
+                    router.push(`/files/edit?id=${currentFolderId ? `${currentFolderId}/${file.name}` : file.name}`);
                 else if (file.name.endsWith('.pdf'))
                 {
                     // Creates a valid URL for 1 hour.

@@ -84,6 +84,12 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
                             setFileNameTaken(false);
                             setFileName(e.target.value);
                         }} pattern="[A-Za-z0-9]" maxLength={48} 
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && isValidFolderName)
+                            {
+                                createNewFile();
+                            }
+                        }}
                         className="px-4 py-1 outline-none bg-tertiary rounded w-full font-semibold aria-disabled:text-red-500"
                         aria-disabled={!isValidFolderName}
                         placeholder="Document Name" />

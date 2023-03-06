@@ -151,15 +151,11 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
         </div>
         <div className="flex-grow w-full max-w-6xl flex flex-col gap-2">
             <section className="w-full h-10 flex flex-row gap-2">
-                <button className="w-64 rounded bg-tertiary text-zinc-100 font-medium transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-zinc-100"
-                aria-selected={selectedType === 0} onClick={() => setSelectedType(0)}>
-                    Files
-                </button>
-                <button className="w-64 rounded bg-tertiary text-zinc-100 font-medium transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-zinc-100"
+                <button className="w-64 rounded bg-tertiary text-zinc-100 font-medium transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary aria-selected:font-semibold"
                 aria-selected={selectedType === 1} onClick={() => setSelectedType(1)}>
                     Calender/Events
                 </button>
-                <button className="w-64 rounded bg-tertiary text-zinc-100 font-medium transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-zinc-100"
+                <button className="w-64 rounded bg-tertiary text-zinc-100 font-medium transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary aria-selected:font-semibold"
                 aria-selected={selectedType === 2} onClick={() => setSelectedType(2)}>
                     Comments
                 </button>
@@ -169,12 +165,6 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                     selectedType === undefined &&
                     <div className="flex-grow h-full flex flex-col items-center justify-center">
                         Select a category for more
-                    </div>
-                }
-                {
-                    selectedType === 0 &&
-                    <div className="flex-grow h-full flex flex-col items-center justify-center">
-                        Files
                     </div>
                 }
                 {
