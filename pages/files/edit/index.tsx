@@ -24,7 +24,7 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 	const [initialHash, setInitialHash] = useState(0);
 
 	useEffect(() => {
-		setComputedHash(computeHash(fileContents));
+		setComputedHash(computeHash(fileContents ?? ''));
 	}, [fileContents]);
 
 	useEffect(() => {
@@ -35,7 +35,8 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 				fileReader.onloadend = (e) => 
 				{
 					setInitialHash(computeHash(e.target?.result as string));
-					setFileContents(e.target?.result as string);
+					console.log((e.target?.result as string).length);
+					setFileContents((e.target?.result as string) ? e.target?.result as string : '# New Document');
 				}
 				fileReader.readAsText(res?.data);
 			}
@@ -48,7 +49,7 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 			}} />
 			<span className="">Editor for document {fileId}</span>
 			{
-				computedHash !== initialHash &&
+				computedHash !== initialHash && fileContents &&
 				<Button text='Save Document' onClick={async () => {
 					const file = new File([fileContents], fileId, {
 						type: 'text/markdown',

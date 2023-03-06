@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
 import { Box, LinearProgress, Modal } from "@mui/material";
+import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 const style = {
@@ -24,6 +25,7 @@ interface NewFileModalProps
 
 export default function NewFileModal({ show, setShow, setRefreshing, currentFolderId, setCurrentFolderId, allFileNamesInFolder }: NewFileModalProps)
 {
+    const router = useRouter();
     const handleClose = () => setShow(false);
     const [isValidFolderName, setIsValidFolderName] = useState(false);
     const [fileName, setFileName] = useState('');
@@ -40,14 +42,15 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
             setIsCreatingNewFile(false);
             return;
         }
-        
-        const file = new File([""], moddedFileName, {
+
+        const file = new File(["# New Document"], moddedFileName, {
             type: 'text/markdown',
             lastModified: Date.now()
         });
         await supabase.storage.from('general.files').upload(currentFolderId ? `${currentFolderId}/${file.name}` : `${file.name}`, file);
         setIsCreatingNewFile(false);
         setShow(false);
+        router.push(`/files/edit?id=${currentFolderId ? `${currentFolderId}/${file.name}` : `${file.name}`}`);
         setRefreshing(true);
     }
 
