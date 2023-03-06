@@ -40,7 +40,6 @@ export default function FilesPage({ user }: FilesPageProps)
 	}
 
 	useEffect(() => {
-		console.log(currentFolderId);
 		listFiles();
 	}, [currentFolderId]);
 
@@ -108,6 +107,7 @@ export default function FilesPage({ user }: FilesPageProps)
 					activeContextMenu={activeContextMenu} 
 					setActiveContextMenu={setactiveContextMenu}
 					setRefreshing={setIsRefreshing} 
+					setIsLoading={setIsLoading}
 					/>
 				)
 			}

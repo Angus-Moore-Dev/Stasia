@@ -29,9 +29,10 @@ interface FileProps
     activeContextMenu: string;
     setActiveContextMenu: Dispatch<SetStateAction<string>>;
     setRefreshing: Dispatch<SetStateAction<boolean>>;
+    setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function File({ file, currentFolderId, setFolderListId, activeContextMenu, setActiveContextMenu, setRefreshing }: FileProps)
+export default function File({ file, currentFolderId, setFolderListId, activeContextMenu, setActiveContextMenu, setRefreshing, setIsLoading }: FileProps)
 {
     const router = useRouter();
     const [divId] = useState(v4()); // This is because folders do not have ids, so we must create our own.
@@ -63,7 +64,7 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
         }
         else if (file.metadata?.mimetype.includes('text'))
         {
-            readableFileType = 'Stasia Doc';
+            readableFileType = 'Doc';
         }
     }
 
@@ -124,7 +125,7 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                 <PictureAsPdfSharpIcon fontSize='medium' />
             }
             {
-                readableFileType === 'Stasia Doc' &&
+                readableFileType === 'Doc' &&
                 <DescriptionSharpIcon fontSize='medium' />
             }
             {
@@ -142,8 +143,8 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                 }
             </div>
         </div>
-        {/* This is the popup box that appears on a given file */}
-        <div hidden={!showContextMenu || activeContextMenu !== divId} className='w-64 h-96 absolute bg-quaternary z-40 rounded'
+        {/* This is the context menu that appears on a given file when the user right clicks */}
+        <div hidden={!showContextMenu || activeContextMenu !== divId} className='w-64 h-96 absolute bg-quaternary z-50 rounded'
         style={{
             top: mousePositionOnScreen.y + 2,
             left: mousePositionOnScreen.x
@@ -179,9 +180,12 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                         if (isFolder)
                         {
                             setIsDeleting(true);
-                            const res = await supabase.storage.from('general.files').remove([currentFolderId ? `${currentFolderId}/${file.name}/IGNORE.stasia` : `${file.name}/IGNORE.stasia`]);
+                            setIsLoading(true);
+                            // This is a classical recursive function for folder deletion, down the tree we go.
+                            await recursivelyDeleteFolder(currentFolderId ? `${currentFolderId}/${file.name}` : file.name);
                             setIsDeleting(false);
                             setRefreshing(true);
+                            setIsLoading(false);
                         }
                         else
                         {
@@ -199,4 +203,24 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
             </div>
         </div>
     </>
+}
+
+
+/**
+ * This will recursively delete a folder by listing all files in a directory,
+ * checking the metadata. If no metadata, then it's a folder.
+ * We then delete all files in the folder, then iterate through the subfolders,
+ * recursively calling the function over and over until it's done.
+ * When the last file is deleted in the last folder, it will automatically delete
+ * the last linear path, since subfolders are deleted when no files are contained
+ * within them.
+ * @param path The path of the folder.
+ */
+async function recursivelyDeleteFolder(path: string): Promise<void>
+{
+    const allFilesInSubFolder = (await supabase.storage.from('general.files').list(path)).data as unknown as FileData[];
+    for (const file of allFilesInSubFolder.filter(x => x.metadata !== null))
+        await supabase.storage.from('general.files').remove([`${path}/${file.name}`]);
+    for (const folder of allFilesInSubFolder.filter(x => x.metadata === null))
+        await recursivelyDeleteFolder(`${path}/${folder.name}`);
 }
