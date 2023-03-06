@@ -17,7 +17,7 @@ const style = {
     outline: 'none'
 };
 
-interface ImagePreviewModalProps
+interface VideoPreviewModalProps
 {
     filePath: string;
     file: FileData;
@@ -26,7 +26,7 @@ interface ImagePreviewModalProps
     setRefreshing: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function VideoPreviewModal({ filePath, file, show, setShow, setRefreshing }: ImagePreviewModalProps)
+export default function VideoPreviewModal({ filePath, file, show, setShow, setRefreshing }: VideoPreviewModalProps)
 {
     const handleClose = () => setShow(false);
     const [imageData, setImageData] = useState('');

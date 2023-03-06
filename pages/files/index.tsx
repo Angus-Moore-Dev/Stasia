@@ -2,6 +2,7 @@ import LoadingBox from "@/components/LoadingBox";
 import Button from "@/components/common/Button";
 import File from "@/components/files/File";
 import FileUploadModal from "@/components/files/FileUploadModal";
+import NewFolderModal from "@/components/files/NewFolderModal";
 import { supabase } from "@/lib/supabaseClient";
 import { FileData } from "@/models/files/FileMetadata";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
@@ -62,10 +63,11 @@ export default function FilesPage({ user }: FilesPageProps)
     return <div className='w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
 		<div className="w-full flex items-center gap-2">
 			<span className="mr-auto">Files</span>
-			<Button text='New Folder' onClick={() => { }} />
+			<Button text='New Folder' onClick={() => setShowNewFolderModal(true)} />
 			<Button text='Upload File' onClick={() => setShowFileUploadModal(true)} />
 			<Button text='New File' onClick={() => { }} />
 			<FileUploadModal show={showFileUploadModal} setShow={setShowFileUploadModal} filePath={currentFolderId} setComplete={setIsRefreshing} />
+			<NewFolderModal show={showNewFolderModal} setShow={setShowNewFolderModal} setRefreshing={setIsRefreshing} currentFolderId={currentFolderId} setCurrentFolderId={setCurrentFolderId} />
 		</div>
 		<div className="w-full mx-auto flex-grow flex flex-col bg-tertiary rounded">
 			<span className="px-8 bg-quaternary py-4 rounded-t font-medium">
@@ -97,7 +99,7 @@ export default function FilesPage({ user }: FilesPageProps)
 				</div>
 			}
 			{
-				files && !isLoading && !isRefreshing && files?.map(file => <File 
+				files && !isLoading && !isRefreshing && files?.filter(x => x.name !== 'IGNORE.stasia').map(file => <File 
 					file={file} 
 					currentFolderId={currentFolderId} 
 					setFolderListId={setCurrentFolderId} 
@@ -106,6 +108,12 @@ export default function FilesPage({ user }: FilesPageProps)
 					setRefreshing={setIsRefreshing} 
 					/>
 				)
+			}
+			{
+				files && !isLoading && !isRefreshing && files.filter(x => x.name !== 'IGNORE.stasia').length === 0 &&
+				<div className="flex-grow flex items-center justify-center">
+					There are no files in this folder
+				</div>
 			}
 		</div>
     </div>

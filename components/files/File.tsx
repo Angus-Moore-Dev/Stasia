@@ -128,28 +128,32 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                     <span className='pl-4'>Share {readableFileType} With Others</span>
                 </button>
                 {
-                    !isFolder &&
-                    <>
-                    {
                     isDeleting &&
                     <LinearProgress color="inherit" className="flex-grow h-3 rounded-sm text-red-500 mx-4 my-2" />
-                    }
-                    {
-                        !isDeleting &&
-                        <button className='w-full p-2 text-red-500 font-semibold transition hover:bg-red-500 hover:text-zinc-100 text-left px-4'
-                        onClick={async () => {
+                }   
+                {
+                    !isDeleting &&
+                    <button className='w-full p-2 text-red-500 font-semibold transition hover:bg-red-500 hover:text-zinc-100 text-left px-4'
+                    onClick={async () => {
+                        if (isFolder)
+                        {
                             setIsDeleting(true);
-                            console.log(currentFolderId ? `${currentFolderId}/${file.name}` : file.name);
+                            const res = await supabase.storage.from('general.files').remove([currentFolderId ? `${currentFolderId}/${file.name}/IGNORE.stasia` : `${file.name}/IGNORE.stasia`]);
+                            setIsDeleting(false);
+                            setRefreshing(true);
+                        }
+                        else
+                        {
+                            setIsDeleting(true);
                             const res = await supabase.storage.from('general.files').remove([currentFolderId ? `${currentFolderId}/${file.name}` : file.name]);
                             console.log(res);
                             setIsDeleting(false);
                             setRefreshing(true);
-                        }}>
-                            <DeleteSharpIcon fontSize='small' />
-                            <span className='pl-4'>Delete {readableFileType}</span>
-                        </button>
-                    }
-                    </>
+                        }
+                    }}>
+                        <DeleteSharpIcon fontSize='small' />
+                        <span className='pl-4'>Delete {readableFileType}</span>
+                    </button>
                 }
             </div>
         </div>
