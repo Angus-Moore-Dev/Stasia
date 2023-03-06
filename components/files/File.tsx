@@ -14,6 +14,8 @@ import ImagePreviewModal from './ImagePreviewModal';
 import VideoPreviewModal from './VideoPreviewModal';
 import InsertDriveFileSharpIcon from '@mui/icons-material/InsertDriveFileSharp';
 import { LinearProgress } from '@mui/material';
+import FileUploadModal from './FileUploadModal';
+import FilePreviewModal from './FilePreviewModal';
 
 interface FileProps
 {
@@ -34,10 +36,12 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
 
     const [imageModal, setImageModal] = useState(false);
     const [videoModal, setVideoModal] = useState(false);
+    const [fileModal, setFileModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const readableFileType = isFolder ? 'Folder' : file.metadata?.mimetype.includes('video') ? 'Video' : file.metadata?.mimetype.includes('image') ? 'Image' : 'File';
 
     return <>
+        <FilePreviewModal show={fileModal} setShow={setFileModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
         <ImagePreviewModal show={imageModal} setShow={setImageModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
         <VideoPreviewModal show={videoModal} setShow={setVideoModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
         <div className={`relative z-40 select-none w-full px-8 py-4 flex flex-row gap-8 flex-wrap items-center transition hover:bg-quaternary hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
@@ -57,6 +61,8 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                     setImageModal(true);
                 else if (file.metadata.mimetype.includes('video/'))
                     setVideoModal(true);
+                else
+                    setFileModal(true)
             }
         }}
         onMouseDown={(e) => {
