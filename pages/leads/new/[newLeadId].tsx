@@ -127,7 +127,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                     router.push('/leads');
                 }
             }}>
-                Update Existing Lead
+                Create New Lead
             </button>
         </div>
     </div>

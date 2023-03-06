@@ -32,11 +32,12 @@ export default function NewFolderModal({ show, setShow, setRefreshing, currentFo
     const handleClose = () => setShow(false);
     const [isValidFolderName, setIsValidFolderName] = useState(false);
     const [folderName, setFolderName] = useState('');
+    const [isCreatingNewFolder, setisCreatingNewFolder] = useState(false)
     const createNewFolder = async () => 
     {
         // Because Supabase doesn't allow empty folders, we create a folder with a new file called 'IGNORE.stasia', which is our blank file for holding the folder.
         // When a folder gets deleted, all that happens is that file is deleted, triggering the folder deletion.
-        
+        setisCreatingNewFolder(true);
         const moddedFolderName = folderName.replaceAll(' ', '_');
         const file = new File([], 'IGNORE.stasia');
         const filePath = currentFolderId ? `${currentFolderId}/${moddedFolderName}/${file.name}` : `${moddedFolderName}/${file.name}`;
@@ -50,6 +51,7 @@ export default function NewFolderModal({ show, setShow, setRefreshing, currentFo
         {
             setIsValidFolderName(false);
             setFolderName('');
+            setisCreatingNewFolder(false);
         }
     }, [show]);
 
@@ -79,25 +81,39 @@ export default function NewFolderModal({ show, setShow, setRefreshing, currentFo
                         }} pattern="[A-Za-z0-9]" maxLength={48} 
                         className="px-4 py-1 outline-none bg-tertiary rounded w-full font-semibold aria-disabled:text-red-500"
                         aria-disabled={!isValidFolderName}
-                        placeholder="Folder Name" />
+                        placeholder="Folder Name" 
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && isValidFolderName)
+                            {
+                                createNewFolder();
+                            }
+                        }}
+                        />
                         {
                             !isValidFolderName && folderName &&
                             <small className="w-full pt-1">Invalid folder name. No special characters.</small>
                         }
                     </div>
-                    <div className="w-full flex flex-row items-center">
-                        <button className="w-1/2 px-2 py-1 rounded text-red-500 font-semibold transition hover:text-zinc-100 hover:bg-red-500"
-                        onClick={() => setShow(false)}>
-                            Cancel
-                        </button>
-                        {
-                            isValidFolderName && folderName &&
-                            <button className="w-1/2 px-2 py-1 rounded text-primary font-semibold transition hover:text-zinc-100 hover:bg-primary"
-                            onClick={() => createNewFolder()}>
-                                Create
+                    {
+                        isCreatingNewFolder &&
+                        <LinearProgress color='inherit' className='text-primary h-5 rounded-b-sm w-full px-4' />
+                    }
+                    {
+                        !isCreatingNewFolder &&
+                        <div className="w-full flex flex-row items-center">
+                            <button className="w-1/2 px-2 py-1 rounded text-red-500 font-semibold transition hover:text-zinc-100 hover:bg-red-500"
+                            onClick={() => setShow(false)}>
+                                Cancel
                             </button>
-                        }
-                    </div>
+                            {
+                                isValidFolderName && folderName &&
+                                <button className="w-1/2 px-2 py-1 rounded text-primary font-semibold transition hover:text-zinc-100 hover:bg-primary"
+                                onClick={() => createNewFolder()}>
+                                    Create
+                                </button>
+                            }
+                        </div>
+                    }
                 </div>
             </Box>
         </Modal>
