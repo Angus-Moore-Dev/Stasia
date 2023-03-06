@@ -13,6 +13,7 @@ import VisibilitySharpIcon from '@mui/icons-material/VisibilitySharp';
 import ImagePreviewModal from './ImagePreviewModal';
 import VideoPreviewModal from './VideoPreviewModal';
 import InsertDriveFileSharpIcon from '@mui/icons-material/InsertDriveFileSharp';
+import { LinearProgress } from '@mui/material';
 
 interface FileProps
 {
@@ -21,9 +22,10 @@ interface FileProps
     setFolderListId: Dispatch<SetStateAction<string>>;
     activeContextMenu: string;
     setActiveContextMenu: Dispatch<SetStateAction<string>>;
+    setRefreshing: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function File({ file, currentFolderId, setFolderListId, activeContextMenu, setActiveContextMenu }: FileProps)
+export default function File({ file, currentFolderId, setFolderListId, activeContextMenu, setActiveContextMenu, setRefreshing }: FileProps)
 {
     const [divId] = useState(v4()); // This is because folders do not have ids, so we must create our own.
     const [isFolder] = useState(!file.metadata || file.metadata === null);
@@ -32,11 +34,13 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
 
     const [imageModal, setImageModal] = useState(false);
     const [videoModal, setVideoModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const readableFileType = isFolder ? 'Folder' : file.metadata?.mimetype.includes('video') ? 'Video' : file.metadata?.mimetype.includes('image') ? 'Image' : 'File';
+
     return <>
-        <ImagePreviewModal show={imageModal} setShow={setImageModal} file={file} filePath={currentFolderId} />
-        <VideoPreviewModal show={videoModal} setShow={setVideoModal} file={file} filePath={currentFolderId} />
-        <div className={`relative select-none w-full px-8 py-4 flex flex-row gap-8 flex-wrap items-center transition hover:bg-quaternary hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
+        <ImagePreviewModal show={imageModal} setShow={setImageModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
+        <VideoPreviewModal show={videoModal} setShow={setVideoModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
+        <div className={`relative z-40 select-none w-full px-8 py-4 flex flex-row gap-8 flex-wrap items-center transition hover:bg-quaternary hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
         onContextMenuCapture={(e) => e.preventDefault()}
         onDoubleClick={async () => {
             if (isFolder)
@@ -117,10 +121,30 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                     <AccountTreeIcon fontSize='small' />
                     <span className='pl-4'>Share {readableFileType} With Others</span>
                 </button>
-                <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4'>
-                    <DeleteSharpIcon fontSize='small' />
-                    <span className='pl-4'>Delete {readableFileType}</span>
-                </button>
+                {
+                    !isFolder &&
+                    <>
+                    {
+                    isDeleting &&
+                    <LinearProgress color="inherit" className="flex-grow h-3 rounded-sm text-red-500 mx-4 my-2" />
+                    }
+                    {
+                        !isDeleting &&
+                        <button className='w-full p-2 text-red-500 font-semibold transition hover:bg-red-500 hover:text-zinc-100 text-left px-4'
+                        onClick={async () => {
+                            setIsDeleting(true);
+                            console.log(currentFolderId ? `${currentFolderId}/${file.name}` : file.name);
+                            const res = await supabase.storage.from('general.files').remove([currentFolderId ? `${currentFolderId}/${file.name}` : file.name]);
+                            console.log(res);
+                            setIsDeleting(false);
+                            setRefreshing(true);
+                        }}>
+                            <DeleteSharpIcon fontSize='small' />
+                            <span className='pl-4'>Delete {readableFileType}</span>
+                        </button>
+                    }
+                    </>
+                }
             </div>
         </div>
     </>

@@ -26,6 +26,7 @@ export default function FilesPage({ user }: FilesPageProps)
 	const [showNewFolderModal, setShowNewFolderModal] = useState(false);
 	const [showFileUploadModal, setShowFileUploadModal] = useState(false);
 	const [showNewFileModal, setShowNewFileModal] = useState(false);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const listFiles = async () => 
 	{
@@ -42,6 +43,14 @@ export default function FilesPage({ user }: FilesPageProps)
 	}, [currentFolderId]);
 
 	useEffect(() => {
+		if (isRefreshing)
+		{
+			listFiles();
+			setIsRefreshing(false);
+		}
+	}, [isRefreshing]);
+
+	useEffect(() => {
 		const listener = () => 
 		{
 			setactiveContextMenu('');
@@ -56,18 +65,17 @@ export default function FilesPage({ user }: FilesPageProps)
 			<Button text='New Folder' onClick={() => { }} />
 			<Button text='Upload File' onClick={() => setShowFileUploadModal(true)} />
 			<Button text='New File' onClick={() => { }} />
-			<FileUploadModal show={showFileUploadModal} setShow={setShowFileUploadModal} filePath={currentFolderId} />
+			<FileUploadModal show={showFileUploadModal} setShow={setShowFileUploadModal} filePath={currentFolderId} setComplete={setIsRefreshing} />
 		</div>
 		<div className="w-full mx-auto flex-grow flex flex-col bg-tertiary rounded">
 			<span className="px-8 bg-quaternary py-4 rounded-t font-medium">
-				<button className="transition hover:text-primary" onClick={() => setCurrentFolderId('')}>jensen_labs</button>{
+				<button className="transition hover:text-primary" onClick={() => setCurrentFolderId('')}>jensen_labs</button>
+				{
 					currentFolderId.split('/').map((folderName, index) => {
 						return (
 							<>
 							/
-							<button className="transition hover:text-primary" onClick={() => {
-								setCurrentFolderId(currentFolderId.split('/').slice(0, index + 1).map(x => x).join('/'));
-							}}>
+							<button className="transition hover:text-primary" onClick={() => setCurrentFolderId(currentFolderId.split('/').slice(0, index + 1).map(x => x).join('/'))}>
 								{folderName.toLowerCase()}
 							</button>
 							</>
@@ -84,12 +92,20 @@ export default function FilesPage({ user }: FilesPageProps)
 				</div>
 			</div>
 			{
-				(!files || isLoading) && <div className="flex-grow flex justify-center items-center">
+				(!files || isLoading || isRefreshing) && <div className="flex-grow flex justify-center items-center">
 					<LoadingBox />
 				</div>
 			}
 			{
-				files && !isLoading && files?.map(file => <File file={file} currentFolderId={currentFolderId} setFolderListId={setCurrentFolderId} activeContextMenu={activeContextMenu} setActiveContextMenu={setactiveContextMenu} />)
+				files && !isLoading && !isRefreshing && files?.map(file => <File 
+					file={file} 
+					currentFolderId={currentFolderId} 
+					setFolderListId={setCurrentFolderId} 
+					activeContextMenu={activeContextMenu} 
+					setActiveContextMenu={setactiveContextMenu}
+					setRefreshing={setIsRefreshing} 
+					/>
+				)
 			}
 		</div>
     </div>

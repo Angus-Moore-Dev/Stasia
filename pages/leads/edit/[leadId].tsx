@@ -259,7 +259,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                         router.push('/leads');
                     }
                 }}>
-                    Delete Lead
+                    Flatline Lead
                 </button>
                 <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold mb-10"
                 onClick={async () => {

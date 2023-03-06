@@ -52,7 +52,7 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
                     !deleteHover &&
                     <button className="px-2 py-1 rounded-lg text-red-500 font-semibold transition hover:text-zinc-100 hover:bg-red-500"
                     onMouseOver={() => {setDeleteHover(true)}}>
-                        Delete Contact
+                        Flatline Contact
                     </button>
                 }
                 {

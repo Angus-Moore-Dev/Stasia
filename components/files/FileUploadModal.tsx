@@ -10,6 +10,7 @@ import ImageSharpIcon from '@mui/icons-material/ImageSharp';
 import MovieSharpIcon from '@mui/icons-material/MovieSharp';
 import { v4 } from "uuid";
 import Button from "../common/Button";
+import { toast } from "react-toastify";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -28,9 +29,10 @@ interface ImagePreviewModalProps
     filePath: string; // We need this for the route we're going to upload these files to.
     show: boolean;
     setShow: Dispatch<SetStateAction<boolean>>;
+    setComplete: Dispatch<SetStateAction<boolean>>; // Used to tell the parent div that we're complete and to refresh.
 }
 
-export default function FileUploadModal({ filePath, show, setShow }: ImagePreviewModalProps)
+export default function FileUploadModal({ filePath, show, setShow, setComplete }: ImagePreviewModalProps)
 {
     const [files, setFiles] = useState<File[]>();
     const handleClose = () => setShow(false);
@@ -56,17 +58,29 @@ export default function FileUploadModal({ filePath, show, setShow }: ImagePrevie
         for (const file of files ?? [])
         {
             setFileUploadingId(file.name);
-            await new Promise((res) => setTimeout(() => res(''), 500));
-            const testResult = Math.random();
-            if (testResult >= 0.5)
+            const res = await supabase.storage.from('general.files').upload(filePath ? `${filePath}/${file.name}` : `${file.name}`, file);
+            if (res.error)
             {
-                setSuccessfulFileUploads(oldValue => [...oldValue, file.name]);
+                toast.error(res.error?.message, 
+                {
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
+                });
+                setFailedFileUploads(failedUploads => [...failedUploads, file.name]);
             }
             else
             {
-                setFailedFileUploads(oldValue => [...oldValue, file.name]);
+                setSuccessfulFileUploads(successfulUploads => [...successfulUploads, file.name]);
             }
         }
+        setComplete(true);
         setFileUploadingId('');
         setShow(false);
     }
