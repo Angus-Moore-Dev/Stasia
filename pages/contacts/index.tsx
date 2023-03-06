@@ -19,7 +19,7 @@ export default function ContactPage({ user, contacts }: ContactPageProps)
 
     return <div className="w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row items-center">
-            <span>Contacts - All People in Psychostasia</span>
+            <span>Contacts - All Known People</span>
             <Link href='/contacts/new' className="ml-auto">
                 <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold">
                     New Contact
