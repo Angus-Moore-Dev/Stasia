@@ -122,6 +122,8 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 			}
 		})
 	}, [fileId]);
+
+
     return <div className='w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
         <div className="w-full flex flex-row items-center gap-4">
 			<Button text='Back to Files' onClick={() => {
@@ -141,14 +143,14 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 		</div>
 		<div className="flex-grow w-full bg-tertiary flex flex-col rounded">
 			<div className="w-full flex flex-row bg-quaternary rounded-t">
-				<div className="w-1/2 px-8">
+				<div className="w-3/5 px-8">
 					Editor
 				</div>
-				<div className="w-1/2 px-8">
+				<div className="w-full px-8">
 					Preview
 				</div>
 			</div>
-			<div className="flex-grow flex flex-row">
+			<div className="flex-grow flex flex-row max-h-full">
 				{
 					fileContents === undefined &&
 					<div className="flex-grow flex flex-col items-center justify-center">
@@ -158,26 +160,26 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 				}
 				{
 					fileContents !== undefined &&
-					<>
-					<textarea 
-					className="w-1/2 max-w-[50%] h-full bg-transparent rounded-l p-4 outline-none scrollbar" 
-					placeholder="Enter Text" 
-					value={fileContents} 
-					onChange={(e) => setFileContents(e.target.value)} 
-					onKeyDown={(e) => {
-						if (e.ctrlKey && e.key === 's')
-						{
-							e.preventDefault();
-							saveDocument();
-							e.stopPropagation();
-						}
-					}}/>
-					<div className="px-4 py-2 my-2 border-l-4 border-l-quaternary max-w-[50%]">
-						<ReactMarkdown remarkPlugins={[remarkGfm]} className="scrollbar whitespace-normal w-full">
-							{fileContents}
-						</ReactMarkdown>
+					<div className="flex-grow flex flex-row max-h-full">
+						<textarea 
+						className="w-3/5 max-w-[50%] h-full bg-transparent rounded-l p-4 outline-none scrollbar max-h-[81vh]" 
+						placeholder="Enter Text" 
+						value={fileContents} 
+						onChange={(e) => setFileContents(e.target.value)} 
+						onKeyDown={(e) => {
+							if (e.ctrlKey && e.key === 's')
+							{
+								e.preventDefault();
+								saveDocument();
+								e.stopPropagation();
+							}
+						}}/>
+						<div className="px-4 py-2 my-2 border-l-4 border-l-quaternary w-full overflow-y-auto scrollbar max-h-[81vh]">
+							<ReactMarkdown remarkPlugins={[remarkGfm]} className="overflow-y-auto whitespace-pre-wrap w-full max-h-full scrollbar">
+								{fileContents}
+							</ReactMarkdown>
+						</div>
 					</div>
-					</>
 				}
 			</div>
 		</div>
