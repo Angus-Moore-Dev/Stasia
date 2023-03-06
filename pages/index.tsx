@@ -13,6 +13,8 @@ import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import BadgeIcon from '@mui/icons-material/Badge';
 import SignInPage from '@/components/SignInPage';
+import logo from '../public/logo.png';
+import Image from 'next/image';
 
 interface HomePageProps
 {
@@ -28,7 +30,7 @@ export default function HomePage({ user }: HomePageProps)
 				user &&
 				<div className='min-h-full flex-grow flex flex-col p-8 w-full max-w-[1920px]'>
 					<div className='flex-grow flex flex-col gap-3 items-center justify-center'>
-						<p className=''>Services</p>
+						<Image src={logo} alt='Stasia' width='400' height='350' className='mx-auto mb-4' />
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
 							<Link href='/customers'>
 								<InteractiveBox title='Customers (coming soon)' icon={<AttachMoneySharpIcon fontSize='large' />}  />
@@ -43,7 +45,7 @@ export default function HomePage({ user }: HomePageProps)
 						</div>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
 							<Link href='/files'>
-								<InteractiveBox title='Files (coming soon)' icon={<AccountTreeIcon fontSize='large' />} />
+								<InteractiveBox title='Files' icon={<AccountTreeIcon fontSize='large' />} />
 							</Link>
 							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />

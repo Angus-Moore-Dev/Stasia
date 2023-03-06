@@ -17,6 +17,9 @@ import { LinearProgress } from '@mui/material';
 import FileUploadModal from './FileUploadModal';
 import FilePreviewModal from './FilePreviewModal';
 import { useRouter } from 'next/router';
+import DescriptionSharpIcon from '@mui/icons-material/DescriptionSharp';
+import PictureAsPdfSharpIcon from '@mui/icons-material/PictureAsPdfSharp';
+
 
 interface FileProps
 {
@@ -40,7 +43,29 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
     const [videoModal, setVideoModal] = useState(false);
     const [fileModal, setFileModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const readableFileType = isFolder ? 'Folder' : file.metadata?.mimetype.includes('video') ? 'Video' : file.metadata?.mimetype.includes('image') ? 'Image' : 'File';
+    let readableFileType = 'File';
+    // const readableFileType = isFolder ? 'Folder' : file.metadata?.mimetype.includes('video') ? 'Video' : file.metadata?.mimetype.includes('image') ? 'Image' : 'File';
+    if (isFolder)
+    {
+        readableFileType = 'Folder';
+    }
+    else
+    {
+        if (file.metadata?.mimetype.includes('video'))
+            readableFileType = 'Video';
+        else if (file.metadata?.mimetype.includes('image'))
+        {
+            readableFileType = 'Image';
+        }
+        else if (file.name.endsWith('pdf'))
+        {
+            readableFileType = 'PDF';
+        }
+        else if (file.metadata?.mimetype.includes('text'))
+        {
+            readableFileType = 'Stasia Doc';
+        }
+    }
 
     return <>
         <FilePreviewModal show={fileModal} setShow={setFileModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
@@ -95,6 +120,14 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                 <MovieSharpIcon fontSize='medium' />
             }
             {
+                readableFileType === 'PDF' &&
+                <PictureAsPdfSharpIcon fontSize='medium' />
+            }
+            {
+                readableFileType === 'Stasia Doc' &&
+                <DescriptionSharpIcon fontSize='medium' />
+            }
+            {
                 readableFileType === 'File' &&
                 <InsertDriveFileSharpIcon fontSize='medium' />
             }
@@ -121,7 +154,9 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
             </div>
             <div className='w-full flex flex-col'>
                 <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4
-                mb-2 border-b-[1px] border-b-primary'>
+                mb-2 border-b-[1px] border-b-primary' onClick={() => {
+                    alert('open file here, if .stasia file, then in a new tab.')
+                }}>
                     <VisibilitySharpIcon fontSize='small' />
                     <span className='pl-4'>Open {readableFileType}</span>
                 </button>

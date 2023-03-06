@@ -2,6 +2,7 @@ import LoadingBox from "@/components/LoadingBox";
 import Button from "@/components/common/Button";
 import { computeHash } from "@/functions/computeHash";
 import { supabase } from "@/lib/supabaseClient";
+import { LinearProgress } from "@mui/material";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
@@ -19,9 +20,10 @@ interface EditDocumentWindowProps
 export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowProps)
 {
     const router = useRouter();
-	const [fileContents, setFileContents] = useState<string>('');
+	const [fileContents, setFileContents] = useState<string>();
 	const [computedHash, setComputedHash] = useState(0);
 	const [initialHash, setInitialHash] = useState(0);
+	const [isSaving, setIsSaving] = useState(false);
 
 	useEffect(() => {
 		setComputedHash(computeHash(fileContents ?? ''));
@@ -47,11 +49,17 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 			<Button text='Back to Files' onClick={() => {
 				router.push('/files');
 			}} />
-			<span className="">Editor for document {fileId}</span>
+			<span className="">Editing <b>{fileId.split('/')[1]}</b></span>
 			{
-				computedHash !== initialHash && fileContents &&
+				isSaving &&
+				<LinearProgress color='inherit' className="text-primary h-4 w-48 rounded-sm ml-auto" />
+			}
+			{
+				computedHash !== initialHash && fileContents && !isSaving &&
 				<Button text='Save Document' onClick={async () => {
-					const file = new File([fileContents], fileId, {
+					setIsSaving(true);
+					const file = new File([fileContents], fileId, 
+					{
 						type: 'text/markdown',
 						lastModified: Date.now()
 					});
@@ -87,6 +95,7 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 							style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
 						});
 					}
+					setIsSaving(false);
 				}} className="ml-auto" />
 			}
 		</div>
@@ -101,18 +110,18 @@ export default function EditDocumentWindow({ user, fileId }: EditDocumentWindowP
 			</div>
 			<div className="flex-grow flex flex-row">
 				{
-					!fileContents &&
+					fileContents === undefined &&
 					<div className="flex-grow flex flex-col items-center justify-center">
 						<LoadingBox />
 						<small>Loading Document</small>
 					</div>
 				}
 				{
-					fileContents &&
+					fileContents !== undefined &&
 					<>
-					<textarea className="w-1/2 h-full bg-transparent rounded-l p-4 outline-none" placeholder="Enter Text" value={fileContents} onChange={(e) => setFileContents(e.target.value)} />
+					<textarea className="w-1/2 h-full bg-transparent rounded-l p-4 outline-none scrollbar" placeholder="Enter Text" value={fileContents} onChange={(e) => setFileContents(e.target.value)} />
 					<div className="px-4 py-2 my-2 border-l-4 border-l-quaternary">
-						<ReactMarkdown remarkPlugins={[remarkGfm]}>
+						<ReactMarkdown remarkPlugins={[remarkGfm]} className="scrollbar whitespace-pre">
 							{fileContents}
 						</ReactMarkdown>
 					</div>
