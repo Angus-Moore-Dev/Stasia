@@ -2,6 +2,7 @@ import LoadingBox from "@/components/LoadingBox";
 import Button from "@/components/common/Button";
 import File from "@/components/files/File";
 import FileUploadModal from "@/components/files/FileUploadModal";
+import NewFileModal from "@/components/files/NewFileModal";
 import NewFolderModal from "@/components/files/NewFolderModal";
 import { supabase } from "@/lib/supabaseClient";
 import { FileData } from "@/models/files/FileMetadata";
@@ -65,9 +66,10 @@ export default function FilesPage({ user }: FilesPageProps)
 			<span className="mr-auto">Files</span>
 			<Button text='New Folder' onClick={() => setShowNewFolderModal(true)} />
 			<Button text='Upload File' onClick={() => setShowFileUploadModal(true)} />
-			<Button text='New File' onClick={() => { }} />
+			<Button text='New Document' onClick={() => setShowNewFileModal(true)} />
 			<FileUploadModal show={showFileUploadModal} setShow={setShowFileUploadModal} filePath={currentFolderId} setComplete={setIsRefreshing} />
 			<NewFolderModal show={showNewFolderModal} setShow={setShowNewFolderModal} setRefreshing={setIsRefreshing} currentFolderId={currentFolderId} setCurrentFolderId={setCurrentFolderId} />
+			<NewFileModal show={showNewFileModal} setShow={setShowNewFileModal} setRefreshing={setIsRefreshing} currentFolderId={currentFolderId} setCurrentFolderId={setCurrentFolderId} allFileNamesInFolder={files?.map(x => x.name) ?? []} />
 		</div>
 		<div className="w-full mx-auto flex-grow flex flex-col bg-tertiary rounded">
 			<span className="px-8 bg-quaternary py-4 rounded-t font-medium">

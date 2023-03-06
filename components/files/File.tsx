@@ -16,6 +16,7 @@ import InsertDriveFileSharpIcon from '@mui/icons-material/InsertDriveFileSharp';
 import { LinearProgress } from '@mui/material';
 import FileUploadModal from './FileUploadModal';
 import FilePreviewModal from './FilePreviewModal';
+import { useRouter } from 'next/router';
 
 interface FileProps
 {
@@ -29,6 +30,7 @@ interface FileProps
 
 export default function File({ file, currentFolderId, setFolderListId, activeContextMenu, setActiveContextMenu, setRefreshing }: FileProps)
 {
+    const router = useRouter();
     const [divId] = useState(v4()); // This is because folders do not have ids, so we must create our own.
     const [isFolder] = useState(!file.metadata || file.metadata === null);
     const [showContextMenu, setShowContextMenu] = useState(false);
@@ -61,6 +63,14 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                     setImageModal(true);
                 else if (file.metadata.mimetype.includes('video/'))
                     setVideoModal(true);
+                else if (file.name.endsWith('.stasia'))
+                    router.push(`/files/edit/${file.name}`);
+                else if (file.name.endsWith('.pdf'))
+                {
+                    // Creates a valid URL for 1 hour.
+                    const signedURL = (await supabase.storage.from('general.files').createSignedUrl(currentFolderId ? `${currentFolderId}/${file.name}` : file.name, 3600)).data?.signedUrl;
+                    window.open(signedURL, '_blank');
+                }
                 else
                     setFileModal(true)
             }
