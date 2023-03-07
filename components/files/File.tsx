@@ -19,6 +19,8 @@ import FilePreviewModal from './FilePreviewModal';
 import { useRouter } from 'next/router';
 import DescriptionSharpIcon from '@mui/icons-material/DescriptionSharp';
 import PictureAsPdfSharpIcon from '@mui/icons-material/PictureAsPdfSharp';
+import ShareFileModal from './ShareFileModal';
+import RenameFolder from './RenameFolderModal';
 
 
 interface FileProps
@@ -30,9 +32,10 @@ interface FileProps
     setActiveContextMenu: Dispatch<SetStateAction<string>>;
     setRefreshing: Dispatch<SetStateAction<boolean>>;
     setIsLoading: Dispatch<SetStateAction<boolean>>;
+    allFilesInDirectory: string[];
 }
 
-export default function File({ file, currentFolderId, setFolderListId, activeContextMenu, setActiveContextMenu, setRefreshing, setIsLoading }: FileProps)
+export default function File({ file, currentFolderId, setFolderListId, activeContextMenu, setActiveContextMenu, setRefreshing, setIsLoading, allFilesInDirectory }: FileProps)
 {
     const router = useRouter();
     const [divId] = useState(v4()); // This is because folders do not have ids, so we must create our own.
@@ -40,6 +43,8 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
     const [showContextMenu, setShowContextMenu] = useState(false);
     const [mousePositionOnScreen, setMousePositionOnScreen] = useState<{x: number, y: number}>({x: 0, y: 0});
 
+    const [renameModal, setRenameModal] = useState(false);
+    const [shareModal, setShareModal] = useState(false);
     const [imageModal, setImageModal] = useState(false);
     const [videoModal, setVideoModal] = useState(false);
     const [fileModal, setFileModal] = useState(false);
@@ -68,35 +73,40 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
         }
     }
 
+    const openFile = async () => 
+    {
+        if (isFolder)
+        {
+            setFolderListId(currentFolderId ? `${currentFolderId}/${file.name}` : file.name);
+        }
+        else
+        {
+            if (file.metadata.mimetype.includes('image/'))
+                setImageModal(true);
+            else if (file.metadata.mimetype.includes('video/'))
+                setVideoModal(true);
+            else if (file.name.endsWith('.stasia'))
+                router.push(`/files/edit?id=${currentFolderId ? `${currentFolderId}/${file.name}` : file.name}`);
+            else if (file.name.endsWith('.pdf'))
+            {
+                // Creates a valid URL for 1 hour.
+                const signedURL = (await supabase.storage.from('general.files').createSignedUrl(currentFolderId ? `${currentFolderId}/${file.name}` : file.name, 3600)).data?.signedUrl;
+                window.open(signedURL, '_blank');
+            }
+            else
+                setFileModal(true);
+        }
+    }
+
     return <>
+        <RenameFolder show={renameModal} setShow={setRenameModal} file={file} currentFolderId={currentFolderId} setRefreshing={setRefreshing} setCurrentFolderId={setFolderListId} isFolder={isFolder} allFilesInPath={allFilesInDirectory} setIsLoading={setIsLoading} />
+        <ShareFileModal show={shareModal} setShow={setShareModal} file={file} currentFolderId={currentFolderId} />
         <FilePreviewModal show={fileModal} setShow={setFileModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
         <ImagePreviewModal show={imageModal} setShow={setImageModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
         <VideoPreviewModal show={videoModal} setShow={setVideoModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
         <div className={`relative z-40 select-none w-full px-8 py-4 flex flex-row gap-8 flex-wrap items-center transition hover:bg-quaternary hover:text-primary font-medium hover:cursor-pointer ${!file.metadata && 'font-semibold'}`}
         onContextMenuCapture={(e) => e.preventDefault()}
-        onDoubleClick={async () => {
-            if (isFolder)
-            {
-                setFolderListId(currentFolderId ? `${currentFolderId}/${file.name}` : file.name);
-            }
-            else
-            {
-                if (file.metadata.mimetype.includes('image/'))
-                    setImageModal(true);
-                else if (file.metadata.mimetype.includes('video/'))
-                    setVideoModal(true);
-                else if (file.name.endsWith('.stasia'))
-                    router.push(`/files/edit?id=${currentFolderId ? `${currentFolderId}/${file.name}` : file.name}`);
-                else if (file.name.endsWith('.pdf'))
-                {
-                    // Creates a valid URL for 1 hour.
-                    const signedURL = (await supabase.storage.from('general.files').createSignedUrl(currentFolderId ? `${currentFolderId}/${file.name}` : file.name, 3600)).data?.signedUrl;
-                    window.open(signedURL, '_blank');
-                }
-                else
-                    setFileModal(true)
-            }
-        }}
+        onDoubleClick={() => openFile()}
         onMouseDown={(e) => {
             if (e.button === 2)
             {
@@ -155,20 +165,26 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
             </div>
             <div className='w-full flex flex-col'>
                 <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4
-                mb-2 border-b-[1px] border-b-primary' onClick={() => {
-                    alert('open file here, if .stasia file, then in a new tab.')
-                }}>
+                mb-2 border-b-[1px] border-b-primary' onClick={() => openFile()}>
                     <VisibilitySharpIcon fontSize='small' />
                     <span className='pl-4'>Open {readableFileType}</span>
                 </button>
-                <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4'>
-                    <EditSharpIcon fontSize='small' />
-                    <span className='pl-4'>Rename {readableFileType}</span>
-                </button>
-                <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4'>
-                    <AccountTreeIcon fontSize='small' />
-                    <span className='pl-4'>Share {readableFileType} With Others</span>
-                </button>
+                {
+                    isFolder &&
+                    <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4'
+                    onClick={() => setRenameModal(true)}>
+                        <EditSharpIcon fontSize='small' />
+                        <span className='pl-4'>Rename {readableFileType}</span>
+                    </button>
+                }
+                {
+                    !isFolder && // Share is only available for files.
+                    <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4'
+                    onClick={() => setShareModal(true)}>
+                        <AccountTreeIcon fontSize='small' />
+                        <span className='pl-4'>Share {readableFileType} With Others</span>
+                    </button>
+                }
                 {
                     isDeleting &&
                     <LinearProgress color="inherit" className="flex-grow h-3 rounded-sm text-red-500 mx-4 my-2" />

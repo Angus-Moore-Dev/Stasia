@@ -48,7 +48,9 @@ export default function HomePage({ user }: HomePageProps)
 							<Link href='/files'>
 								<InteractiveBox title='Files' icon={<AccountTreeIcon fontSize='large' />} />
 							</Link>
-							<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
+							<Link href='/projects'>
+								<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
+							</Link>
 							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Staff (coming soon)' icon={<BadgeIcon fontSize='large' />}  />
 						</div>
@@ -96,7 +98,7 @@ function InteractiveBox({title, icon}: InteractiveBoxProps)
 			<div className='p-2 rounded-xl text-primary group-hover:text-secondary group-hover:animate-pulse'>
 				{icon}
 			</div>
-			<p className='text-center'>{title}</p>
+			<p className='text-center font-medium'>{title}</p>
 		</div>
 	)
 }

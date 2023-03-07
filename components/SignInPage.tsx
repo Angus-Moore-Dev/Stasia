@@ -15,11 +15,11 @@ export default function SignInPage()
     const [isSigningIn, setIsSigningIn] = useState(false);
 
     return <div className="h-full w-full max-w-6xl flex flex-col items-center justify-center mx-auto">
-        <form className="flex flex-col gap-4 p-4 rounded-lg bg-tertiary  justify-start">
+        <form className="flex flex-col gap-4 p-4 rounded bg-tertiary justify-start">
             <div>
-                <Image placeholder="blur" src={logo} alt='logo' height='600' width='500' className="mb-24" />
+                <Image placeholder="blur" src={logo} alt='logo' height='600' width='500' className="mb-10" />
             </div>
-            <span>Sign in to Psychostasia</span>
+            <span>Sign in to Stasia</span>
             <input value={email} onChange={(e) => setEmail(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Username" type="email" />
             <input value={password} onChange={(e) => setPassword(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Password" type='password' />
             {

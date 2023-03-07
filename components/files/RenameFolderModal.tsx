@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { FileData } from "@/models/files/FileMetadata";
 import { Box, LinearProgress, Modal } from "@mui/material";
 import { useRouter } from "next/router";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -19,40 +20,35 @@ interface NewFileModalProps
     setShow: Dispatch<SetStateAction<boolean>>;
     currentFolderId: string;
     setCurrentFolderId: Dispatch<SetStateAction<string>>;
-    setRefreshing:Dispatch<SetStateAction<boolean>>;
-    allFileNamesInFolder: string[];
+    setRefreshing: Dispatch<SetStateAction<boolean>>;
+    file: FileData;
+    isFolder: boolean;
+    allFilesInPath: string[];
+    setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function NewFileModal({ show, setShow, setRefreshing, currentFolderId, setCurrentFolderId, allFileNamesInFolder }: NewFileModalProps)
+export default function RenameFolder({ show, setShow, setRefreshing, currentFolderId, file, allFilesInPath, setIsLoading }: NewFileModalProps)
 {
     const router = useRouter();
     const handleClose = () => setShow(false);
-    const [isValidFolderName, setIsValidFolderName] = useState(false);
-    const [fileName, setFileName] = useState('');
+    const [isValidFolderName, setIsValidFolderName] = useState(true);
+    const [fileName, setFileName] = useState(file.name);
     const [isCreatingNewFile, setIsCreatingNewFile] = useState(false);
     const [fileNameTaken, setFileNameTaken] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
 
-    const createNewFile = async () => 
+    const renameFile = async () => 
     {
-        setIsCreatingNewFile(true);
-        const moddedFileName = `${fileName.replaceAll(' ', '_')}.stasia`;
-        if (allFileNamesInFolder.some(x => x === moddedFileName))
+        if (allFilesInPath.some(x => x === fileName))
         {
             setFileNameTaken(true);
-            setIsCreatingNewFile(false);
-            return;
         }
-
-        const file = new File(["# New Document"], moddedFileName, {
-            type: 'text/markdown',
-            lastModified: Date.now()
-        });
-        await supabase.storage.from('general.files').upload(currentFolderId ? `${currentFolderId}/${file.name}` : `${file.name}`, file);
-        setIsCreatingNewFile(false);
-        setShow(false);
-        router.push(`/files/edit?id=${currentFolderId ? `${currentFolderId}/${file.name}` : `${file.name}`}`);
-        setRefreshing(true);
+        else
+        {
+            setIsLoading(true);
+            await renameFolder(currentFolderId, file.name, fileName);
+            setIsLoading(false);
+            setRefreshing(true);
+        }
     }
 
     useEffect(() => {
@@ -60,8 +56,15 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
         {
             setIsValidFolderName(false);
             setFileName('');
+            setFileNameTaken(false);
+        }
+        else
+        {
+            setIsValidFolderName(true);
+            setFileName(file.name);
         }
     }, [show]);
+
 
     return <div>
         <Modal
@@ -73,10 +76,10 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
             <Box sx={style}>
                 <div className="w-full h-full flex flex-col rounded bg-quaternary min-w-[500px]">
                     <div className="py-1 flex flex-row items-center justify-between px-8">
-                        <span>New Document</span>
+                        <span>Rename Folder</span>
                     </div>
                     <div className="flex-grow bg-secondary p-8 flex items-center justify-center rounded-b flex-col">
-                        <input autoFocus={true} ref={inputRef} value={fileName} onChange={(e) => {
+                        <input spellCheck={false} autoFocus={true} value={fileName} onChange={(e) => {
                             if (/[`!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/.test(e.target.value))
                             {
                                 setIsValidFolderName(false);
@@ -91,12 +94,12 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && isValidFolderName)
                             {
-                                createNewFile();
+                                renameFile();
                             }
                         }}
                         className="px-4 py-1 outline-none bg-tertiary rounded w-full font-semibold aria-disabled:text-red-500"
-                        aria-disabled={!isValidFolderName}
-                        placeholder="Document Name" />
+                        aria-disabled={!isValidFolderName || fileNameTaken}
+                        placeholder='Folder Name' />
                         {
                             !isValidFolderName && fileName &&
                             <small className="w-full pt-1">Invalid folder name. No special characters.</small>
@@ -120,8 +123,8 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
                             {
                                 isValidFolderName && fileName &&
                                 <button className="w-1/2 px-2 py-1 rounded text-primary font-semibold transition hover:text-zinc-100 hover:bg-primary"
-                                onClick={() => createNewFile()}>
-                                    Create
+                                onClick={() => renameFile()}>
+                                    Rename
                                 </button>
                             }
                         </div>
@@ -130,4 +133,26 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
             </Box>
         </Modal>
     </div>
+}
+
+
+/**
+ * 
+ * @param path the path to the current folder (folder/subfolder/)
+ * @param folderName the name of the existing folder ([path][fileName])
+ * @param newFolderName the name of the new folder ([path][newFileName]), this never changes.
+ */
+async function renameFolder(path: string, folderName: string, newFolderName: string): Promise<void>
+{
+    await moveFilesInFolder(path ? `${path}/${folderName}` : folderName, path ? `${path}/${newFolderName}` : newFolderName);
+}
+
+
+async function moveFilesInFolder(oldPath: string, newPath: string)
+{
+    const filesInDirectory = (await supabase.storage.from('general.files').list(oldPath)).data as unknown as FileData[];
+    for (const file of filesInDirectory.filter(x => x.metadata !== null))
+        await supabase.storage.from('general.files').move(`${oldPath}/${file.name}`, `${newPath}/${file.name}`);
+    for (const folder of filesInDirectory.filter(x => x.metadata === null))
+        await moveFilesInFolder(`${oldPath}/${folder.name}`, `${newPath}/${folder.name}`);
 }
