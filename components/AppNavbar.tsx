@@ -29,7 +29,7 @@ export default function AppNavbar()
     }, [user]);
     return (
         <div className="w-full min-h-[30] p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start py-1">
-            <Link href='/'>
+            <Link href='/' className="">
                 <Image src={logo} placeholder="blur" width='200' height='250' alt='logo' className="object-cover" />
             </Link>
             {
@@ -38,8 +38,8 @@ export default function AppNavbar()
                     {
                         profile.name
                     }
-                    <Link href='/me'>
-                        <Image src={profile.profilePictureURL} alt='profile' className="rounded transition hover:border-[1px] hover:border-primary" width='50' height='50' />
+                    <Link href='/me' className="w-[40px] h-[40px]">
+                        <Image src={profile.profilePictureURL} alt='profile' className="rounded transition hover:border-[1px] hover:border-primary object-cover h-full w-full" width='40' height='40' />
                     </Link>
                 </section>
             }
