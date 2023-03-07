@@ -103,16 +103,6 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                         // channel.subscribe();
                     }
                 });
-
-                // Now we get all the users that have commented on this.
-                const commentProfileData = await supabase.from('profiles').select(`id, name, profilePictureURL`).eq('id', comments.map(x => x.senderId));
-                const profiles = commentProfileData.data as unknown as Profile[];
-                for (const comment of profiles ?? [])
-                {
-                    comment.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(comment.profilePictureURL).data.publicUrl ?? '';
-                }
-                console.log(profiles);
-                setCommentProfileInfo(profiles);
             }
         }
         fetchComments();

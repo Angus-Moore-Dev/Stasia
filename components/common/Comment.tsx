@@ -32,7 +32,6 @@ export function ContactCommentBox({ comment, profile, }: CommentBoxProps)
                             Edit
                         </button>
                         <button className="rounded font-medium text-zinc-100 transition hover:text-red-500 text-xs" onClick={async () => {
-                            console.log('delete!');
                             await supabase.from('contact_comments').delete().eq('id', comment.id);
                         }}>
                             Delete
