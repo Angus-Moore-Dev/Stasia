@@ -1,10 +1,11 @@
 import LoadingBox from "@/components/LoadingBox";
 import Button from "@/components/common/Button";
-import { CommentBox } from "@/components/common/Comment";
+import { LeadCommentBox } from "@/components/common/Comment";
 import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
 import { Lead, LeadStage } from "@/models/Lead";
 import { Comment } from "@/models/chat/Comment";
+import { Profile } from "@/models/me/Profile";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
 import Image from 'next/image';
@@ -29,6 +30,8 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
     const [messagetoSendContents, setMessagetoSendContents] = useState('');
     const [comments, setComments] = useState<Comment[]>();
     const [commentsIsLoading, setCommentsIsLoading] = useState(true);
+    const [commentProfileInfo, setCommentProfileInfo] = useState<{id: string, name: string, profilePictureURL: string}[]>();
+
     const updateMessage = useCallback((comment: Comment) => 
     {
         setComments(comments => [...comments ?? [], comment]);
@@ -39,6 +42,29 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
     }, []);
 
     useEffect(() => {
+        if (comments)
+        {
+            const checkMessages = async () =>
+            {
+                 // Now we get all the users that have commented on this.
+                if (!commentProfileInfo?.some(x => x.id === comments.find(comment => comment.senderId === x.id)?.senderId))
+                {
+                    const commentProfileData = await supabase.from('profiles').select(`id, name, profilePictureURL`).in('id', [...comments.map(x => x.senderId)]);
+                    const profiles = commentProfileData.data as unknown as Profile[];
+                    for (const comment of profiles ?? [])
+                    {
+                        comment.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(comment.profilePictureURL).data.publicUrl ?? '';
+                    }
+                    console.log(profiles);
+                    setCommentProfileInfo(profiles);
+                }
+            }
+            checkMessages();
+        }
+    }, [comments]);
+
+
+    useEffect(() => {
         const fetchComments = async() => {
             if (viewComments && !comments)
             {
@@ -47,7 +73,8 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 setComments(comments);
                 setCommentsIsLoading(false);
                 const channel = supabase.channel('table-db-changes')
-                .on('postgres_changes', {event: '*', schema: 'public', table: 'lead_comments'}, (payload) => {
+                .on('postgres_changes', {event: '*', schema: 'public', table: 'lead_comments'}, async (payload) => 
+                {
                     if (payload.eventType === 'INSERT')
                     {
                         const message = payload.new as Comment;
@@ -55,6 +82,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                         {
                             // ADD THIS MESSAGE ONTO THE LIST!
                             updateMessage(message);
+                            // Now we get all the users that have commented on this.
                         }
                     }
                     else if (payload.eventType === 'UPDATE')
@@ -75,6 +103,16 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                         // channel.subscribe();
                     }
                 });
+
+                // Now we get all the users that have commented on this.
+                const commentProfileData = await supabase.from('profiles').select(`id, name, profilePictureURL`).eq('id', comments.map(x => x.senderId));
+                const profiles = commentProfileData.data as unknown as Profile[];
+                for (const comment of profiles ?? [])
+                {
+                    comment.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(comment.profilePictureURL).data.publicUrl ?? '';
+                }
+                console.log(profiles);
+                setCommentProfileInfo(profiles);
             }
         }
         fetchComments();
@@ -162,16 +200,17 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 <div className="w-full flex-grow flex flex-col">
                     <section className="flex-grow flex flex-col gap-1 overflow-y-auto max-h-[40vh] scrollbar mb-4">
                         {
-                            commentsIsLoading &&
+                            commentsIsLoading && (!commentProfileInfo || commentProfileInfo.length === 0) &&
                             <div className="flex-grow flex items-center justify-center">
                                 <LoadingBox />
                             </div>
                         }
                         {
-                            comments && comments.length > 0 && !commentsIsLoading && comments.map(comment => <CommentBox comment={comment} />)
+                            comments && comments.length > 0 && !commentsIsLoading && commentProfileInfo && commentProfileInfo.length > 0 && 
+                            comments.map(comment => <LeadCommentBox comment={comment} profile={commentProfileInfo?.find(x => x.id === comment.senderId) as Profile} />)
                         }
                         {
-                            comments && comments.length === 0 && !commentsIsLoading &&
+                            comments && comments.length === 0 && !commentsIsLoading && (!commentProfileInfo || commentProfileInfo.length === 0) &&
                             <div className='flex-grow flex items-center justify-center'>
                                 <p>No comments.</p>
                             </div>

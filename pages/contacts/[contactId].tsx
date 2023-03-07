@@ -10,9 +10,10 @@ import BusinessSharpIcon from '@mui/icons-material/BusinessSharp';
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import LoadingBox from "@/components/LoadingBox";
-import { CommentBox } from "@/components/common/Comment";
+import { ContactCommentBox } from "@/components/common/Comment";
 import { v4 } from "uuid";
 import { Comment } from '@/models/chat/Comment';
+import { Profile } from "@/models/me/Profile";
 interface SpecificContactPageProps
 {
     user: User;
@@ -26,19 +27,44 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
     const [name, setName] = useState(contact.name);
     const [shortDescription, setShortDescription] = useState(contact.description);
     const [selectedType, setSelectedType] = useState<number | undefined>();
+    const [commentProfileInfo, setCommentProfileInfo] = useState<{id: string, name: string, profilePictureURL: string}[]>();
 
     // for comments
     const [messagetoSendContents, setMessagetoSendContents] = useState('');
     const [comments, setComments] = useState<Comment[]>();
     const [commentsIsLoading, setCommentsIsLoading] = useState(true);
-    const updateMessage = useCallback((comment: Comment) => 
+    const updateMessage = useCallback(async (comment: Comment) => 
     {
         setComments(comments => [...comments ?? [], comment]);
     }, []);
-    const removeMessage = useCallback((id: string) => 
+    const removeMessage = useCallback(async (id: string) => 
     {
         setComments(comments => [...comments?.filter(x => x.id !== id) ?? []]);
     }, []);
+
+
+    useEffect(() => {
+        if (comments)
+        {
+            const checkMessages = async () =>
+            {
+                 // Now we get all the users that have commented on this.
+                if (!commentProfileInfo?.some(x => x.id === comments.find(comment => comment.senderId === x.id)?.senderId))
+                {
+                    const commentProfileData = await supabase.from('profiles').select(`id, name, profilePictureURL`).in('id', [...comments.map(x => x.senderId)]);
+                    const profiles = commentProfileData.data as unknown as Profile[];
+                    for (const comment of profiles ?? [])
+                    {
+                        comment.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(comment.profilePictureURL).data.publicUrl ?? '';
+                    }
+                    console.log('profile info::', profiles);
+                    setCommentProfileInfo(profiles);
+                }
+            }
+            checkMessages();
+        }
+    }, [comments]);
+
 
     useEffect(() => {
         if (selectedType === 2)
@@ -52,7 +78,8 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                     setComments(comments);
                     setCommentsIsLoading(false);
                     const channel = supabase.channel('table-db-changes')
-                    .on('postgres_changes', {event: '*', schema: 'public', table: 'contact_comments'}, (payload) => {
+                    .on('postgres_changes', {event: '*', schema: 'public', table: 'contact_comments'}, async (payload) => 
+                    {
                         console.log(payload);
                         if (payload.eventType === 'INSERT')
                         {
@@ -81,11 +108,30 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                             // channel.subscribe();
                         }
                     });
+
+                    if (comments.length > 0)
+                    {
+                        // Now we get all the users that have commented on this.
+                        const commentProfileData = await supabase.from('profiles').select(`id, name, profilePictureURL`).eq('id', comments.map(x => x.senderId));
+                        console.log(commentProfileData);
+                        const profiles = commentProfileData.data as unknown as Profile[];
+                        for (const comment of profiles ?? [])
+                        {
+                            comment.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(comment.profilePictureURL).data.publicUrl ?? '';
+                        }
+                        console.log(profiles);
+                        setCommentProfileInfo(profiles);
+                    }
                 }
             }
             fetchComments();
         }
     }, [selectedType]);
+
+
+    useEffect(() => {
+        console.log('commentProfileInfo::', commentProfileInfo);
+    }, [commentProfileInfo]);
 
     return <div className="w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto">
         <div className="w-full flex flex-row justify-between">
@@ -106,6 +152,7 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                     </p>
                     <div className="w-full flex flex-col">
                         <textarea value={shortDescription}
+                        readOnly={true}
                         className="px-2 pb-2 pt-4 bg-transparent text-zinc-100 outline-none font-medium w-2/3 h-[250px] max-h-[250px] min-h-[250px] scrollbar" placeholder="short description" />
                     </div>
                 </div>
@@ -178,16 +225,17 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                     <div className="w-full flex-grow flex flex-col">
                         <section className="flex-grow flex flex-col gap-1 overflow-y-auto max-h-[30vh] scrollbar mb-4">
                             {
-                                commentsIsLoading &&
+                                commentsIsLoading && (!commentProfileInfo || commentProfileInfo.length === 0) &&
                                 <div className="flex-grow flex items-center justify-center">
                                     <LoadingBox />
                                 </div>
                             }
                             {
-                                comments && comments.length > 0 && !commentsIsLoading && comments.map(comment => <CommentBox comment={comment} />)
+                                comments && comments.length > 0 && !commentsIsLoading && commentProfileInfo && commentProfileInfo.length > 0 && 
+                                comments.map(comment => <div key={comment.id}><ContactCommentBox comment={comment} profile={commentProfileInfo.find(x => x.id === comment.senderId) as Profile} /></div>)
                             }
                             {
-                                comments && comments.length === 0 && !commentsIsLoading &&
+                                comments && comments.length === 0 && !commentsIsLoading && (!commentProfileInfo || commentProfileInfo.length === 0) &&
                                 <div className='flex-grow flex items-center justify-center'>
                                     <p>No comments.</p>
                                 </div>
