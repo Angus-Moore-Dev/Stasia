@@ -22,7 +22,7 @@ export default function MePage({ user, profile }: MePageProps)
 	const [isUploading, setIsUploading] = useState(false);
 	const [profilePictureFile, setProfilePictureFile] = useState<File>();
 	const [profilePictureURL, setProfilePictureURL] = useState(profile.profilePictureURL);
-	const updateProfilePicture = async () =>
+	const updateProfilePicture = async () => 
 	{
 		if (profilePictureFile)
 		{
