@@ -108,20 +108,6 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                             // channel.subscribe();
                         }
                     });
-
-                    if (comments.length > 0)
-                    {
-                        // Now we get all the users that have commented on this.
-                        const commentProfileData = await supabase.from('profiles').select(`id, name, profilePictureURL`).eq('id', comments.map(x => x.senderId));
-                        console.log(commentProfileData);
-                        const profiles = commentProfileData.data as unknown as Profile[];
-                        for (const comment of profiles ?? [])
-                        {
-                            comment.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(comment.profilePictureURL).data.publicUrl ?? '';
-                        }
-                        console.log(profiles);
-                        setCommentProfileInfo(profiles);
-                    }
                 }
             }
             fetchComments();
