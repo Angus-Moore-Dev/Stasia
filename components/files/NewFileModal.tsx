@@ -27,7 +27,7 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
 {
     const router = useRouter();
     const handleClose = () => setShow(false);
-    const [isValidFolderName, setIsValidFolderName] = useState(false);
+    const [isValidFolderName, setIsValidFolderName] = useState(true);
     const [fileName, setFileName] = useState('');
     const [isCreatingNewFile, setIsCreatingNewFile] = useState(false);
     const [fileNameTaken, setFileNameTaken] = useState(false);
@@ -77,14 +77,6 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
                     </div>
                     <div className="flex-grow bg-secondary p-8 flex items-center justify-center rounded-b flex-col">
                         <input autoFocus={true} ref={inputRef} value={fileName} onChange={(e) => {
-                            if (/[`!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/.test(e.target.value))
-                            {
-                                setIsValidFolderName(false);
-                            }
-                            else
-                            {
-                                setIsValidFolderName(true);
-                            }
                             setFileNameTaken(false);
                             setFileName(e.target.value);
                         }} pattern="[A-Za-z0-9]" maxLength={48} 
