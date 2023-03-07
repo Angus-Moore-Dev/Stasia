@@ -19,6 +19,7 @@ import FilePreviewModal from './FilePreviewModal';
 import { useRouter } from 'next/router';
 import DescriptionSharpIcon from '@mui/icons-material/DescriptionSharp';
 import PictureAsPdfSharpIcon from '@mui/icons-material/PictureAsPdfSharp';
+import ShareFileModal from './ShareFileModal';
 
 
 interface FileProps
@@ -40,6 +41,7 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
     const [showContextMenu, setShowContextMenu] = useState(false);
     const [mousePositionOnScreen, setMousePositionOnScreen] = useState<{x: number, y: number}>({x: 0, y: 0});
 
+    const [shareModal, setShareModal] = useState(false);
     const [imageModal, setImageModal] = useState(false);
     const [videoModal, setVideoModal] = useState(false);
     const [fileModal, setFileModal] = useState(false);
@@ -69,6 +71,7 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
     }
 
     return <>
+        <ShareFileModal show={shareModal} setShow={setShareModal} file={file} currentFolderId={currentFolderId} />
         <FilePreviewModal show={fileModal} setShow={setFileModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
         <ImagePreviewModal show={imageModal} setShow={setImageModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
         <VideoPreviewModal show={videoModal} setShow={setVideoModal} file={file} filePath={currentFolderId} setRefreshing={setRefreshing} />
@@ -165,10 +168,14 @@ export default function File({ file, currentFolderId, setFolderListId, activeCon
                     <EditSharpIcon fontSize='small' />
                     <span className='pl-4'>Rename {readableFileType}</span>
                 </button>
-                <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4'>
-                    <AccountTreeIcon fontSize='small' />
-                    <span className='pl-4'>Share {readableFileType} With Others</span>
-                </button>
+                {
+                    !isFolder &&
+                    <button className='w-full p-2 text-primary font-semibold transition hover:bg-primary hover:text-secondary text-left px-4'
+                    onClick={() => setShareModal(true)}>
+                        <AccountTreeIcon fontSize='small' />
+                        <span className='pl-4'>Share {readableFileType} With Others</span>
+                    </button>
+                }
                 {
                     isDeleting &&
                     <LinearProgress color="inherit" className="flex-grow h-3 rounded-sm text-red-500 mx-4 my-2" />
