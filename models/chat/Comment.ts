@@ -7,4 +7,8 @@ export class Comment
     contactId: string = ''; // for contact comments
     replyingToId: string = '';
     message: string = '';
+
+    // This is for injecting the profile data.
+    name: string = '';
+    publicProfileURL: string = '';
 }
