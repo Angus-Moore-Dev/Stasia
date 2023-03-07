@@ -68,7 +68,7 @@ export default function NewFolderModal({ show, setShow, setRefreshing, currentFo
                         <span>New Folder</span>
                     </div>
                     <div className="flex-grow bg-secondary p-8 flex items-center justify-center rounded-b flex-col">
-                        <input value={folderName} onChange={(e) => {
+                        <input autoFocus={true} value={folderName} onChange={(e) => {
                             if (/[`!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/.test(e.target.value))
                             {
                                 setIsValidFolderName(false);

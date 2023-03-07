@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { Box, LinearProgress, Modal } from "@mui/material";
 import { useRouter } from "next/router";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -31,6 +31,7 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
     const [fileName, setFileName] = useState('');
     const [isCreatingNewFile, setIsCreatingNewFile] = useState(false);
     const [fileNameTaken, setFileNameTaken] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const createNewFile = async () => 
     {
@@ -75,7 +76,7 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
                         <span>New Document</span>
                     </div>
                     <div className="flex-grow bg-secondary p-8 flex items-center justify-center rounded-b flex-col">
-                        <input value={fileName} onChange={(e) => {
+                        <input autoFocus={true} ref={inputRef} value={fileName} onChange={(e) => {
                             if (/[`!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/.test(e.target.value))
                             {
                                 setIsValidFolderName(false);
