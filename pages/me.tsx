@@ -65,6 +65,10 @@ export default function MePage({ user, profile }: MePageProps)
 						<LinearProgress color='inherit' className='text-primary h-5 rounded-b-sm px-4 w-32' />
 					}
 					{
+						!showSaveChanges &&
+						<small>Click to Change Profile Picture</small>
+					}
+					{
 						showSaveChanges && !isUploading &&
 						<Button text='Upload New Profile Pic' onClick={() => updateProfilePicture()} className="w-fit mt-2" />
 					}
