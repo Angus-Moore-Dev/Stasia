@@ -1,12 +1,13 @@
 export class Project
 {
+    id: string = ''; // uuid
     name: string = '';
     created_at: string = '';
     description: string = '';
     projectType: ProjectType = ProjectType.NoSpecificType;
     commercialisationType: CommercialisationType = CommercialisationType.None;
     peopleInvolved: string[] = []; // User IDs
-    contractedContact: string = ''; // Contact ID of the user, for contractual applications only.
+    contractedContactId: string = ''; // Contact ID of the user, for contractual applications only.
     industry: string = '';
 }
 

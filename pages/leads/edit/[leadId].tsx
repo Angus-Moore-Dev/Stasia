@@ -206,7 +206,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                             </div>
                         }
                     </section>
-                    <section className="h-14 flex flex-row items-center">
+                    <section className="h-fit flex flex-col items-center">
                     <textarea 
                         value={messagetoSendContents} 
                         onChange={(e) => setMessagetoSendContents(e.target.value)} 
@@ -227,6 +227,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                             }
                         }}
                     />
+                    <small className="ml-auto pt-1">Press <b>Enter</b> to send message.</small>
                     </section>
                 </div>
             }
@@ -251,77 +252,80 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 </section>
                 </>
             }
-            <div className="w-full flex flex-row justify-between">
-                <button className="px-4 py-1 rounded-lg bg-secondary text-red-500 transition hover:bg-red-500 hover:text-zinc-100 font-bold mb-10"
-                onClick={async () => {
-                    const res = await supabase.from('leads').delete().eq('id', contactData.id);
-                    console.log('deletion lead::', res);
-                    if (res.status !== 204)
-                    {
-                        toast.error(res?.error?.message, 
+            {
+                !viewComments &&
+                <div className="w-full flex flex-row justify-between">
+                    <button className="px-4 py-1 rounded-lg bg-secondary text-red-500 transition hover:bg-red-500 hover:text-zinc-100 font-bold mb-10"
+                    onClick={async () => {
+                        const res = await supabase.from('leads').delete().eq('id', contactData.id);
+                        console.log('deletion lead::', res);
+                        if (res.status !== 204)
                         {
-                            position: "bottom-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "colored",
-                            style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
-                        });
-                    }
-                    else
-                    {
-                        toast.success('Lead Deleted Successfully.', 
-                        {
-                            position: "bottom-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "colored",
-                            style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
-                        });
-                        router.push('/leads');
-                    }
-                }}>
-                    Flatline Lead
-                </button>
-                <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold mb-10"
-                onClick={async () => {
-                    const result = await supabase.from('leads').update([
-                        {
-                            stage: contactData.stage,
-                            initialContact: contactData.initialContact,
-                            primaryElevationApproach: contactData.primaryElevationApproach,
-                            secondaryElevationApproach: contactData.secondaryElevationApproach,
-                            otherComments: contactData.otherComments
+                            toast.error(res?.error?.message, 
+                            {
+                                position: "bottom-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored",
+                                style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
+                            });
                         }
-                    ]).eq('id', contactData.id);
-                    console.log(result);
-                    if (result.status === 204)
-                    {
-                        toast.success('Lead Updated Successfully.', 
+                        else
                         {
-                            position: "bottom-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "colored",
-                            style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
-                        });
-                    }
-                    
-                }}>
-                    Update Existing Lead
-                </button>
-            </div>
+                            toast.success('Lead Deleted Successfully.', 
+                            {
+                                position: "bottom-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored",
+                                style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
+                            });
+                            router.push('/leads');
+                        }
+                    }}>
+                        Flatline Lead
+                    </button>
+                    <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold mb-10"
+                    onClick={async () => {
+                        const result = await supabase.from('leads').update([
+                            {
+                                stage: contactData.stage,
+                                initialContact: contactData.initialContact,
+                                primaryElevationApproach: contactData.primaryElevationApproach,
+                                secondaryElevationApproach: contactData.secondaryElevationApproach,
+                                otherComments: contactData.otherComments
+                            }
+                        ]).eq('id', contactData.id);
+                        console.log(result);
+                        if (result.status === 204)
+                        {
+                            toast.success('Lead Updated Successfully.', 
+                            {
+                                position: "bottom-right",
+                                autoClose: 5000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored",
+                                style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
+                            });
+                        }
+                        
+                    }}>
+                        Update Existing Lead
+                    </button>
+                </div>
+            }
         </div>
     </div>
 }
