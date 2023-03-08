@@ -7,13 +7,14 @@ import { supabase } from "@/lib/supabaseClient";
 import { Profile } from "@/models/me/Profile";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
-
+import VisibilitySharpIcon from '@mui/icons-material/VisibilitySharp';
+import NotificationMenu from "./NotificationMenu";
 
 export default function AppNavbar()
 {
     const user = useUser();
     const [profile, setProfile] = useState<Profile>();
-
+    const [showNotificationMenu, setShowNotificationMenu] = useState(false);
 
     useEffect(() => 
     {
@@ -28,13 +29,21 @@ export default function AppNavbar()
         }
     }, [user]);
     return (
-        <div className="w-full min-h-[30] p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start py-1">
+        <div className="w-full min-h-[30] p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start py-1 relative">
             <Link href='/' className="">
                 <Image src={logo} placeholder="blur" width='200' height='250' alt='logo' className="object-cover" />
             </Link>
             {
                 user && profile &&
                 <section className="flex-grow flex justify-end items-center gap-4">
+                    <button className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
+                    aria-checked={showNotificationMenu}
+                    onClick={() => setShowNotificationMenu(!showNotificationMenu)}>
+                        <VisibilitySharpIcon fontSize="small" />
+                    </button>
+                    {
+                        showNotificationMenu && <NotificationMenu setShowNotificationMenu={setShowNotificationMenu} />
+                    }
                     {
                         profile.name
                     }

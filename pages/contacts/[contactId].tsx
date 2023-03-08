@@ -14,14 +14,15 @@ import { ContactCommentBox } from "@/components/common/Comment";
 import { v4 } from "uuid";
 import { Comment } from '@/models/chat/Comment';
 import { Profile } from "@/models/me/Profile";
+import createNewNotification from "@/functions/createNewNotification";
 interface SpecificContactPageProps
 {
-    user: User;
+    profile: Profile;
     contact: Contact;
 }
 
 
-export default function SpecificContactPage({ user, contact }: SpecificContactPageProps)
+export default function SpecificContactPage({ profile, contact }: SpecificContactPageProps)
 {
     const [imagePreview, setImagePreview] = useState('');
     const [name, setName] = useState(contact.name);
@@ -240,7 +241,7 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                                     const messageData = `${messagetoSendContents}`;
                                     setMessagetoSendContents('');
                                     const res = await supabase.from('contact_comments').insert([{
-                                        senderId: user.id,
+                                        senderId: profile.id,
                                         contactId: contact.id,
                                         message: messageData
                                     }]);
@@ -248,6 +249,10 @@ export default function SpecificContactPage({ user, contact }: SpecificContactPa
                                     if (res.error)
                                     {
                                         console.log(res.error);
+                                    }
+                                    else
+                                    {
+                                        createNewNotification(profile, `${contact.name} (contact) has a new comment`, `${profile.name} added a new comment for ${contact.name} on their contact page.`, contact.previewImageURL);
                                     }
                                 }
                             }}
@@ -277,10 +282,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     const { data, error } = await supabase.from('contacts').select("*").eq('id', context.query['contactId'] as string).single();
     const contact = data as Contact;
     contact.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL)).data?.publicUrl ?? '';
-
+    const profile = (await supabase.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
     return {
         props: {
-            user: session?.user,
+            profile: profile,
             contact: data as Contact,
         }
     }
