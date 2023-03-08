@@ -8,6 +8,7 @@ import { GetServerSidePropsContext } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 interface MePageProps
 {
@@ -22,6 +23,10 @@ export default function MePage({ user, profile }: MePageProps)
 	const [isUploading, setIsUploading] = useState(false);
 	const [profilePictureFile, setProfilePictureFile] = useState<File>();
 	const [profilePictureURL, setProfilePictureURL] = useState(profile.profilePictureURL);
+
+	const [password, setPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
+
 	const updateProfilePicture = async () => 
 	{
 		if (profilePictureFile)
@@ -80,6 +85,50 @@ export default function MePage({ user, profile }: MePageProps)
 					<p>{profile.team}</p>
 					<p>Employee ID: <b>{profile.id}</b></p>
 				</div>
+			</div>
+			<div className="flex flex-col gap-2">
+				<span>Update Profile Password</span>
+				<input value={password} onChange={(e) => setPassword(e.target.value)} className="p-2 rounded bg-tertiary outline-none w-96" placeholder="Update Password" />
+				<input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="p-2 rounded bg-tertiary outline-none w-96" placeholder="Confirm Password" />
+				{
+					password && confirmPassword === password &&
+					<Button text='Update Password' onClick={async () => 
+					{
+						const res = await supabase.auth.updateUser({ password: password });
+						if (res.error)
+						{
+							toast.error(res.error?.message, 
+							{
+								position: "bottom-right",
+								autoClose: 5000,
+								hideProgressBar: false,
+								closeOnClick: true,
+								pauseOnHover: true,
+								draggable: true,
+								progress: undefined,
+								theme: "colored",
+								style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
+							});
+						}
+						else
+						{
+							setPassword('');
+							setConfirmPassword('');
+							toast.success('Updated Password Successfully.',
+							{
+								position: "bottom-right",
+								autoClose: 5000,
+								hideProgressBar: false,
+								closeOnClick: true,
+								pauseOnHover: true,
+								draggable: true,
+								progress: undefined,
+								theme: "colored",
+								style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
+							});
+						}
+					}} className="w-fit" />
+				}
 			</div>
         </div>
     )
