@@ -22,13 +22,40 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
             <Button text='Back to Projects' onClick={() => {
                 router.push('/projects');
             }} className="mr-auto" />
+            <Button text='Edit Project Details' onClick={() => {
+
+            }} />
         </div>
-        <div className="flex-grow flex flex-col">
-            {
-                JSON.stringify(project)
-            }
-            <br />
-            <br />
+        <div className="flex-grow flex flex-col gap-6">
+            <div className="w-full flex flex-row">
+                <div className="flex-grow">
+                    <span className="text-4xl font-semibold">{project.name}</span>
+                    <p className="text-lg font-medium">{project.description}</p>
+                    
+                </div>
+                <div className="flex flex-col text-right">
+                    <span className="font-medium">{project.projectType}</span>
+                    <span className="font-medium">{`${project.industry ? `${project.industry } -` : ''} `}{project.commercialisationType}</span>
+                </div>
+            </div>
+            <div className="flex flex-col w-full">
+                <div className="flex flex-row gap-4 items-center">
+                    <span className="font-semibold">Major Features</span>
+                    <Button text="Add New Feature" onClick={() => {
+                        router.push(`/projects/feature/major/new?id=${project.id}`)
+                    }} />
+                </div>
+                <span>Click on a major feature to view its minor features and associated tasks.</span>
+            </div>
+            <div className="flex flex-col">
+                <div className="flex flex-row gap-4 items-center">
+                    <span className="font-semibold">Tasks</span>
+                    <Button text="Add New Task" onClick={() => {
+
+                    }} />
+                </div>
+            </div>
+            
             <p>{JSON.stringify(profiles)}</p>
         </div>
     </div>

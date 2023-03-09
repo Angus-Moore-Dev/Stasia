@@ -14,7 +14,6 @@ export default function AppNavbar()
 {
     const user = useUser();
     const [profile, setProfile] = useState<Profile>();
-    const [showNotificationMenu, setShowNotificationMenu] = useState(false);
 
     useEffect(() => 
     {
@@ -36,17 +35,8 @@ export default function AppNavbar()
             {
                 user && profile &&
                 <section className="flex-grow flex justify-end items-center gap-4">
-                    <button className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
-                    aria-checked={showNotificationMenu}
-                    onClick={() => setShowNotificationMenu(!showNotificationMenu)}>
-                        <VisibilitySharpIcon fontSize="small" />
-                    </button>
-                    {
-                        showNotificationMenu && <NotificationMenu setShowNotificationMenu={setShowNotificationMenu} />
-                    }
-                    {
-                        profile.name
-                    }
+                    <NotificationMenu profile={profile} />
+                    <span>{profile.name}</span>
                     <Link href='/me' className="w-[40px] h-[40px]">
                         <Image src={profile.profilePictureURL} alt='profile' className="rounded transition hover:border-[1px] hover:border-primary object-cover h-full w-full" width='40' height='40' />
                     </Link>
