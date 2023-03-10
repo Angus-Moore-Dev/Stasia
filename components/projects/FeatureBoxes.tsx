@@ -109,9 +109,15 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
         }
     }, [taskType]);
 
+    useEffect(() => {
+        if (isEditable)
+        {
+            inputRef.current?.focus();
+        }
+    }, [isEditable]);
+
 
     return <div className="w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]" onBlur={() => {setIsEditable(false)}}>
-        <span>{task.id}</span>
         <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32`} 
         style={{ backgroundColor: taskColour }} onChange={async (e) => {
             const res = await supabase.from('project_tickets').update({

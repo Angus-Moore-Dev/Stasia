@@ -45,7 +45,7 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
                 router.push('/projects');
             }} className="mr-auto" />
             <Button text='Edit Project Details' onClick={() => {
-
+                alert('edit project details');
             }} />
         </div>
         <div className="flex-grow w-full flex flex-col gap-6">
@@ -101,7 +101,7 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
                 </div>
                 <div className="flex flex-col gap-1 overflow-y-auto scrollbar">
                 {
-                    currentTasks && currentTasks.sort((a, b) => a.id - b.id).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} deleteTask={() => {
+                    currentTasks && currentTasks.map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} deleteTask={() => {
                         // This whole function is there because there's no realtime db changes set up right now.
                         // That will come in time.
                         setCurrentTasks(currentTasks.filter(x => x.id !== task.id));
@@ -112,7 +112,7 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
                 {
                     if (currentTasks)
                     {
-                        const task = new Task(currentTasks[currentTasks.length - 1].id + 1, project.id);
+                        const task = new Task(project.id);
                         const res = await supabase.from('project_tickets').insert(task);
                         createToast(res?.error ? res.error.message : 'Successfully Created New Task', res.error !== null);
                         if (!res.error)

@@ -1,6 +1,8 @@
+import { v4 } from "uuid";
+
 export class Task
 {
-    id: number; // This helps us figure out how many tickets have been created for a given project.
+    id: string = v4(); // This helps us figure out how many tickets have been created for a given project.
     name: string = '';
     description: string = '';
     projectId: string = ''; // the project this is attached to.
@@ -10,9 +12,8 @@ export class Task
     creatorId: string | null = null;
     taskType: TaskType = TaskType.General;
 
-    constructor(id: number, projectId: string)
+    constructor(projectId: string)
     {
-        this.id = id;
         this.projectId = projectId;
     }
 }
