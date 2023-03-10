@@ -1,11 +1,18 @@
 import Button from "@/components/common/Button";
+import { MajorFeatureBox, TaskBox } from "@/components/projects/FeatureBoxes";
+import createToast from "@/functions/createToast";
+import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
 import { Profile } from "@/models/me/Profile";
+import { MajorFeature } from "@/models/projects/MajorFeature";
 import { Project } from "@/models/projects/Project";
+import { Task } from "@/models/projects/Task";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { User } from "@supabase/supabase-js";
 import { GetServerSidePropsContext } from "next";
+import Image from "next/image";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 interface ProjectIdPageProps
 {
@@ -17,7 +24,22 @@ interface ProjectIdPageProps
 export default function ProjectIdPage({ user, project, profiles }: ProjectIdPageProps)
 {
     const router = useRouter();
-    return <div className='w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
+    const [majorFeatures, setMajorFeatures] = useState<MajorFeature[]>();
+    const [currentTasks, setCurrentTasks] = useState<Task[]>();
+
+    useEffect(() => {
+        supabase.from('project_major_features').select('*').eq('projectId', project.id).then(res => 
+        {
+            setMajorFeatures(res.data as MajorFeature[]);
+        });
+
+        supabase.from('project_tickets').select('*').eq('projectId', project.id).then(res =>
+        {
+            setCurrentTasks(res.data as Task[]);
+        })
+    }, []);
+
+    return <div className='w-full min-h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
         <div className="w-full flex flex-row items-center">
             <Button text='Back to Projects' onClick={() => {
                 router.push('/projects');
@@ -26,16 +48,37 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
 
             }} />
         </div>
-        <div className="flex-grow flex flex-col gap-6">
+        <div className="flex-grow w-full flex flex-col gap-6">
             <div className="w-full flex flex-row">
                 <div className="flex-grow">
                     <span className="text-4xl font-semibold">{project.name}</span>
                     <p className="text-lg font-medium">{project.description}</p>
-                    
                 </div>
                 <div className="flex flex-col text-right">
                     <span className="font-medium">{project.projectType}</span>
                     <span className="font-medium">{`${project.industry ? `${project.industry } -` : ''} `}{project.commercialisationType}</span>
+                </div>
+            </div>
+            <div className="w-full flex flex-col gap-2">
+                <span>People Involved In This Project</span>
+                <div className="w-full flex flex-row gap-4 flex-wrap">
+                {
+                    profiles.map(profile => <div className="h-80 w-64 mb-10 flex text-left" key={profile.id}>
+                        <div className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
+                            <Image 
+                            priority={true}
+                            src={profile.profilePictureURL} 
+                            alt='profile' 
+                            width='600' height='400' 
+                            className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
+                            <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
+                                <p className="text-lg font-medium">{profile.name}</p>
+                                <span>{profile.role}</span>
+                            </div>
+                        </div>
+                    </div>
+                    ).reverse()
+                }
                 </div>
             </div>
             <div className="flex flex-col w-full">
@@ -46,17 +89,39 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
                     }} />
                 </div>
                 <span>Click on a major feature to view its minor features and associated tasks.</span>
-            </div>
-            <div className="flex flex-col">
-                <div className="flex flex-row gap-4 items-center">
-                    <span className="font-semibold">Tasks</span>
-                    <Button text="Add New Task" onClick={() => {
-
-                    }} />
+                <div className="w-full flex flex-row gap-2 items-center pt-2">
+                {
+                    majorFeatures && majorFeatures.map(feature => <MajorFeatureBox feature={feature} />)
+                }
                 </div>
             </div>
-            
-            <p>{JSON.stringify(profiles)}</p>
+            <div className="flex flex-col gap-2">
+                <div className="flex flex-row gap-4 items-center">
+                    <span className="font-semibold">Tasks</span>
+                </div>
+                <div className="flex flex-col gap-1 overflow-y-auto scrollbar">
+                {
+                    currentTasks && currentTasks.sort((a, b) => a.id - b.id).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} deleteTask={() => {
+                        // This whole function is there because there's no realtime db changes set up right now.
+                        // That will come in time.
+                        setCurrentTasks(currentTasks.filter(x => x.id !== task.id));
+                    }} />)
+                }
+                </div>
+                <Button text="Add New Task" onClick={async () => 
+                {
+                    if (currentTasks)
+                    {
+                        const task = new Task(currentTasks[currentTasks.length - 1].id + 1, project.id);
+                        const res = await supabase.from('project_tickets').insert(task);
+                        createToast(res?.error ? res.error.message : 'Successfully Created New Task', res.error !== null);
+                        if (!res.error)
+                        {
+                            setCurrentTasks(currentTask => [...currentTask ?? [], task]);
+                        }
+                    }
+                }} className="w-fit" />
+            </div>
         </div>
     </div>
 }

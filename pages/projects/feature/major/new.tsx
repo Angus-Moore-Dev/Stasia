@@ -6,10 +6,12 @@ import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { User } from "@supabase/supabase-js";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { MinorFeature } from "@/models/projects/MinorFeature";
 import { MinorFeatureBox } from "@/components/projects/FeatureBoxes";
+import { supabase } from "@/lib/supabaseClient";
+import { toast } from "react-toastify";
 
 interface MajorFeatureProps
 {
@@ -22,10 +24,9 @@ interface MajorFeatureProps
 export default function NewMajorFeature({ user, projectName, projectId, profiles }: MajorFeatureProps)
 {
     const router = useRouter();
-    const [unsavedChanges, setUnsavedChanges] = useState(false);
-	const [majorFeature, setMajorFeature] = useState(new MajorFeature());
-	const [staffInvolved, setStaffInvolved] = useState<string[]>([]);
+	const [majorFeature, setMajorFeature] = useState(new MajorFeature(projectId));
 	const [minorFeatures, setMinorFeatures] = useState<MinorFeature[]>([]);
+	useEffect(() => console.log(minorFeatures), [minorFeatures]);
 
     return <div className='w-full h-full min-h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto'>
         <div className="w-full flex flex-row items-center justify-between">
@@ -34,7 +35,42 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
             }} className="mr-auto" />
 			<Button text='Create Major Feature' onClick={async () => 
 			{
-                
+                const featureRes = await supabase.from('project_major_features').insert(majorFeature);
+				if (featureRes.error)
+				{
+					// show error toast here.
+					toast.error(featureRes.error?.message, 
+					{
+						position: "bottom-right",
+						autoClose: 5000,
+						hideProgressBar: false,
+						closeOnClick: true,
+						pauseOnHover: true,
+						draggable: true,
+						progress: undefined,
+						theme: "colored",
+						style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
+					});
+				}
+				for (const minorFeature of minorFeatures)
+				{
+					const res = await supabase.from('project_minor_features').insert(minorFeature);
+					if (res.error)
+					{
+						toast.error(res.error?.message, 
+						{
+							position: "bottom-right",
+							autoClose: 5000,
+							hideProgressBar: false,
+							closeOnClick: true,
+							pauseOnHover: true,
+							draggable: true,
+							progress: undefined,
+							theme: "colored",
+							style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
+						});
+					}
+				}
             }} className="" />
         </div>
 		<div className="w-full flex flex-row gap-8">
@@ -52,10 +88,10 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
 					{
                         profiles.map(profile => <button className="h-80 w-64 mb-10 flex text-left" 
                         onClick={() => {
-                            if (staffInvolved.some(x => x === profile.id))
-                                setStaffInvolved(staffInvolved.filter(x => x !== profile.id));
+                            if (!majorFeature.peopleInvolved.some(x => x === profile.id))
+                                setMajorFeature({...majorFeature, peopleInvolved: [...majorFeature.peopleInvolved, profile.id]})
                             else
-                                setStaffInvolved(staffInvolved => [...staffInvolved, profile.id]);
+                                setMajorFeature({...majorFeature, peopleInvolved: majorFeature.peopleInvolved.filter(x => x !== profile.id)});
                         }}>
                             <div className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
                                 <Image 
@@ -65,7 +101,7 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
                                 width='600' height='400' 
                                 className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
                                 <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary"
-                                aria-selected={staffInvolved.some(x => x === profile.id)}>
+                                aria-selected={majorFeature.peopleInvolved.some(x => x === profile.id)}>
                                     <p className="text-lg font-medium">{profile.name}</p>
                                     <span>{profile.role}</span>
                                 </div>
@@ -90,7 +126,15 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
 		</div>
 		<div className="w-full flex flex-row flex-wrap gap-2 pb-10">
 			{
-				minorFeatures.map(feature => <MinorFeatureBox feature={feature} />)
+				minorFeatures.map(feature => <MinorFeatureBox key={feature.id} feature={feature} setFeature={(feature) => 
+				{
+					let features = [...minorFeatures];
+					features[features.findIndex(x => x.id === feature.id)] = feature;
+					setMinorFeatures(features);
+				}} deleteMinorFeature={() => {
+					console.log('deleting::', feature.id);
+					setMinorFeatures(minorFeatures.filter(x => x !== feature));
+				}} />)
 			}
 		</div>
     </div>

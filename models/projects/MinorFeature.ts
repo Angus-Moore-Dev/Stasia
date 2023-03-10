@@ -4,11 +4,12 @@ export class MinorFeature
 {
     id: string = v4();
     majorFeatureId: string = '';
-    commenceDeath: string = '';
+    commenceDate: string = new Date(Date.now()).toISOString();
     name: string = '';
     description: string = '';
-    featureType: FeatureType[] = [];
-    expectedCompletionDate: Date = new Date(Date.now());
+    objective: string = '';
+    featureType: FeatureType = FeatureType.General;
+    expectedCompletionDate: string = '';
     staffInvolved: string[] = [];
 }
 
@@ -18,6 +19,8 @@ export enum FeatureType
     General = "General",
     UserInterface = "User Interface",
     UserExperience = "User Experience",
+    Iteration = "Iteration",
     ExpansionOfExistingLogic = "Expansion of Existing Logic",
-    CreationOfNewLogic = "Creation of "
+    CreationOfNewLogic = "Creation of New Logic",
+    ReworkOfExistingLogic = "Rework of Existing Logic",
 }

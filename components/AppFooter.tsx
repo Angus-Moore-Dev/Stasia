@@ -6,16 +6,5 @@ export default function AppFooter()
         <section className="w-full md:w-1/4 min-w-fit h-full px-4 flex items-center justify-start text-center md:text-left">
             <small>Jensen Labs, Copyright 2023. All Rights Reserved.</small>
         </section>
-        <section className="hidden md:flex w-3/4 h-full px-4 justify-end text-zinc-100 items-center gap-6">
-            <Link href='/privacy'>
-                <small className="text-zinc-100">Privacy Policy</small>
-            </Link>
-            <Link href='/tos'>
-                <small className="text-zinc-100">Terms of Service</small>
-            </Link>
-            <Link href='/contact'>
-                <small className="text-zinc-100">Contact</small>
-            </Link>
-        </section>
     </div>
 }

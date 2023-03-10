@@ -8,4 +8,9 @@ export class MajorFeature
     description: string = '';
     objective: string = '';
     peopleInvolved: string[] = [];
+
+    constructor(projectId: string)
+    {
+        this.projectId = projectId;
+    }
 }
