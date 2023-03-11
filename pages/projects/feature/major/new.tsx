@@ -77,16 +77,16 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
 			<div className="flex-grow w-1/2 flex flex-col gap-2 min-h-full">
 				<span>Create A New Major Feature for <b>{projectName}</b></span>
 				<input value={majorFeature.name} onChange={(e) => setMajorFeature({...majorFeature, name: e.target.value})} className="p-2 bg-tertiary font-medium w-full rounded outline-none" placeholder="Feature Name" />
-				<div className="flex flex-row gap-2">
-					<textarea value={majorFeature.description} onChange={(e) => setMajorFeature({...majorFeature, description: e.target.value})} className="p-2 bg-tertiary font-medium w-1/2 rounded h-80 outline-none" placeholder="Feature Description" />
-					<textarea value={majorFeature.objective} onChange={(e) => setMajorFeature({...majorFeature, objective: e.target.value})} className="p-2 bg-tertiary font-medium w-1/2 rounded h-80 outline-none" placeholder="Objective" />
+				<div className="flex flex-row gap-2 h-full">
+					<textarea value={majorFeature.description} onChange={(e) => setMajorFeature({...majorFeature, description: e.target.value})} className="p-2 bg-tertiary font-medium w-1/2 rounded h-full outline-none" placeholder="Feature Description" />
+					<textarea value={majorFeature.objective} onChange={(e) => setMajorFeature({...majorFeature, objective: e.target.value})} className="p-2 bg-tertiary font-medium w-1/2 rounded h-full outline-none" placeholder="Objective" />
 				</div>
 			</div>
-			<div className="flex-grow w-1/2 flex flex-col gap-2 min-h-full">
+			<div className="flex-grow w-3/5 flex flex-col gap-2">
 				<span>Staff Involved In This Feature</span>
-				<div className="flex-grow flex flex-row gap-4">
+				<div className="w-full max-h-[50vh] flex flex-row flex-wrap gap-4 overflow-auto">
 					{
-                        profiles.map(profile => <button className="h-80 w-64 mb-10 flex text-left" 
+                        profiles.map(profile => <button className="h-96 w-64 mb-10 flex text-left" 
                         onClick={() => {
                             if (!majorFeature.peopleInvolved.some(x => x === profile.id))
                                 setMajorFeature({...majorFeature, peopleInvolved: [...majorFeature.peopleInvolved, profile.id]})
@@ -99,7 +99,7 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
                                 src={profile.profilePictureURL} 
                                 alt='profile' 
                                 width='600' height='400' 
-                                className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
+                                className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[384px]"  />
                                 <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary"
                                 aria-selected={majorFeature.peopleInvolved.some(x => x === profile.id)}>
                                     <p className="text-lg font-medium">{profile.name}</p>

@@ -45,22 +45,22 @@ export function MinorFeatureBox({ feature, setFeature, deleteMinorFeature }: Min
     const [featureData, setfeatureData] = useState(feature);
     useEffect(() => setFeature(featureData), [featureData]);
     
-    return <div className="w-96 h-[500px] rounded bg-tertiary p-4 flex flex-col gap-2">
+    return <div className="w-[49%] h-[750px] rounded bg-tertiary p-4 flex flex-col gap-2">
         <div className="flex flex-row justify-between items-center">
             <span className="font-medium">New Minor Feature</span>
             <Button className="text-red-500 transition hover:bg-red-500 hover:text-zinc-100 rounded w-fit" text='Flatline' onClick={() => deleteMinorFeature()} />
         </div>
         <input value={featureData.name} onChange={(e) => setfeatureData({...featureData, name: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium text-lg rounded' placeholder="Minor Feature Name" />
-        <textarea value={featureData.description} onChange={(e) => setfeatureData({...featureData, description: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium rounded h-32' placeholder="Description" />
-        <textarea value={featureData.objective} onChange={(e) => setfeatureData({...featureData, objective: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium rounded h-20' placeholder="Objective" />
+        <textarea value={featureData.description} onChange={(e) => setfeatureData({...featureData, description: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium rounded h-64' placeholder="Description" />
+        <textarea value={featureData.objective} onChange={(e) => setfeatureData({...featureData, objective: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium rounded h-32' placeholder="Objective" />
         <span>Feature Type</span>
-        <select defaultValue={feature.featureType} className="w-full p-2 bg-quaternary text-zinc-100 font-semibold -mt-2" onChange={(e) => setfeatureData({...featureData, featureType: e.target.value as FeatureType})}>
+        <select defaultValue={feature.featureType} className="w-64 p-2 bg-quaternary text-zinc-100 font-semibold -mt-2" onChange={(e) => setfeatureData({...featureData, featureType: e.target.value as FeatureType})}>
             {
                 Object.values(FeatureType).map(type => <option key={type} value={type}>{type.valueOf()}</option>)
             }
         </select>
         <span>Expected Completion Date</span>
-        <input value={featureData.expectedCompletionDate} type='date' className="bg-quaternary text-zinc-100 font-medium rounded p-2 w-full -mt-2" style={{colorScheme: 'dark'}} onChange={(e) => 
+        <input value={featureData.expectedCompletionDate} type='date' className="bg-quaternary text-zinc-100 font-medium rounded p-2 w-64 -mt-2" style={{colorScheme: 'dark'}} onChange={(e) => 
         {
             setfeatureData({...featureData, expectedCompletionDate: e.target.value});
         }} />
@@ -75,16 +75,16 @@ interface TaskBoxProps
 {
     task: Task;
     profile: Profile | undefined;
-    deleteTask: () => void;
 }
 
-export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
+export function TaskBox({ task, profile }: TaskBoxProps)
 {
     const [titleText, setTitleText] = useState(task.name);
     const [isEditable, setIsEditable] = useState(false);
     const [taskType, setTaskType] = useState<TaskType>(task.taskType);
     const [taskColour, setTaskColour] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
+    const [showEditButton, setShowEditButton] = useState(false);
 
     const [showTaskModal, setShowTaskModal] = useState(false);
 
@@ -107,6 +107,15 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
             case TaskType.LogicFix:
                 setTaskColour('#b91c1c'); // bg-red-700
                 break;
+            case TaskType.Research:
+                setTaskColour('#84cc16'); // bg-lime-500
+                break;
+            case TaskType.Investigate:
+                setTaskColour('#be123c'); // bg-rose-700
+                break;
+            case TaskType.Planning:
+                setTaskColour('#334155'); // bg-slate-900
+                break;
             case TaskType.Other:
                 setTaskColour('#525252'); // bg-neutral-600
                 break;
@@ -121,25 +130,24 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
         }
     }, [isEditable]);
 
-
     return <>
         <TaskModal task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
-        <div className="w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]" onBlur={() => {setIsEditable(false)}}>
+        <div className={`${task.completed ? 'w-full px-2 bg-primary text-secondary hover:text-primary transition font-semibold hover:bg-tertiary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]' : 'w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]'}`} 
+            onBlur={() => {setIsEditable(false)}}
+            onMouseOver={() => setShowEditButton(true)}
+            onMouseLeave={() => setShowEditButton(false)}
+        >
             <p>{task.id}</p>
-            <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32`} 
+            <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 ${task.completed && 'text-zinc-100'}`} 
             style={{ backgroundColor: taskColour }} onChange={async (e) => {
                 const res = await supabase.from('project_tickets').update({
                     taskType: e.target.value
                 }).eq('id', task.id);
 
                 if (!res.error)
-                {
                     setTaskType(e.target.value as TaskType);
-                }
                 else
-                {
                     createToast(res.error.message, true);
-                }
             }}>
                 {
                     Object.values(TaskType).map(type => <option key={type} value={type}>{type}</option>)
@@ -149,15 +157,20 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
                 {
                     !isEditable &&
                     <>
-                        <button className="w-fit text-left px-2 font-medium mr-2" onClick={() => setShowTaskModal(true)}>
+                        <button className="w-fit text-left px-2 font-medium mr-2" onClick={() => setShowTaskModal(true)} style={{
+                            color: titleText ? '#fffff': '#7f7f7f',
+                        }}>
                             {titleText ? titleText : 'No Task Description'}
                         </button>
-                        <button onClick={() => {
-                            setIsEditable(true);
-                            inputRef.current?.focus();
-                        }} className="transition hover:text-primary">
-                            <CreateIcon fontSize="small" />
-                        </button>
+                        {
+                            showEditButton &&
+                            <button onClick={() => {
+                                setIsEditable(true);
+                                inputRef.current?.focus();
+                            }} className="transition hover:text-primary">
+                                <CreateIcon fontSize="small" />
+                            </button>
+                        }
                         <div className="flex-grow -my-1" onClick={() => setShowTaskModal(true)} />
                     </>
                 }
@@ -165,7 +178,7 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
                     isEditable &&
                     <input 
                         ref={inputRef}
-                        value={titleText} 
+                        value={titleText}
                         onChange={(e) => setTitleText(e.target.value)} 
                         readOnly={!isEditable} 
                         onBlur={() => setIsEditable(false)}
@@ -175,9 +188,7 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
                         onKeyDown={async (e) => {
                             if (e.key === 'Enter')
                             {
-                                await supabase.from('project_tickets').update({
-                                    name: titleText
-                                }).eq('id', task.id);
+                                await supabase.from('project_tickets').update({ name: titleText }).eq('id', task.id);
                                 inputRef.current?.blur();
                             }
                         }}
