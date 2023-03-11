@@ -56,38 +56,69 @@ export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesD
 			}} className={`${majorFeature !== majorFeatureData && 'animate-pulse shadow-primary shadow-md'}`} />
 		</div>
 		<div className="flex-grow w-full flex flex-col gap-2">
-			<div className="flex-grow h-full flex flex-row gap-2">
-				<div className="w-1/2 h-full flex flex-col gap-2">
-					<span className="text-lg font-semibold">Editing Major Feature</span>
-					<input value={majorFeature.name} onChange={(e) => setMajorFeature({...majorFeature, name: e.target.value})} className="p-2 w-full outline-none bg-tertiary rounded text-lg font-semibold" />
-					<textarea value={majorFeature.description} onChange={(e) => setMajorFeature({...majorFeature, description: e.target.value})} className="p-2 w-full outline-none bg-tertiary rounded text-lg font-semibold h-96 scrollbar" placeholder="Edit Description Here" />
-					<textarea value={majorFeature.objective} onChange={(e) => setMajorFeature({...majorFeature, objective: e.target.value})} className="p-2 w-full outline-none bg-tertiary rounded text-lg font-semibold h-96 scrollbar" placeholder="Edit Objective Here" />
-				</div>
-				<div className="w-2/3 h-full flex flex-col gap-1">
-					<div className="flex flex-row items-center gap-2">
-						<span>Minor Features</span>
-						<Button text='Add Minor Feature' onClick={() => {
-							const newMinorFeature = new MinorFeature();
-							newMinorFeature.majorFeatureId = majorFeature.id;
-							newMinorFeature.staffInvolved = majorFeature.peopleInvolved;
-							setMinorFeatures(minorFeatures => [...minorFeatures, newMinorFeature]);
-						}} />
+			<div className="w-full flex flex-row gap-8">
+				<div className="flex-grow w-1/2 flex flex-col gap-2 min-h-full">
+					<span>Editing Major Feature</span>
+					<input value={majorFeature.name} onChange={(e) => setMajorFeature({...majorFeature, name: e.target.value})} className="p-2 bg-tertiary font-medium w-full rounded outline-none" placeholder="Feature Name" />
+					<div className="flex flex-row gap-2">
+						<textarea value={majorFeature.description} onChange={(e) => setMajorFeature({...majorFeature, description: e.target.value})} className="p-2 bg-tertiary font-medium w-1/2 rounded h-80 outline-none" placeholder="Feature Description" />
+						<textarea value={majorFeature.objective} onChange={(e) => setMajorFeature({...majorFeature, objective: e.target.value})} className="p-2 bg-tertiary font-medium w-1/2 rounded h-80 outline-none" placeholder="Objective" />
 					</div>
-					<div className="w-full flex flex-row flex-wrap gap-2 mb-10">
-					{
-						minorFeatures.map(feature => <MinorFeatureBox key={feature.id} feature={feature} setFeature={(feature) => 
+				</div>
+				<div className="flex-grow w-1/2 flex flex-col gap-2 min-h-full">
+					<span>Staff Involved In This Feature</span>
+					<div className="flex-grow flex flex-row gap-4">
 						{
-							let features = [...minorFeatures];
-							features[features.findIndex(x => x.id === feature.id)] = feature;
-							setMinorFeatures(features);
-						}} deleteMinorFeature={async () => {
-							setMinorFeatures(minorFeatures.filter(x => x !== feature));
-							const res = await supabase.from('project_minor_features').delete().eq('id', feature.id);
-							createToast(res.error ? res.error.message : 'Successfully deleted minor feature', res.error !== null);
-						}} />)
-					}
+							profiles.map(profile => <button className="h-80 w-64 mb-10 flex text-left" 
+							onClick={() => {
+								if (!majorFeature.peopleInvolved.some(x => x === profile.id))
+									setMajorFeature({...majorFeature, peopleInvolved: [...majorFeature.peopleInvolved, profile.id]})
+								else
+									setMajorFeature({...majorFeature, peopleInvolved: majorFeature.peopleInvolved.filter(x => x !== profile.id)});
+							}}>
+								<div className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
+									<Image 
+									priority={true}
+									src={profile.profilePictureURL} 
+									alt='profile' 
+									width='600' height='400' 
+									className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
+									<div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary"
+									aria-selected={majorFeature.peopleInvolved.some(x => x === profile.id)}>
+										<p className="text-lg font-medium">{profile.name}</p>
+										<span>{profile.role}</span>
+									</div>
+								</div>
+							</button>
+							)
+						}
 					</div>
 				</div>
+			</div>
+			<div className="flex flex-col w-full items-center">
+				<div className="w-full flex flex-row items-center gap-4">
+					<span className="">Minor Features</span>
+					<Button text='Add Minor Feature' onClick={() => {
+						const newMinorFeature = new MinorFeature();
+						newMinorFeature.majorFeatureId = majorFeature.id;
+						newMinorFeature.staffInvolved = majorFeature.peopleInvolved;
+						setMinorFeatures(minorFeatures => [...minorFeatures, newMinorFeature]);
+					}} />
+				</div>
+				<span className="w-full">A minor feature is an isolated component that is required to make the major feature work. A small part of a bigger picture.</span>
+			</div>
+			<div className="w-full flex flex-row flex-wrap gap-2 pb-10">
+				{
+					minorFeatures.map(feature => <MinorFeatureBox key={feature.id} feature={feature} setFeature={(feature) => 
+					{
+						let features = [...minorFeatures];
+						features[features.findIndex(x => x.id === feature.id)] = feature;
+						setMinorFeatures(features);
+					}} deleteMinorFeature={() => {
+						console.log('deleting::', feature.id);
+						setMinorFeatures(minorFeatures.filter(x => x !== feature));
+					}} />)
+				}
 			</div>
 		</div>
     </div>

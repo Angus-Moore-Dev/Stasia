@@ -4,9 +4,10 @@ import { supabase } from '@/lib/supabaseClient';
 import { Profile } from '@/models/me/Profile';
 import { Task, TaskType } from '@/models/projects/Task';
 import { Box, Modal } from '@mui/material';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { ContactCommentBox } from '../common/Comment';
 import { Comment } from '@/models/chat/Comment';
+import Button from '../common/Button';
 
 
 const style = {
@@ -50,7 +51,7 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
         setTaskType(task.taskType);
     }, [task]);
 
-    useEffect(() => 
+    useEffect(() => // There has to be a way to automatically configure this.
     {
         switch(taskType)
         {
@@ -69,6 +70,15 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
             case TaskType.LogicFix:
                 setTaskColour('#b91c1c'); // bg-red-700
                 break;
+            case TaskType.Research:
+                setTaskColour('#84cc16'); // bg-lime-500
+                break;
+            case TaskType.Investigate:
+                setTaskColour('#be123c'); // bg-rose-700
+                break;
+            case TaskType.Planning:
+                setTaskColour('#334155'); // bg-slate-900
+                break;
             case TaskType.Other:
                 setTaskColour('#525252'); // bg-neutral-600
                 break;
@@ -83,15 +93,23 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <div className='w-[50vw] h-[80vh] bg-tertiary rounded p-8 flex flex-col gap-4'>
-                    <div className='w-full flex flex-row items-center'>
+                <div className='w-[50vw] h-[80vh] bg-tertiary rounded p-8 flex flex-col gap-2'>
+                    <div className='w-full flex flex-row items-start gap-4'>
                         <input 
-                            value={taskTitle} 
+                            value={taskTitle}
+                            maxLength={255}
                             onChange={(e) => setTaskTitle(e.target.value)} 
-                            className='w-full text-3xl font-semibold bg-transparent outline-none focus:border-b-2 border-b-primary'
+                            className='w-full text-xl font-semibold bg-transparent outline-none focus:border-b-2 border-b-primary scrollbar h-full'
                             placeholder='Enter Title Here'
+                            contentEditable={true}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter')
+                                {
+
+                                }
+                            }}
                         />
-                        <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32`} 
+                        <select defaultValue={task.taskType} className={`bg-transparent hover:text-zinc-100 font-semibold text-center rounded-sm w-32 h-fit py-2`} 
                         style={{ backgroundColor: taskColour }} onChange={async (e) => {
                             const res = await supabase.from('project_tickets').update({
                                 taskType: e.target.value
@@ -114,9 +132,9 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                     <textarea className='w-full text-lg bg-transparent rounded p-2 outline-none h-1/4' placeholder='Description Here'>
                         {task.description}
                     </textarea>
-                    <p className='py-2 font-medium border-b-[1px] border-b-primary'>Comments</p>
+                    <p className='py-2 font-medium border-b-2 border-b-primary'>Comments</p>
                     <div className='flex-grow h-full flex flex-row'>
-                        <div className='w-3/4 h-full flex items-center justify-center'>
+                        <div className='flex-grow h-full flex items-center justify-center'>
                         {
                             (!taskComments  || taskComments?.length === 0) &&
                             <div className='flex-grow flex items-center justify-center'>
@@ -127,10 +145,16 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                             taskComments && taskComments.map(comment => <ContactCommentBox comment={comment} profile={new Profile()} />)
                         }
                         </div>
-                        <div className='w-[280px] h-full border-[1px] rounded border-primary'>
-
+                        <div className='w-[280px] h-full border-l-2 border-primary p-2'>
+                            Configuration goes here.
                         </div>
                     </div>
+                    <Button text={`${task.completed ? 'Mark Task as Not Complete' : 'Complete Task'}`} className='ml-auto bg-transparent' onClick={async () => {
+                        const res= await supabase.from('project_tickets').update({
+                            completed: !task.completed,
+                        }).eq('id', task.id);
+                        createToast(res.error ? res.error.message : `${task.completed ? 'Task Marked As Not Complete' : 'Task Has Been Completed'}`, res.error !== null);
+                    }} />
                 </div>
             </Box>
         </Modal>

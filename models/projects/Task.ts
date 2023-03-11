@@ -1,5 +1,3 @@
-import { v4 } from "uuid";
-
 export class Task
 {
     id!: number; // This helps us figure out how many tickets have been created for a given project.
@@ -11,6 +9,7 @@ export class Task
     assigneeId: string | null = null;
     creatorId: string | null = null;
     taskType: TaskType = TaskType.General;
+    completed: boolean = false;
 
     constructor(projectId: string)
     {
@@ -26,5 +25,8 @@ export enum TaskType
     DesignTask = "Design Task",
     BugFix = "Bug Fix",
     LogicFix = "Logic Fix",
+    Research = "Research",
+    Investigate = "Investigation",
+    Planning = "Planning",
     Other = "Other",
 }
