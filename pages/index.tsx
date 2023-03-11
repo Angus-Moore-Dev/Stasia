@@ -49,7 +49,7 @@ export default function HomePage({ user }: HomePageProps)
 								<InteractiveBox title='Files' icon={<AccountTreeIcon fontSize='large' />} />
 							</Link>
 							<Link href='/projects'>
-								<InteractiveBox title='Projects (coming soon)' icon={<CodeSharpIcon fontSize='large' />} />
+								<InteractiveBox title='Projects' icon={<CodeSharpIcon fontSize='large' />} />
 							</Link>
 							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
 							<InteractiveBox title='Staff (coming soon)' icon={<BadgeIcon fontSize='large' />}  />

@@ -29,7 +29,7 @@ export default function ContactPage({ user, contacts }: ContactPageProps)
         <div className="flex-grow w-full flex flex-col gap-4 min-h-full">
             <input value={searchForProfile} onChange={(e) => setSearchForProfile(e.target.value)} className="p-2 bg-tertiary text-zinc-100 font-medium border-b-[1px] border-b-primary outline-none w-1/2 rounded"
             placeholder="Search Contact List" />
-            <div className="flex-grow flex flex-row flex-wrap gap-2">
+            <div className="flex flex-row flex-wrap gap-2">
             {
                 contacts && contacts.filter(x => x.name.toLowerCase().startsWith(searchForProfile.toLowerCase())).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()).map(contact => <ContactBox key={contact.id} contact={contact} />)
             }

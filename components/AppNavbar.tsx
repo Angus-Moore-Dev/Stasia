@@ -7,13 +7,13 @@ import { supabase } from "@/lib/supabaseClient";
 import { Profile } from "@/models/me/Profile";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
-
+import VisibilitySharpIcon from '@mui/icons-material/VisibilitySharp';
+import NotificationMenu from "./NotificationMenu";
 
 export default function AppNavbar()
 {
     const user = useUser();
     const [profile, setProfile] = useState<Profile>();
-
 
     useEffect(() => 
     {
@@ -28,16 +28,15 @@ export default function AppNavbar()
         }
     }, [user]);
     return (
-        <div className="w-full min-h-[30] p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start py-1">
+        <div className="w-full min-h-[30] p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start py-1 relative">
             <Link href='/' className="">
                 <Image src={logo} placeholder="blur" width='200' height='250' alt='logo' className="object-cover" />
             </Link>
             {
                 user && profile &&
                 <section className="flex-grow flex justify-end items-center gap-4">
-                    {
-                        profile.name
-                    }
+                    <NotificationMenu profile={profile} />
+                    <span>{profile.name}</span>
                     <Link href='/me' className="w-[40px] h-[40px]">
                         <Image src={profile.profilePictureURL} alt='profile' className="rounded transition hover:border-[1px] hover:border-primary object-cover h-full w-full" width='40' height='40' />
                     </Link>
