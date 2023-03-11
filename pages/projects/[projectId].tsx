@@ -156,6 +156,7 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
                     if (currentTasks)
                     {
                         const task = new Task(project.id);
+                        task.creatorId = user.id;
                         const res = await supabase.from('project_tickets').insert(task);
                         createToast(res?.error ? res.error.message : 'Successfully Created New Task', res.error !== null);
                     }
