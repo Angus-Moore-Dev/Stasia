@@ -158,7 +158,7 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
                         }} className="transition hover:text-primary">
                             <CreateIcon fontSize="small" />
                         </button>
-                        <div className="flex-grow" onClick={() => setShowTaskModal(true)} />
+                        <div className="flex-grow -my-1" onClick={() => setShowTaskModal(true)} />
                     </>
                 }
                 {
