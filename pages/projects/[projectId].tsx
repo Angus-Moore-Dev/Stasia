@@ -3,6 +3,7 @@ import { MajorFeatureBox, TaskBox } from "@/components/projects/FeatureBoxes";
 import createToast from "@/functions/createToast";
 import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
+import { Message } from "@/models/chat/Message";
 import { Profile } from "@/models/me/Profile";
 import { MajorFeature } from "@/models/projects/MajorFeature";
 import { Project } from "@/models/projects/Project";
@@ -12,7 +13,7 @@ import { User } from "@supabase/supabase-js";
 import { GetServerSidePropsContext } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface ProjectIdPageProps
 {
@@ -27,6 +28,21 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
     const [majorFeatures, setMajorFeatures] = useState<MajorFeature[]>();
     const [currentTasks, setCurrentTasks] = useState<Task[]>();
 
+    // These are the updaters for supabase. There's gotta be a faster way for this.
+    const addNewTask = useCallback((task: Task) => {
+        setCurrentTasks(tasks => [...tasks ?? [], task]);
+    }, []);
+
+    const removeTask = useCallback((id: number) => {
+        setCurrentTasks(currentTasks => [...currentTasks?.filter(x => x.id !== id) ?? []]);
+    }, []);
+
+    const updateTask = useCallback((task: Task) => {
+        setCurrentTasks(currentTasks => currentTasks?.map(x => {
+            return x.id === task.id ? task : x;
+        }));
+    }, []);
+
     useEffect(() => {
         supabase.from('project_major_features').select('*').eq('projectId', project.id).then(res => 
         {
@@ -37,6 +53,33 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
         {
             setCurrentTasks(res.data as Task[]);
         })
+
+        const channel = supabase.channel('table-db-changes')
+        .on('postgres_changes', {event: '*', schema: 'public', table: 'project_tickets'}, (payload) => {
+            console.log('payload::', payload);
+            if (payload.eventType === 'INSERT')
+            {
+                console.log('realtime insert of ticket')
+                const message = payload.new as Task;
+                if (message.projectId === project.id)
+                {
+                    addNewTask(message);
+                }
+            }
+            else if (payload.eventType === 'DELETE')
+            {
+                console.log('realtime delete of ticket')
+                removeTask(payload.old.id);
+            }
+            else if (payload.eventType === 'UPDATE')
+            {
+                console.log('realtime update of ticket');
+                const message = payload.new as Task;
+                updateTask(message);
+            }
+        }).subscribe((status) => {
+            console.log('tasks::', status);
+        });
     }, []);
 
     return <div className='w-full min-h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
@@ -99,9 +142,9 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
                 <div className="flex flex-row gap-4 items-center">
                     <span className="font-semibold">Tasks</span>
                 </div>
-                <div className="flex flex-col gap-1 overflow-y-auto scrollbar">
+                <div className="flex flex-col gap-[2px] overflow-y-auto scrollbar">
                 {
-                    currentTasks && currentTasks.map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} deleteTask={() => {
+                    currentTasks && currentTasks.sort((a, b) => a.id - b.id).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} deleteTask={() => {
                         // This whole function is there because there's no realtime db changes set up right now.
                         // That will come in time.
                         setCurrentTasks(currentTasks.filter(x => x.id !== task.id));
@@ -115,10 +158,6 @@ export default function ProjectIdPage({ user, project, profiles }: ProjectIdPage
                         const task = new Task(project.id);
                         const res = await supabase.from('project_tickets').insert(task);
                         createToast(res?.error ? res.error.message : 'Successfully Created New Task', res.error !== null);
-                        if (!res.error)
-                        {
-                            setCurrentTasks(currentTask => [...currentTask ?? [], task]);
-                        }
                     }
                 }} className="w-fit" />
             </div>

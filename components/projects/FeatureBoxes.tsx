@@ -9,6 +9,7 @@ import Image from "next/image";
 import CreateIcon from '@mui/icons-material/Create';
 import { supabase } from "@/lib/supabaseClient";
 import createToast from "@/functions/createToast";
+import TaskModal from "./TaskModal";
 
 interface MajorFeatureBoxProps
 {
@@ -85,7 +86,10 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
     const [taskColour, setTaskColour] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
+    const [showTaskModal, setShowTaskModal] = useState(false);
+
+    useEffect(() => 
+    {
         switch(taskType)
         {
             case TaskType.General:
@@ -109,7 +113,8 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
         }
     }, [taskType]);
 
-    useEffect(() => {
+    useEffect(() => 
+    {
         if (isEditable)
         {
             inputRef.current?.focus();
@@ -117,76 +122,79 @@ export function TaskBox({ task, profile, deleteTask }: TaskBoxProps)
     }, [isEditable]);
 
 
-    return <div className="w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]" onBlur={() => {setIsEditable(false)}}>
-        <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32`} 
-        style={{ backgroundColor: taskColour }} onChange={async (e) => {
-            const res = await supabase.from('project_tickets').update({
-                taskType: e.target.value
-            }).eq('id', task.id);
+    return <>
+        <TaskModal task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
+        <div className="w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]" onBlur={() => {setIsEditable(false)}}>
+            <p>{task.id}</p>
+            <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32`} 
+            style={{ backgroundColor: taskColour }} onChange={async (e) => {
+                const res = await supabase.from('project_tickets').update({
+                    taskType: e.target.value
+                }).eq('id', task.id);
 
-            if (!res.error)
-            {
-                setTaskType(e.target.value as TaskType);
-            }
-            else
-            {
-                createToast(res.error.message, true);
-            }
-        }}>
-            {
-                Object.values(TaskType).map(type => <option key={type} value={type}>{type}</option>)
-            }
-        </select>
-        <div className="flex flex-row flex-grow">
-            {
-                !isEditable &&
-                <>
-                <button className="w-fit text-left px-2 font-medium mr-2">
-                    {titleText ? titleText : 'No Task Description'}
-                </button>
-                <button onClick={() => {
-                    setIsEditable(true);
-                    inputRef.current?.focus();
-                }} className="transition hover:text-primary">
-                    <CreateIcon fontSize="small" />
-                </button>
-                </>
-            }
-            {
-                isEditable &&
-                <input 
-                    ref={inputRef}
-                    value={titleText} 
-                    onChange={(e) => setTitleText(e.target.value)} 
-                    readOnly={!isEditable} 
-                    onClick={() => {
-                        if (!isEditable)
-                        {
-                            alert('show modal');
-                        }
-                    }}
-                    onBlur={() => setIsEditable(false)}
-                    maxLength={200}
-                    className={`bg-transparent outline-none px-2 flex-grow font-medium rounded text-zinc-100`}
-                    placeholder="Provide a Task Title Here"
-                    onKeyDown={async (e) => {
-                        if (e.key === 'Enter')
-                        {
-                            await supabase.from('project_tickets').update({
-                                name: titleText
-                            }).eq('id', task.id);
-                            inputRef.current?.blur();
-                        }
-                    }}
-                />
-            }
+                if (!res.error)
+                {
+                    setTaskType(e.target.value as TaskType);
+                }
+                else
+                {
+                    createToast(res.error.message, true);
+                }
+            }}>
+                {
+                    Object.values(TaskType).map(type => <option key={type} value={type}>{type}</option>)
+                }
+            </select>
+            <div className="flex flex-row flex-grow">
+                {
+                    !isEditable &&
+                    <>
+                        <button className="w-fit text-left px-2 font-medium mr-2" onClick={() => setShowTaskModal(true)}>
+                            {titleText ? titleText : 'No Task Description'}
+                        </button>
+                        <button onClick={() => {
+                            setIsEditable(true);
+                            inputRef.current?.focus();
+                        }} className="transition hover:text-primary">
+                            <CreateIcon fontSize="small" />
+                        </button>
+                        <div className="flex-grow" onClick={() => setShowTaskModal(true)} />
+                    </>
+                }
+                {
+                    isEditable &&
+                    <input 
+                        ref={inputRef}
+                        value={titleText} 
+                        onChange={(e) => setTitleText(e.target.value)} 
+                        readOnly={!isEditable} 
+                        onBlur={() => setIsEditable(false)}
+                        maxLength={200}
+                        className={`bg-transparent outline-none px-2 flex-grow font-medium rounded text-zinc-100`}
+                        placeholder="Provide a Task Title Here"
+                        onKeyDown={async (e) => {
+                            if (e.key === 'Enter')
+                            {
+                                await supabase.from('project_tickets').update({
+                                    name: titleText
+                                }).eq('id', task.id);
+                                inputRef.current?.blur();
+                            }
+                        }}
+                    />
+                }
+            </div>
+            <Image src={profile?.profilePictureURL ?? '/blank_pfp.jpg'} alt='task preview' height='20' width='20' className="rounded object-cover w-[20px] h-[20px]" />
+            <button className="font-bold transition hover:text-red-500 w-3 h-full" onClick={async () => {
+                const res = await supabase.from('project_tickets').delete().eq('id', task.id);
+                if (res.error)
+                {
+                    createToast(res.error.message, true);
+                }
+            }}>
+                X
+            </button>
         </div>
-        <Image src={profile?.profilePictureURL ?? '/blank_pfp.jpg'} alt='task preview' height='20' width='20' className="rounded object-cover w-[20px] h-[20px]" />
-        <button className="font-bold transition hover:text-red-500 w-3 h-full" onClick={async () => {
-            await supabase.from('project_tickets').delete().eq('id', task.id);
-            deleteTask(); // This is here because I haven't setup realtime listening to db changes.
-        }}>
-            X
-        </button>
-    </div>
+    </>
+    
 }
