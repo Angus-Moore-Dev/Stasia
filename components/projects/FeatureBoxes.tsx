@@ -3,7 +3,7 @@ import Button from "../common/Button";
 import { useEffect, useRef, useState } from "react";
 import { MajorFeature } from "@/models/projects/MajorFeature";
 import Link from "next/link";
-import { Task, TaskType } from "@/models/projects/Task";
+import { Task, TaskState, TaskType } from "@/models/projects/Task";
 import { Profile } from "@/models/me/Profile";
 import Image from "next/image";
 import CreateIcon from '@mui/icons-material/Create';
@@ -18,7 +18,7 @@ interface MajorFeatureBoxProps
 
 export function MajorFeatureBox({ feature }: MajorFeatureBoxProps)
 {
-    return <Link href={`/projects/feature/major/${feature.id}`} className="w-96 h-96 rounded bg-tertiary p-4 flex flex-col gap-3 transition hover:bg-primary hover:text-secondary hover:cursor-pointer">
+    return <Link href={`/projects/feature/major/${feature.id}`} className="w-full lg:w-[32%] h-96 rounded bg-tertiary p-4 flex flex-col gap-3 transition hover:bg-primary hover:text-secondary hover:cursor-pointer">
         <p className="text-lg font-semibold">{feature.name}</p>
         <small className="pb-1 border-b-[1px] border-b-primary w-full">Description</small>
         <p className="-mt-1 overflow-y-auto scrollbar">{feature.description ? feature.description : 'No Description...'}</p>
@@ -85,8 +85,9 @@ export function TaskBox({ task, profile }: TaskBoxProps)
     const [taskColour, setTaskColour] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
     const [showEditButton, setShowEditButton] = useState(false);
-
     const [showTaskModal, setShowTaskModal] = useState(false);
+    const [taskState, setTaskState] = useState(task.taskState);
+    const [taskStateColour, setTaskStateColour] = useState('');
 
     useEffect(() => 
     {
@@ -130,20 +131,37 @@ export function TaskBox({ task, profile }: TaskBoxProps)
         }
     }, [isEditable]);
 
+
+    useEffect(() =>
+    {
+        switch(taskState)
+        {
+            case TaskState.NotStarted:
+                setTaskStateColour('#1d4ed8'); // bg-neutral-600
+                break;
+            case TaskState.InProgress:
+                setTaskStateColour('#3b82f6'); // bg-blue-700
+                break;
+            case TaskState.RequiresReview:
+                setTaskStateColour('#fbbf24'); // bg-amber-700
+                break;
+            case TaskState.Completed:
+                setTaskStateColour('#00fe49'); // bg-green-600
+                break;
+        }
+    }, [taskState]);
+
     return <>
         <TaskModal task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
-        <div className={`${task.completed ? 'w-full px-2 bg-primary text-secondary hover:text-primary transition font-semibold hover:bg-tertiary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]' : 'w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]'}`} 
+        <div className='w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]'
             onBlur={() => {setIsEditable(false)}}
             onMouseOver={() => setShowEditButton(true)}
             onMouseLeave={() => setShowEditButton(false)}
         >
             <p>{task.id}</p>
-            <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 ${task.completed && 'text-zinc-100'}`} 
+            <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 ${task.taskState === TaskState.Completed && 'text-zinc-100'}`} 
             style={{ backgroundColor: taskColour }} onChange={async (e) => {
-                const res = await supabase.from('project_tickets').update({
-                    taskType: e.target.value
-                }).eq('id', task.id);
-
+                const res = await supabase.from('project_tickets').update({ taskType: e.target.value }).eq('id', task.id);
                 if (!res.error)
                     setTaskType(e.target.value as TaskType);
                 else
@@ -195,6 +213,18 @@ export function TaskBox({ task, profile }: TaskBoxProps)
                     />
                 }
             </div>
+            <select defaultValue={task.taskState} className={`bg-transparent h-full text-secondary font-bold text-center rounded-sm w-32`} 
+            style={{ backgroundColor: taskStateColour }} onChange={async (e) => {
+                const res = await supabase.from('project_tickets').update({ taskState: e.target.value }).eq('id', task.id);
+                if (!res.error)
+                    setTaskState(e.target.value as TaskState);
+                else
+                    createToast(res.error.message, true);
+            }}>
+                {
+                    Object.values(TaskState).map(type => <option key={type} value={type}>{type}</option>)
+                }
+            </select>
             <Image src={profile?.profilePictureURL ?? '/blank_pfp.jpg'} alt='task preview' height='20' width='20' className="rounded object-cover w-[20px] h-[20px]" />
             <button className="font-bold transition hover:text-red-500 w-3 h-full" onClick={async () => {
                 const res = await supabase.from('project_tickets').delete().eq('id', task.id);

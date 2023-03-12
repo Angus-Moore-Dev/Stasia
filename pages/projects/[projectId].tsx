@@ -7,7 +7,7 @@ import { Message } from "@/models/chat/Message";
 import { Profile } from "@/models/me/Profile";
 import { MajorFeature } from "@/models/projects/MajorFeature";
 import { CommercialisationType, Project, ProjectType } from "@/models/projects/Project";
-import { Task } from "@/models/projects/Task";
+import { Task, TaskState } from "@/models/projects/Task";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { RealtimeChannel, User } from "@supabase/supabase-js";
 import { GetServerSidePropsContext } from "next";
@@ -77,7 +77,7 @@ export default function ProjectIdPage({ user, project, profiles, contact }: Proj
             }
             else if (payload.eventType === 'UPDATE')
             {
-                console.log('realtime update of ticket');
+                console.log('realtime update of ticket::', payload.new as Task);
                 const message = payload.new as Task;
                 updateTask(message);
             }
@@ -157,7 +157,7 @@ export default function ProjectIdPage({ user, project, profiles, contact }: Proj
                     }} />
                 </div>
                 <span>Click on a major feature to view its minor features and associated tasks.</span>
-                <div className="w-full flex flex-row gap-2 items-center pt-2">
+                <div className="w-full flex flex-row flex-wrap gap-2 items-center pt-2">
                 {
                     majorFeatures && majorFeatures.map(feature => <MajorFeatureBox feature={feature} />)
                 }
@@ -169,13 +169,13 @@ export default function ProjectIdPage({ user, project, profiles, contact }: Proj
                 </div>
                 <div className="flex flex-col gap-[2px] overflow-y-auto scrollbar">
                     {
-                        currentTasks && currentTasks.filter(x => !x.completed).length === 0 &&
+                        currentTasks && currentTasks.length === 0 &&
                         <div className="flex items-center justify-start h-14 w-full px-16">
                             No Active Tasks
                         </div>
                     }
                     {
-                        currentTasks && currentTasks.sort((a, b) => a.id - b.id).filter(x => !x.completed).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} />)
+                        currentTasks && currentTasks.sort((a, b) => a.id - b.id).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} />)
                     }
                 </div>
                 <Button text="Add New Task" onClick={async () => 
@@ -188,20 +188,6 @@ export default function ProjectIdPage({ user, project, profiles, contact }: Proj
                         createToast(res?.error ? res.error.message : 'Successfully Created New Task', res.error !== null);
                     }
                 }} className="w-fit" />
-                <div className="flex flex-row gap-4 items-center mt-8">
-                    <span className="font-semibold">Completed Tasks</span>
-                </div>
-                <div className="flex flex-col gap-[2px] overflow-y-auto scrollbar max-h-[30vh]">
-                    {
-                        currentTasks && currentTasks.filter(x => x.completed).length === 0 &&
-                        <div className="flex items-center justify-start h-14 w-full px-16">
-                            No Completed Tasks
-                        </div>
-                    }
-                    {
-                        currentTasks && currentTasks.sort((a, b) => a.id - b.id).filter(x => x.completed).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} />)
-                    }
-                </div>
                 <div className="flex flex-col gap-2 overflow-y-auto scrollbar max-h-[40vh] mt-4 mb-10">
                     <span className="font-semibold">{project.name} Discussion</span>
                 </div>

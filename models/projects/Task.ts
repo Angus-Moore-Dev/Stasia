@@ -9,12 +9,21 @@ export class Task
     assigneeId: string | null = null;
     creatorId: string | null = null;
     taskType: TaskType = TaskType.General;
-    completed: boolean = false;
+    taskState: TaskState= TaskState.NotStarted;
 
     constructor(projectId: string)
     {
         this.projectId = projectId;
     }
+}
+
+
+export enum TaskState
+{
+    NotStarted = "Not Started",
+    InProgress = "In Progress",
+    RequiresReview = "Requires Review", // In the event this requires another user to review.
+    Completed = "Completed",
 }
 
 

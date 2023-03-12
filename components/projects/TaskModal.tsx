@@ -39,13 +39,17 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
     const handleClose = () => setShow(false);
     const [taskTitle, setTaskTitle] = useState(task.name);
     const [taskDescription, setTaskDescription] = useState(task.description);
+    const [showUnsavedChanges, setShowUnsavedChanges] = useState(false);
     const [taskColour, setTaskColour] = useState('');
     const [taskType, setTaskType] = useState(task.taskType);
     const [taskComments, setTaskComments] = useState<Comment[]>();
+    const titleRef = useRef<HTMLInputElement>(null);
+    const descriptionRef = useRef<HTMLTextAreaElement>(null);
     
     useEffect(() => {
         // We're doing it this way to containerise the changes inside the modal, but have external changes be reflected here in realtime.
         // That way, we're not passing a setTask object down here and then requiring some nasty callback prop hell.
+        console.log('udpating task description::', task.description);
         setTaskTitle(task.name);
         setTaskDescription(task.description);
         setTaskType(task.taskType);
@@ -96,42 +100,72 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                 <div className='w-[50vw] h-[80vh] bg-tertiary rounded p-8 flex flex-col gap-2'>
                     <div className='w-full flex flex-row items-start gap-4'>
                         <input 
+                            ref={titleRef}
                             value={taskTitle}
                             maxLength={255}
                             onChange={(e) => setTaskTitle(e.target.value)} 
                             className='w-full text-xl font-semibold bg-transparent outline-none focus:border-b-2 border-b-primary scrollbar h-full'
                             placeholder='Enter Title Here'
                             contentEditable={true}
-                            onKeyDown={(e) => {
+                            onKeyDown={async (e) => {
                                 if (e.key === 'Enter')
                                 {
-
+                                    const res = await supabase.from('project_tickets').update({ name: taskTitle }).eq('id', task.id);
+                                    if (res.error)
+                                    {
+                                        createToast(res.error.message, true);
+                                    }
+                                    else
+                                    {
+                                        titleRef.current?.blur();
+                                    }
                                 }
                             }}
                         />
                         <select defaultValue={task.taskType} className={`bg-transparent hover:text-zinc-100 font-semibold text-center rounded-sm w-32 h-fit py-2`} 
                         style={{ backgroundColor: taskColour }} onChange={async (e) => {
-                            const res = await supabase.from('project_tickets').update({
-                                taskType: e.target.value
-                            }).eq('id', task.id);
-
+                            const res = await supabase.from('project_tickets').update({ taskType: e.target.value }).eq('id', task.id);
                             if (!res.error)
                             {
+                                createToast('Successfully Updated Task Title', false);
                                 setTaskType(e.target.value as TaskType);
                             }
                             else
-                            {
                                 createToast(res.error.message, true);
-                            }
                         }}>
                             {
                                 Object.values(TaskType).map(type => <option key={type} value={type}>{type}</option>)
                             }
                         </select>
                     </div>
-                    <textarea className='w-full text-lg bg-transparent rounded p-2 outline-none h-1/4' placeholder='Description Here'>
+                    <textarea 
+                        ref={descriptionRef}
+                        value={taskDescription} 
+                        onChange={(e) => { setTaskDescription(e.target.value); setShowUnsavedChanges(true); }}
+                        className='w-full text-lg bg-transparent rounded p-2 outline-none h-1/4' 
+                        placeholder='Description Here'
+                    >
                         {task.description}
                     </textarea>
+                    {
+                        showUnsavedChanges &&
+                        <div className='w-full flex items-center justify-end'>
+                            <Button text='Update Description' onClick={async () => {
+                                const res = await supabase.from('project_tickets').update({
+                                    description: taskDescription
+                                }).eq('id', task.id);
+                                if (res.error)
+                                    createToast(res.error.message, true);
+                                else
+                                {
+                                    createToast('Successfully Updated Task Description', false);
+                                    descriptionRef.current?.blur();
+                                    setShowUnsavedChanges(false);
+                                }
+                                
+                            }} />
+                        </div>
+                    }
                     <p className='py-2 font-medium border-b-2 border-b-primary'>Comments</p>
                     <div className='flex-grow h-full flex flex-row'>
                         <div className='flex-grow h-full flex items-center justify-center'>
@@ -149,12 +183,6 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                             Configuration goes here.
                         </div>
                     </div>
-                    <Button text={`${task.completed ? 'Mark Task as Not Complete' : 'Complete Task'}`} className='ml-auto bg-transparent' onClick={async () => {
-                        const res= await supabase.from('project_tickets').update({
-                            completed: !task.completed,
-                        }).eq('id', task.id);
-                        createToast(res.error ? res.error.message : `${task.completed ? 'Task Marked As Not Complete' : 'Task Has Been Completed'}`, res.error !== null);
-                    }} />
                 </div>
             </Box>
         </Modal>

@@ -19,8 +19,10 @@ export default function AppNavbar()
     {
         if (user)
         {
+            console.log(user.id);
             supabase.from('profiles').select('*').eq('id', user?.id).single().then(async data => {
                 const profileData = data.data as Profile;
+                console.log('profileData::', profileData);
                 const url = supabase.storage.from('profile.pictures').getPublicUrl(profileData.profilePictureURL).data.publicUrl ?? '';
                 profileData.profilePictureURL = url;
                 setProfile(profileData);
