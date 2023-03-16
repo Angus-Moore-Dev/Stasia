@@ -89,6 +89,13 @@ export function TaskBox({ task, profile }: TaskBoxProps)
     const [taskState, setTaskState] = useState(task.taskState);
     const [taskStateColour, setTaskStateColour] = useState('');
 
+    useEffect(() => {
+        setTaskType(task.taskType);
+        setTitleText(task.name);
+        setTaskState(task.taskState);
+        console.log('NEW TASK STATE::', task.taskState);
+    }, [task]);
+
     useEffect(() => 
     {
         switch(taskType)
@@ -153,13 +160,13 @@ export function TaskBox({ task, profile }: TaskBoxProps)
 
     return <>
         <TaskModal task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
-        <div className='w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px]'
+        <div className='w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px] min-w-[450px]'
             onBlur={() => {setIsEditable(false)}}
             onMouseOver={() => setShowEditButton(true)}
             onMouseLeave={() => setShowEditButton(false)}
         >
             <p>{task.id}</p>
-            <select defaultValue={task.taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 ${task.taskState === TaskState.Completed && 'text-zinc-100'}`} 
+            <select defaultValue={taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 min-w-[128px] max-w-[128px] ${taskState === TaskState.Completed && 'text-zinc-100'}`} 
             style={{ backgroundColor: taskColour }} onChange={async (e) => {
                 const res = await supabase.from('project_tickets').update({ taskType: e.target.value }).eq('id', task.id);
                 if (!res.error)
@@ -213,7 +220,7 @@ export function TaskBox({ task, profile }: TaskBoxProps)
                     />
                 }
             </div>
-            <select defaultValue={task.taskState} className={`bg-transparent h-full text-secondary font-bold text-center rounded-sm w-32`} 
+            <select defaultValue={taskState} value={taskState} className={`bg-transparent h-full text-secondary font-bold text-center rounded-sm w-32`} 
             style={{ backgroundColor: taskStateColour }} onChange={async (e) => {
                 const res = await supabase.from('project_tickets').update({ taskState: e.target.value }).eq('id', task.id);
                 if (!res.error)

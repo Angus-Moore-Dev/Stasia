@@ -42,9 +42,7 @@ export default function ProjectIdPage({ user, project, profiles, contact }: Proj
     }, []);
 
     const updateTask = useCallback((task: Task) => {
-        setCurrentTasks(currentTasks => currentTasks?.map(x => {
-            return x.id === task.id ? task : x;
-        }));
+        
     }, []);
 
     useEffect(() => {
@@ -79,7 +77,12 @@ export default function ProjectIdPage({ user, project, profiles, contact }: Proj
             {
                 console.log('realtime update of ticket::', payload.new as Task);
                 const message = payload.new as Task;
-                updateTask(message);
+                setCurrentTasks(currentTasks => {
+                    const allTasks = [...currentTasks ?? []];
+                    allTasks[allTasks.findIndex(x => x.id === message.id)] = message;
+                    console.log('updating task::', message.id);
+                    return allTasks;
+                });
             }
         }).subscribe((status) => {
             console.log('tasks::', status);
@@ -93,7 +96,7 @@ export default function ProjectIdPage({ user, project, profiles, contact }: Proj
                 router.push('/projects');
             }} className="mr-auto" />
             <Button text='Edit Project Details' onClick={() => {
-                alert('edit project details');
+                router.push(`/projects/edit?id=${project.id}`);
             }} />
         </div>
         <div className="flex-grow w-full flex flex-col gap-6">
@@ -212,6 +215,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 	}
 
     const project = (await supabaseClient.from('projects').select('*').eq('id', context.query['projectId']).single()).data as Project;
+    console.log(project);
     const profiles = (await supabaseClient.from('profiles').select('id, name, profilePictureURL, role').in('id', project.peopleInvolved)).data as Profile[];
 
     for (const profile of profiles)

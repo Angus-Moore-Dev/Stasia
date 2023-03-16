@@ -2,12 +2,15 @@
 import createToast from '@/functions/createToast';
 import { supabase } from '@/lib/supabaseClient';
 import { Profile } from '@/models/me/Profile';
-import { Task, TaskType } from '@/models/projects/Task';
+import { Task, TaskState, TaskType } from '@/models/projects/Task';
 import { Box, Modal } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { ContactCommentBox } from '../common/Comment';
 import { Comment } from '@/models/chat/Comment';
 import Button from '../common/Button';
+import Image from 'next/image';
+import LoadingBox from '../LoadingBox';
+import { toast } from 'react-toastify';
 
 
 const style = {
@@ -41,10 +44,20 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
     const [taskDescription, setTaskDescription] = useState(task.description);
     const [showUnsavedChanges, setShowUnsavedChanges] = useState(false);
     const [taskColour, setTaskColour] = useState('');
+    const [taskStateColour, setTaskStateColour] = useState('');
     const [taskType, setTaskType] = useState(task.taskType);
     const [taskComments, setTaskComments] = useState<Comment[]>();
+    const [taskState, setTaskState] = useState(task.taskState);
+    const [assigneeId, setAssigneeId] = useState(task.assigneeId);
     const titleRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+    const [showAllProfiles, setShowAllProfiles] = useState(false);
+    const [nameQuery, setNameQuery] = useState('');
+
+    const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
+    const [creatorOfTask, setCreatorOfTask] = useState<Profile>();
+    const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
     
     useEffect(() => {
         // We're doing it this way to containerise the changes inside the modal, but have external changes be reflected here in realtime.
@@ -53,6 +66,25 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
         setTaskTitle(task.name);
         setTaskDescription(task.description);
         setTaskType(task.taskType);
+        setAssigneeId(task.assigneeId);
+        setTaskState(task.taskState);
+
+        const fetchAllMetadata = async () =>
+        {
+            setIsFetchingMetadata(true);
+            const profileOfCreator = (await supabase.from('profiles').select('name, profilePictureURL').eq('id', task.creatorId).single()).data as Profile;
+            profileOfCreator.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(profileOfCreator.profilePictureURL).data.publicUrl!;
+            setCreatorOfTask(profileOfCreator);
+            const allStaffInvoled = await (await supabase.from('profiles').select('id, name, profilePictureURL')).data as Profile[];
+            for (const staff of allStaffInvoled)
+            {
+                staff.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(staff.profilePictureURL).data.publicUrl!;
+            }
+            setAllProfiles(allStaffInvoled);
+            setIsFetchingMetadata(false);
+        }
+
+        fetchAllMetadata();
     }, [task]);
 
     useEffect(() => // There has to be a way to automatically configure this.
@@ -88,6 +120,28 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                 break;
         }
     }, [taskType]);
+
+
+    useEffect(() =>
+    {
+        switch(taskState)
+        {
+            case TaskState.NotStarted:
+                setTaskStateColour('#1d4ed8'); // bg-neutral-600
+                break;
+            case TaskState.InProgress:
+                setTaskStateColour('#3b82f6'); // bg-blue-700
+                break;
+            case TaskState.RequiresReview:
+                setTaskStateColour('#fbbf24'); // bg-amber-700
+                break;
+            case TaskState.Completed:
+                setTaskStateColour('#00fe49'); // bg-green-600
+                break;
+        }
+    }, [taskState]);
+
+
 
     return <div>
         <Modal
@@ -179,8 +233,79 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                             taskComments && taskComments.map(comment => <ContactCommentBox comment={comment} profile={new Profile()} />)
                         }
                         </div>
-                        <div className='w-[280px] h-full border-l-2 border-primary p-2'>
-                            Configuration goes here.
+                        <div className='w-[280px] h-full p-2 flex flex-col px-4 gap-4 bg-quaternary'>
+                            <span>Task Configuration</span>
+                            {
+                                isFetchingMetadata && !creatorOfTask &&
+                                <div className='flex-grow flex items-center justify-center'>
+                                    <LoadingBox />
+                                </div>
+                            }
+                            {
+                                !isFetchingMetadata && creatorOfTask &&
+                                <>
+                                <div className='flex flex-col'>
+                                    <small className='text-primary font-semibold'>Created by</small>
+                                    <div className='flex flex-row items-center gap-2 px-2 py-1'>
+                                        <Image src={creatorOfTask?.profilePictureURL} alt='asfasf' width='40' height='40' className='rounded object-cover w-[40px] h-[40px]' />
+                                        <p className='font-medium'>{creatorOfTask.name}</p>
+                                    </div>
+                                </div>
+                                <div className='flex flex-col relative'>
+                                    <small className='text-primary font-semibold'>Assigned To</small>
+                                    <button className='flex flex-row items-center gap-2 transition hover:bg-tertiary rounded px-2 py-1 aria-checked:bg-primary aria-checked:text-secondary' onClick={() => {setShowAllProfiles(!showAllProfiles); setNameQuery('')}} 
+                                    aria-checked={showAllProfiles}>
+                                        <Image src={allProfiles.find(x => x.id === assigneeId)?.profilePictureURL ?? '/blank_pfp.jpg'} alt='asfasf' width='40' height='40' className='rounded object-cover w-[40px] h-[40px]' />
+                                        <p className='font-medium'>{allProfiles.find(x => x.id === assigneeId)?.name ?? 'No One (Click to Select)'}</p>
+                                    </button>
+                                    {
+                                        showAllProfiles && 
+                                        <div className='absolute z-50 top-16 flex flex-col gap-2 max-h-[300px] overflow-y-auto scrollbar bg-secondary rounded p-2 w-full'>
+                                            <input className='w-full h-14 p-2 bg-tertiary text-zinc-100 border-b-2 border-b-primary rounded' placeholder='Search Name' />
+                                            {
+                                            allProfiles.map(profile => <button className='flex flex-row items-center gap-2 transition hover:bg-primary hover:text-secondary rounded p-2'
+                                            onClick={async () => {
+                                                const res = await supabase.from('project_tickets').update({
+                                                    assigneeId: profile.id
+                                                }).eq('id', task.id);
+                                                res.error && createToast(res.error.message, true);
+                                                setShowAllProfiles(false);
+                                                setNameQuery('');
+                                                setAssigneeId(profile.id);
+                                                task.assigneeId = profile.id
+                                            }}>
+                                                    <Image src={profile.profilePictureURL} alt='asfasf' width='40' height='40' className='rounded object-cover w-[40px] h-[40px]' />
+                                                    <p className=''>{profile.name}</p>
+                                                </button>
+                                                )
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                                <div className='flex flex-col'>
+                                    <small className='text-primary font-semibold'>State</small>
+                                    <select defaultValue={taskState} value={taskState} className={`mx-2 bg-transparent h-full text-secondary font-bold text-center rounded-sm w-[90%]`} 
+                                    style={{ backgroundColor: taskStateColour }} onChange={async (e) => {
+                                        const res = await supabase.from('project_tickets').update({ taskState: e.target.value }).eq('id', task.id);
+                                        if (!res.error)
+                                            setTaskState(e.target.value as TaskState);
+                                        else
+                                            createToast(res.error.message, true);
+                                    }}>
+                                        {
+                                            Object.values(TaskState).map(type => <option key={type} value={type}>{type}</option>)
+                                        }
+                                    </select>
+                                </div>
+                                {/* <div className='flex flex-col'>
+                                    <small className='text-primary font-semibold'>Major Feature</small>
+                                    <div className='flex flex-row items-center gap-2'>
+                                        <Image src={creatorOfTask?.profilePictureURL} alt='asfasf' width='40' height='40' className='rounded object-cover w-[40px] h-[40px]' />
+                                        <p className='font-medium'>{creatorOfTask.name}</p>
+                                    </div>
+                                </div> */}
+                                </>
+                            }
                         </div>
                     </div>
                 </div>

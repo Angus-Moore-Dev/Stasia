@@ -75,11 +75,11 @@ export default function ChatPage({ user }: ChatPageProps)
         }
     }, [messages]);
 
-    return <div className='w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
+    return <div className='w-full h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto'>
         <section className="w-full flex justify-between">
             <span className="">Chat</span>
         </section>
-        <section className="flex-grow max-h-full flex flex-row w-full">
+        <section className="flex-grow max-h-[85vh] min-h-[400px] flex flex-row w-full">
             <div className="w-1/4 bg-tertiary rounded-l py-8 px-4">
                 <div className="w-full flex justify-between pr-2 ">
                     <span>Channels</span>

@@ -11,18 +11,21 @@ import { Router } from 'next/router';
 import LoadingBox from '@/components/LoadingBox';
 import Image from 'next/image';
 import { ToastContainer } from 'react-toastify';
+import SideBar from '@/components/SideBar';
 
 
 export default function App({ Component, pageProps }: AppProps) {
 	const [supabase] = useState(() => createBrowserSupabaseClient());
 	const [loading, setLoading] = useState(false);
 	const [pageName, setPageName] = useState('');
+	const [inSubRoute, setInSubRoute] = useState(false);
 
 	useEffect(() => 
 	{
 		const start = (url: string) => {
 			setPageName(url.split('/')[1]);
 			setLoading(true);
+			setInSubRoute(url.split('/')[1] !== '');
 		};
 		const end = (url: string) => {
 			setLoading(false);
@@ -48,23 +51,26 @@ export default function App({ Component, pageProps }: AppProps) {
 			<Head>
 				<title>Stasia</title>
 			</Head>
-			<div className='w-screen h-screen flex flex-col bg-secondary'>
-				<AppNavbar  />
-				<div className='flex-grow overflow-x-hidden scrollbar'>
-					{
-						loading && 
-						<div className='flex-grow h-full flex flex-col gap-2 items-center justify-center'>
-							<LoadingBox content={<Image src='/favicon.ico' alt='logo' width='40' height='40' />} />
-							<small className='capitalize'>Loading {pageName}</small>
-						</div>
-					}
-					{
-						!loading &&
-						<Component {...pageProps} />
-					}
+			<div className='min-w-screen min-h-screen flex flex-row'>
+				<SideBar />
+				<div className='flex-grow flex flex-col bg-secondary'>
+					<AppNavbar  />
+					<div className='flex-grow overflow-x-hidden'>
+						{
+							loading && 
+							<div className='flex-grow h-full flex flex-col gap-2 items-center justify-center'>
+								<LoadingBox content={<Image src='/favicon.ico' alt='logo' width='40' height='40' />} />
+								<small className='capitalize'>Loading {pageName}</small>
+							</div>
+						}
+						{
+							!loading &&
+							<Component {...pageProps} />
+						}
+					</div>
+					<AppFooter />
+					<ToastContainer />
 				</div>
-				<AppFooter />
-				<ToastContainer />
 			</div>
 		</SessionContextProvider>
 	)
