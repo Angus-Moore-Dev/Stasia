@@ -12,6 +12,7 @@ import { MinorFeature } from "@/models/projects/MinorFeature";
 import { MinorFeatureBox } from "@/components/projects/FeatureBoxes";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
+import createNewNotification from "@/functions/createNewNotification";
 
 interface MajorFeatureProps
 {
@@ -19,9 +20,10 @@ interface MajorFeatureProps
 	projectName: string;
     user: User;
 	profiles: Profile[];
+	profile: Profile;
 }
 
-export default function NewMajorFeature({ user, projectName, projectId, profiles }: MajorFeatureProps)
+export default function NewMajorFeature({ user, projectName, projectId, profiles, profile }: MajorFeatureProps)
 {
     const router = useRouter();
 	const [majorFeature, setMajorFeature] = useState(new MajorFeature(projectId));
@@ -69,6 +71,10 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
 							theme: "colored",
 							style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
 						});
+					}
+					else
+					{
+						createNewNotification(profile, `${profile.name} Created A New Major Feature`, `${profile.name} created a new feature for the project ${projectName}, ${majorFeature.name}.`, profile.profilePictureURL);
 					}
 				}
             }} className="" />
@@ -161,12 +167,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 	{
 		profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl;
 	}
+
+	const profile = (await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
+
+
 	return {
 		props: {
 			user: session?.user ?? null,
 			projectName: project.name,
             projectId: project.id,
 			profiles: staffInvolved,
+			profile: profile,
 		}
 	}
 }

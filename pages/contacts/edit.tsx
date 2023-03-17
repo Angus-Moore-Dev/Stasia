@@ -13,14 +13,17 @@ import { v4 } from "uuid";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { Profile } from "@/models/me/Profile";
+import createNewNotification from "@/functions/createNewNotification";
 
 interface NewLeadPageProps
 {
     user: User;
+    profile: Profile;
     contact: Contact | null;
 }
 
-export default function NewContactPage({ user, contact }: NewLeadPageProps)
+export default function NewContactPage({ user, profile, contact }: NewLeadPageProps)
 {
     const [deleteHover, setDeleteHover] = useState(false);
     const supabase = createBrowserSupabaseClient({
@@ -80,6 +83,7 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
                         else
                         {
                             router.push('/contacts');
+                            createNewNotification(profile, `${profile.name} Deleted A Contact`, `${profile.name} deleted the contact ${name}.`, profile.profilePictureURL);
                         }
                     }}>
                         Warning, this is permanent!
@@ -213,6 +217,7 @@ export default function NewContactPage({ user, contact }: NewLeadPageProps)
 
                             if (response.status === 201 || response.status === 204)
                             {
+                                createNewNotification(profile, `${profile.name} Updated A Contact`, `${profile.name} updated the contact details for ${name}.`, profile.profilePictureURL);
                                 toast.success('Contact Updated Successfully.', 
                                 {
                                     position: "bottom-right",
@@ -257,6 +262,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
         }
     }
 
+    const profile = (await supabase.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabase.storage.from('general.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
+
     let contactData: Contact | null = null;
     if (!context.query['id'])
     {
@@ -276,7 +284,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     return {
         props: {
             user: session?.user,
-            contact: contactData
+            contact: contactData,
+            profile: profile,
         }
     }
 }

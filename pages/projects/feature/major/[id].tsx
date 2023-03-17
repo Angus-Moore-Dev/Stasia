@@ -13,6 +13,7 @@ import { MinorFeatureBox } from "@/components/projects/FeatureBoxes";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
 import createToast from "@/functions/createToast";
+import createNewNotification from "@/functions/createNewNotification";
 
 interface MajorFeatureProps
 {
@@ -20,9 +21,10 @@ interface MajorFeatureProps
 	minorFeaturesData: MinorFeature[];
     user: User;
 	profiles: Profile[];
+	profile: Profile;
 }
 
-export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesData, profiles }: MajorFeatureProps)
+export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesData, profiles, profile }: MajorFeatureProps)
 {
     const router = useRouter();
 	const [majorFeature, setMajorFeature] = useState(majorFeatureData);
@@ -67,6 +69,7 @@ export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesD
 					{
 						setCompleted(true);
 						createToast('Marked Feature As Complete!', false);
+						createNewNotification(profile, `${profile.name} Marked a Major Feature As Complete`, `${profile.name} marked a major feature as complete, ${majorFeature.name}.`, profile.profilePictureURL);
 					}
 				}} className={`${majorFeature !== majorFeatureData && 'animate-pulse shadow-primary shadow-md'}`} />
 			}
@@ -177,12 +180,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 	{
 		profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl;
 	}
+
+	const profile = (await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
+
 	return {
 		props: {
 			user: session?.user ?? null,
 			majorFeatureData: majorFeature,
 			minorFeaturesData: minorFeatures,
 			profiles: staffInvolved,
+			profile: profile,
 		}
 	}
 }

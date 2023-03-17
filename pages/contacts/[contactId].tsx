@@ -283,6 +283,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     const contact = data as Contact;
     contact.previewImageURL = (await supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL)).data?.publicUrl ?? '';
     const profile = (await supabase.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
+
     return {
         props: {
             profile: profile,

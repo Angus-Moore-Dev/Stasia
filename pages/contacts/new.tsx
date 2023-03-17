@@ -12,13 +12,16 @@ import PublicSharpIcon from '@mui/icons-material/PublicSharp';
 import { v4 } from "uuid";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import createNewNotification from "@/functions/createNewNotification";
+import { Profile } from "@/models/me/Profile";
 
 interface NewLeadPageProps
 {
     user: User;
+    profile: Profile;
 }
 
-export default function NewContactPage({ user }: NewLeadPageProps)
+export default function NewContactPage({ user, profile }: NewLeadPageProps)
 {
     const supabase = createBrowserSupabaseClient({
         supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
@@ -130,7 +133,6 @@ export default function NewContactPage({ user }: NewLeadPageProps)
                     </div>
                     <button className="px-4 py-1 rounded-lg bg-secondary text-primary transition hover:bg-primary hover:text-secondary font-bold ml-auto"
                     onClick={async () => {
-                        //todo: file upload for the user's image.
                         const newId = v4();
                         let imageURL = '';
                         if (image)
@@ -167,6 +169,7 @@ export default function NewContactPage({ user }: NewLeadPageProps)
                         if (response.status === 201)
                         {
                             router.push(`/contacts/${newId}`);
+                            createNewNotification(profile, `${profile.name} Created A New Contact`, `${profile.name} created a new contact, ${name}.`, profile.profilePictureURL);
                         }
                         else
                         {
@@ -197,10 +200,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
             }
         }
     }
+    
+    const profile = (await supabase.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
 
     return {
         props: {
-            user: session?.user
+            user: session?.user,
+            profile: profile
         }
     }
 }

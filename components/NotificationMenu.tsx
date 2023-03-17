@@ -16,7 +16,7 @@ interface NotificationMenuProps
 
 export default function NotificationMenu({ profile }: NotificationMenuProps)
 {
-    const [notifications, setNotifications] = useState<Notification[]>();
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotificationMenu, setShowNotificationMenu] = useState(false);
     const [unseenNotificationCount, setUnseenNotificationCount] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -30,10 +30,16 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
     useEffect(() => {
         fetchAllNotifications();
         supabase.channel('notificationUpdates')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (newNotification) => {
-            setNotifications(notifications => [...notifications ?? [], newNotification.new as Notification].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
-            setUnseenNotificationCount(true);
-            audioRef.current?.play();
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload) => {
+            const newNotification = payload.new as Notification;
+            setNotifications(notifications => [newNotification, ...notifications ?? [],]);
+            // Coming from someone other than ourselves.
+            if (newNotification.userId !== profile.id)
+            {
+                setUnseenNotificationCount(true);
+                audioRef.current!.volume = 0.25;
+                audioRef.current?.play();
+            }
         }).subscribe((status) => console.log('notification listener::', status));
     }, []);
 
@@ -41,15 +47,18 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
         if (showNotificationMenu)
         {
             setUnseenNotificationCount(false);
+            setNotifications(notifications => notifications.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
         }
     }, [showNotificationMenu]);
 
     useEffect(() => {
         if (unseenNotificationCount)
         {
+            setNotifications(notifications => notifications?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
         }
-    }, [unseenNotificationCount])
-    
+    }, [unseenNotificationCount]);
+
+
     return <>
         <audio hidden ref={audioRef}>
             <source src='/notificationSound.mp3' />
@@ -70,17 +79,34 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
             <div className="w-96 min-h-[384px] max-h-[50vh] bg-quaternary rounded absolute z-50 top-12 mr-36 p-2 flex flex-col gap-1">
                 <span className="px-4 font-medium">Notifications</span>
                 {
-                    !notifications &&
+                    notifications.length === 0 &&
                     <div className="flex-grow flex items-center justify-center">
                         <LoadingBox />
                     </div>
                 }
                 {
-                    notifications &&
+                    notifications.length > 0 &&
                     <div className="flex-grow  flex flex-col overflow-y-auto scrollbar">
                         <div className="flex-grow flex flex-col gap-1">
+                        <span>Today</span>
                         {
-                            notifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map(notification => <div key={notification.id}><NotificationEvent notification={notification} setShowNotificationMenu={setShowNotificationMenu} /></div>)
+                            notifications.filter(x => Math.floor(Math.abs(Date.now() - new Date(x.created_at).getTime()) / 36e5) < 24)
+                            .map(notification => <div key={notification.id}><NotificationEvent notification={notification} setShowNotificationMenu={setShowNotificationMenu} /></div>)
+                        }
+                        <span>Less Than A Week Ago</span>
+                        {
+                            notifications.filter(x => Math.floor(Math.abs(Date.now() - new Date(x.created_at).getTime()) / 36e5) > 24 && Math.floor(Math.abs(Date.now() - new Date(x.created_at).getTime()) / 36e5) < 144)
+                            .map(notification => <div key={notification.id}><NotificationEvent notification={notification} setShowNotificationMenu={setShowNotificationMenu} /></div>)
+                        }
+                        <span>A Week Ago</span>
+                        {
+                            notifications.filter(x => Math.floor(Math.abs(Date.now() - new Date(x.created_at).getTime()) / 36e5) > 144 && Math.floor(Math.abs(Date.now() - new Date(x.created_at).getTime()) / 36e5) < (30 * 24))
+                            .map(notification => <div key={notification.id}><NotificationEvent notification={notification} setShowNotificationMenu={setShowNotificationMenu} /></div>)
+                        }
+                        <span>Old Notifications</span>
+                        {
+                            notifications.filter(x => Math.floor(Math.abs(Date.now() - new Date(x.created_at).getTime()) / 36e5) > 720)
+                            .map(notification => <div key={notification.id}><NotificationEvent notification={notification} setShowNotificationMenu={setShowNotificationMenu} /></div>)
                         }
                         </div>
                     </div>
