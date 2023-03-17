@@ -1,7 +1,7 @@
 ![psychostasia graphic](https://user-images.githubusercontent.com/99398403/222959200-11668430-670f-4454-91f2-815d1161916d.png)
 
 
-A better way to organise your files, customer relationships, internal communications and project management. This Cyberpunk themed tool will ensure that there is no need to use external services like Jira, Monday, Copper, Salesforce or some Cloud storage workaround to organise your files; this is the place to manage the business and growth side of your team/company. Stasia will simply eliminate any need for you to use 8-10+ platforms and SaaS products when you can do it all here, being open source so you are free to contribute new ideas and systems to the platform.
+A better way to organise your files, customer relationships, internal communications and project management. This Cyberpunk themed tool will ensure that there is no need to use external services like Jira, Monday, Copper, Salesforce or some Cloud storage workaround to organise your files; this is the place to manage the business and growth side of your team/company. Stasia will simply eliminate any need for you to use 8-10+ platforms and SaaS products when you can do it all here, being open source so you are free to contribute new ideas and systems to the platform. Kind of like Notion, except with a cool Cyberpunk aesthetic and focuses on the really critical things, zero bloat or extras.
 
 This is currently being used for my own internal management and for my friends, but if this ends up becoming popular then I will make it easier for you to run your own instance (since there are a ton of row level policies for Supabase).
 
