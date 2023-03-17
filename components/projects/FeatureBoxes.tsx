@@ -18,15 +18,23 @@ interface MajorFeatureBoxProps
 
 export function MajorFeatureBox({ feature }: MajorFeatureBoxProps)
 {
-    return <Link href={`/projects/feature/major/${feature.id}`} className="w-full lg:w-[32%] h-96 rounded bg-tertiary p-4 flex flex-col gap-3 transition hover:bg-primary hover:text-secondary hover:cursor-pointer">
-        <p className="text-lg font-semibold">{feature.name}</p>
-        <small className="pb-1 border-b-[1px] border-b-primary w-full">Description</small>
-        <p className="-mt-1 overflow-y-auto scrollbar">{feature.description ? feature.description : 'No Description...'}</p>
-        <small className="">Objective</small>
-        <p className="-mt-3 overflow-y-auto scrollbar">{feature.objective ? feature.objective : 'No Objective...'}</p>
-        <div className="flex-grow flex items-end flex-row justify-between">
-            <small>Click to Open</small>
-            <small>{feature.id}</small>
+    return <Link href={`/projects/feature/major/${feature.id}`} className="w-full lg:w-[32%] h-96 rounded bg-tertiary flex flex-col gap-3 transition hover:bg-primary hover:text-secondary hover:cursor-pointer relative">
+        {
+            feature.completed &&
+            <div className="w-full h-full z-50 absolute bg-primary bg-opacity-60 flex items-center justify-center text-4xl font-bold">
+                COMPLETED
+            </div>
+        }
+        <div className="w-full h-full p-2 flex flex-col gap-3">
+            <p className="text-lg font-semibold">{feature.name}</p>
+            <small className="pb-1 border-b-[1px] border-b-primary w-full">Description</small>
+            <p className="-mt-1 overflow-y-auto scrollbar">{feature.description ? feature.description : 'No Description...'}</p>
+            <small className="">Objective</small>
+            <p className="-mt-3 overflow-y-auto scrollbar">{feature.objective ? feature.objective : 'No Objective...'}</p>
+            <div className="flex-grow flex items-end flex-row justify-between">
+                <small>Click to Open</small>
+                <small>{feature.id}</small>
+            </div>
         </div>
     </Link>
 }

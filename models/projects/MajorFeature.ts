@@ -8,6 +8,7 @@ export class MajorFeature
     description: string = '';
     objective: string = '';
     peopleInvolved: string[] = [];
+    completed: boolean = false;
 
     constructor(projectId: string)
     {

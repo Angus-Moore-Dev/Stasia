@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import LoadingBox from "./LoadingBox";
 import Button from "./common/Button";
 import { v4 } from "uuid";
@@ -19,6 +19,7 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
     const [notifications, setNotifications] = useState<Notification[]>();
     const [showNotificationMenu, setShowNotificationMenu] = useState(false);
     const [unseenNotificationCount, setUnseenNotificationCount] = useState(false);
+    const audioRef = useRef<HTMLAudioElement>(null);
 
     const fetchAllNotifications = async () =>
     {
@@ -32,6 +33,7 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (newNotification) => {
             setNotifications(notifications => [...notifications ?? [], newNotification.new as Notification].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
             setUnseenNotificationCount(true);
+            audioRef.current?.play();
         }).subscribe((status) => console.log('notification listener::', status));
     }, []);
 
@@ -40,9 +42,18 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
         {
             setUnseenNotificationCount(false);
         }
-    }, [showNotificationMenu])
+    }, [showNotificationMenu]);
+
+    useEffect(() => {
+        if (unseenNotificationCount)
+        {
+        }
+    }, [unseenNotificationCount])
     
     return <>
+        <audio hidden ref={audioRef}>
+            <source src='/notificationSound.mp3' />
+        </audio>
         <button className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
         aria-checked={showNotificationMenu}
         onClick={() => setShowNotificationMenu(!showNotificationMenu)}>
