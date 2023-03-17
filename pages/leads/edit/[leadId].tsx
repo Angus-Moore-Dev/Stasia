@@ -1,6 +1,7 @@
 import LoadingBox from "@/components/LoadingBox";
 import Button from "@/components/common/Button";
 import { LeadCommentBox } from "@/components/common/Comment";
+import createNewNotification from "@/functions/createNewNotification";
 import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
 import { Lead, LeadStage } from "@/models/Lead";
@@ -20,9 +21,10 @@ interface EditLeadPageProps
 {
     user: User;
     contact: Lead;
+    profile: Profile;
 }
 
-export default function EditLeadPage({ user, contact }: EditLeadPageProps)
+export default function EditLeadPage({ user, profile, contact }: EditLeadPageProps)
 {
     const router = useRouter();
     const [contactData, setContactData] = useState(contact);
@@ -224,6 +226,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                                     leadId: contact.id,
                                     message: messageData
                                 }]);
+                                createNewNotification(profile, `${profile.name} Commmented On A Lead`, `${profile.name} added a new comment for the lead ${contact.name}`, contact.previewImageURL);
                             }
                         }}
                     />
@@ -288,6 +291,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                                 theme: "colored",
                                 style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
                             });
+                            createNewNotification(profile, `${profile.name} Deleted A Lead`, `${profile.name} deleted the lead, ${contactData.name}.`, contact.previewImageURL);
                             router.push('/leads');
                         }
                     }}>
@@ -307,6 +311,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                         console.log(result);
                         if (result.status === 204)
                         {
+                            createNewNotification(profile, `${profile.name} Updated A Lead`, `${profile.name} updated the lead, ${contactData.name}.`, contact.previewImageURL);
                             toast.success('Lead Updated Successfully.', 
                             {
                                 position: "bottom-right",
@@ -345,6 +350,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
         }
     }
 
+    if (!session)
+    {
+        return {
+            redirect: {
+                destination: '/sign-in',
+                permanent: false
+            }
+        }
+    }
+
     if (!data)
     {
         return {
@@ -354,6 +369,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
             }
         }
     }
+
+    const profile = (await supabase.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
 
     const contact = data as Lead;
     console.log('leads::', data.leads);
@@ -369,6 +387,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
         props: {
             user: session?.user,
             contact: data as Lead,
+            profile: profile,
         }
     }
 }

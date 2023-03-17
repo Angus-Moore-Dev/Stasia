@@ -12,6 +12,7 @@ import { Contact } from "@/models/Contact";
 import { supabase } from "@/lib/supabaseClient";
 import { v4 } from "uuid";
 import { toast } from "react-toastify";
+import createNewNotification from "@/functions/createNewNotification";
 
 interface ProectsPageProps
 {
@@ -19,9 +20,10 @@ interface ProectsPageProps
     profiles: Profile[];
     contacts: Contact[];
     project: Project;
+    profile: Profile;
 }
 
-export default function NewProjectPage({ user, profiles, contacts, project }: ProectsPageProps)
+export default function NewProjectPage({ user, profiles, profile, contacts, project }: ProectsPageProps)
 {
     const router = useRouter();
     const [projectName, setProjectName] = useState(project.name);
@@ -78,6 +80,7 @@ export default function NewProjectPage({ user, profiles, contacts, project }: Pr
                         theme: "colored",
                         style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
                     });
+                    createNewNotification(profile, `${profile.name} Updated a Project`, `${profile.name} updated the information for project, ${project.name}.`, profile.profilePictureURL);
                     router.push(`/projects/${updatedProject.id}`);
                 }
             }} />
@@ -200,12 +203,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
         profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl;
     }
 
+    const profile = (await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
+
 	return {
 		props: {
 			user: session?.user ?? null,
             profiles: profiles,
             contacts: contacts,
-            project: projectDetails
+            project: projectDetails,
+            profile: profile,
 		}
 	}
 }

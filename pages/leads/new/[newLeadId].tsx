@@ -1,7 +1,9 @@
 import Button from "@/components/common/Button";
+import createNewNotification from "@/functions/createNewNotification";
 import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
 import { Lead, LeadStage } from "@/models/Lead";
+import { Profile } from "@/models/me/Profile";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
 import Image from 'next/image';
@@ -14,9 +16,10 @@ interface EditLeadPageProps
 {
     user: User;
     contact: Contact;
+    profile: Profile;
 }
 
-export default function EditLeadPage({ user, contact }: EditLeadPageProps)
+export default function EditLeadPage({ user, profile, contact }: EditLeadPageProps)
 {
     const router = useRouter();
     const [contactData, setContactData] = useState(new Lead(contact.id, contact.name, contact.previewImageURL, contact.created_at, LeadStage.UNKNOWN));
@@ -124,6 +127,7 @@ export default function EditLeadPage({ user, contact }: EditLeadPageProps)
                 ]);
                 if (insertResult.status === 201)
                 {
+                    createNewNotification(profile, `${profile.name} Created a New Lead`, `${profile.name} created a new lead with the name ${contact.name}`, contact.previewImageURL);
                     router.push('/leads');
                 }
             }}>
@@ -153,10 +157,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
         }
     }
 
+    const profile = (await supabase.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
+
     return {
         props: {
             user: session?.user,
             contact: data as Contact,
+            profile: profile,
         }
     }
 }

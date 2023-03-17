@@ -1,5 +1,6 @@
 import Button from "@/components/common/Button";
 import { MajorFeatureBox, TaskBox } from "@/components/projects/FeatureBoxes";
+import createNewNotification from "@/functions/createNewNotification";
 import createToast from "@/functions/createToast";
 import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
@@ -20,12 +21,13 @@ import { useCallback, useEffect, useState } from "react";
 interface ProjectIdPageProps
 {
     user: User;
+    profile: Profile;
     project: Project;
     profiles: Profile[];
     contact: Contact | null;
 }
 
-export default function ProjectIdPage({ user, project, profiles, contact }: ProjectIdPageProps)
+export default function ProjectIdPage({ user, project, profile, profiles, contact }: ProjectIdPageProps)
 {
     const router = useRouter();
     const [majorFeatures, setMajorFeatures] = useState<MajorFeature[]>();
@@ -189,6 +191,7 @@ export default function ProjectIdPage({ user, project, profiles, contact }: Proj
                         task.creatorId = user.id;
                         const res = await supabase.from('project_tickets').insert(task);
                         createToast(res?.error ? res.error.message : 'Successfully Created New Task', res.error !== null);
+						createNewNotification(profile, `${profile.name} Created A Task For ${project.name}`, `${profile.name} created a new task for the project ${project.name}`, profile.profilePictureURL);
                     }
                 }} className="w-fit" />
                 <div className="flex flex-col gap-2 overflow-y-auto scrollbar max-h-[40vh] mt-4 mb-10">
@@ -215,7 +218,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 	}
 
     const project = (await supabaseClient.from('projects').select('*').eq('id', context.query['projectId']).single()).data as Project;
-    console.log(project);
     const profiles = (await supabaseClient.from('profiles').select('id, name, profilePictureURL, role').in('id', project.peopleInvolved)).data as Profile[];
 
     for (const profile of profiles)
@@ -223,17 +225,20 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
         profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl;
     }
 
-    console.log((await supabaseClient.from('contacts').select('id, name, organisations, previewImageURL').eq('id', project.contractedContactId).single()));
     const contact = project.contractedContactId ? (await supabaseClient.from('contacts').select('*').eq('id', project.contractedContactId).single()).data as Contact : null;
     if (contact)
-        contact.previewImageURL = supabase.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL).data.publicUrl ?? '';
+        contact.previewImageURL = supabaseClient.storage.from('contacts.pictures').getPublicUrl(contact.previewImageURL).data.publicUrl ?? '';
+
+    const profile = (await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
+    profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
 
 	return {
 		props: {
 			user: session?.user ?? null,
             profiles: profiles,
             project,
-            contact
+            contact,
+            profile
 		}
 	}
 }
