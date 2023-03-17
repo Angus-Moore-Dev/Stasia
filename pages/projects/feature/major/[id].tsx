@@ -27,9 +27,10 @@ export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesD
     const router = useRouter();
 	const [majorFeature, setMajorFeature] = useState(majorFeatureData);
 	const [minorFeatures, setMinorFeatures] = useState<MinorFeature[]>(minorFeaturesData);
+	const [completed, setCompleted] = useState(majorFeatureData.completed)
 
     return <div className='w-full h-full min-h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto'>
-        <div className="w-full flex flex-row items-center justify-between">
+        <div className="w-full flex flex-row items-center justify-start">
             <Button text={`Back to Project`} onClick={() => {
                 router.push(`/projects/${majorFeature.projectId}`);
             }} className="mr-auto" />
@@ -54,6 +55,36 @@ export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesD
 					createToast('Successfully Updated Major Feature', false);
 				}
 			}} className={`${majorFeature !== majorFeatureData && 'animate-pulse shadow-primary shadow-md'}`} />
+			{
+				!completed &&
+				<Button text='Complete Major Feature' onClick={async () => {
+					const res = await supabase.from('project_major_features').update({
+						completed: true
+					}).eq('id', majorFeature.id);
+					if (res.error)
+						createToast(res.error.message, true);
+					else
+					{
+						setCompleted(true);
+						createToast('Marked Feature As Complete!', false);
+					}
+				}} className={`${majorFeature !== majorFeatureData && 'animate-pulse shadow-primary shadow-md'}`} />
+			}
+			{
+				completed &&
+				<Button text='Mark as Not Complete' onClick={async () => {
+					const res = await supabase.from('project_major_features').update({
+						completed: false
+					}).eq('id', majorFeature.id);
+					if (res.error)
+						createToast(res.error.message, true);
+					else
+					{
+						createToast('Feature Marked As Not Complete', false);
+						setCompleted(false);						
+					}
+				}} className='text-red-500 hover:bg-red-500 hover:text-zinc-100' />
+			}
 		</div>
 		<div className="flex-grow w-full flex flex-col gap-2">
 			<div className="w-full flex flex-row gap-8">
