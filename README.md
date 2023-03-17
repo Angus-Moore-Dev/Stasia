@@ -6,7 +6,16 @@ A better way to organise your files, customer relationships, internal communicat
 This is currently being used for my own internal management and for my friends, but if this ends up becoming popular then I will make it easier for you to run your own instance (since there are a ton of row level policies for Supabase).
 
 # Table of Contents
-[Getting Started](#Getting-Started)
+[Getting Started](#getting-started)
+[Adding Contacts](#adding-new-contacts)
+[Creating a New Lead](#creating-a-new-lead)
+[Creating a New Customer](#creating-a-new-customer)
+[Internal Communications](#internal-communications)
+[Managing Your Files](#managing-your-files)
+[Projects](#projects)
+[Calendar / Events](#calendar-/-events)
+[Staff](#staff)
+
 
 ## Getting Started
 You will need to create your own Supabase instance, it's pretty easy, just go to [Supabase](https://supabase.com/) to get started. Supabase is a fantastic service and is FOSS, which is even cooler. Note that you will need to configure a lot of RLS policies, which will be listed here at a later date.
@@ -20,4 +29,26 @@ Once you've done that, in your instance run `npm install && npm run dev` and thi
 
 ## Adding New Contacts
 Stasia's core logic surrounds contacts. Contacts are people that you have interacted with and want to document their existance in relation to your business.
+
+
+## Creating A New Lead
+
+
+## Creating A New Customer
+
+
+## Internal Communications
+
+
+## Managing Your Files
+
+
+## Projects
+
+
+## Calendar / Events
+
+
+## Staff
+
 
