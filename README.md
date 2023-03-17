@@ -6,15 +6,15 @@ A better way to organise your files, customer relationships, internal communicat
 This is currently being used for my own internal management and for my friends, but if this ends up becoming popular then I will make it easier for you to run your own instance (since there are a ton of row level policies for Supabase).
 
 # Table of Contents
-[Getting Started](#getting-started)
-[Adding Contacts](#adding-new-contacts)
-[Creating a New Lead](#creating-a-new-lead)
-[Creating a New Customer](#creating-a-new-customer)
-[Internal Communications](#internal-communications)
-[Managing Your Files](#managing-your-files)
-[Projects](#projects)
-[Calendar / Events](#calendar-/-events)
-[Staff](#staff)
+* [Getting Started](#getting-started)
+* [Adding Contacts](#adding-new-contacts)
+* [Creating a New Lead](#creating-a-new-lead)
+* [Creating a New Customer](#creating-a-new-customer)
+* [Internal Communications](#internal-communications)
+* [Managing Your Files](#managing-your-files)
+* [Projects](#projects)
+* [Calendar / Events](#calendar--events)
+* [Staff](#staff)
 
 
 ## Getting Started
