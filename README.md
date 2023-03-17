@@ -7,7 +7,7 @@ This is currently being used for my own internal management and for my friends, 
 
 # Table of Contents
 * [Getting Started](#getting-started)
-* [Adding Contacts](#adding-new-contacts)
+* [Creating a New Contact](#creating-a-new-contact)
 * [Creating a New Lead](#creating-a-new-lead)
 * [Creating a New Customer](#creating-a-new-customer)
 * [Internal Communications](#internal-communications)
@@ -27,7 +27,7 @@ To get started, you will need the following environment variables:
 
 Once you've done that, in your instance run `npm install && npm run dev` and things should be up and running at `http://localhost:3000/`
 
-## Adding New Contacts
+## Creating A New Contact
 Stasia's core logic surrounds contacts. Contacts are people that you have interacted with and want to document their existance in relation to your business.
 
 
