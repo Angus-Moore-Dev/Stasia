@@ -5,8 +5,11 @@ A better way to organise your files, customer relationships, internal communicat
 
 This is currently being used for my own internal management and for my friends, but if this ends up becoming popular then I will make it easier for you to run your own instance (since there are a ton of row level policies for Supabase).
 
-# Getting Started
-You will need to create your own Supabase instance, it's pretty easy, just go to [Supabase](https://supabase.com/) to get started. Supabase is a fantastic service and is FOSS, which is even cooler.
+# Table of Contents
+[Getting Started](#Getting-Started)
+
+## Getting Started
+You will need to create your own Supabase instance, it's pretty easy, just go to [Supabase](https://supabase.com/) to get started. Supabase is a fantastic service and is FOSS, which is even cooler. Note that you will need to configure a lot of RLS policies, which will be listed here at a later date.
 
 To get started, you will need the following environment variables:
 
@@ -15,6 +18,6 @@ To get started, you will need the following environment variables:
 
 Once you've done that, in your instance run `npm install && npm run dev` and things should be up and running at `http://localhost:3000/`
 
-# Adding New Contacts
+## Adding New Contacts
 Stasia's core logic surrounds contacts. Contacts are people that you have interacted with and want to document their existance in relation to your business.
 
