@@ -6,7 +6,7 @@ A better way to organise your files, customer relationships, internal communicat
 This is currently being used for my own internal management and for my friends, but if this ends up becoming popular then I will make it easier for you to run your own instance (since there are a ton of row level policies for Supabase).
 
 # Getting Started
-You will need to create your own Supabase instance, it's pretty easy, just go to https://supabase.com/ to get started. Supabase is a fantastic service and is FOSS, which is even cooler.
+You will need to create your own Supabase instance, it's pretty easy, just go to [Supabase](https://supabase.com/) to get started. Supabase is a fantastic service and is FOSS, which is even cooler.
 
 To get started, you will need the following environment variables:
 
