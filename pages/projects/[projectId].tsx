@@ -139,11 +139,12 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                     profiles.map(profile => <div className="h-80 w-64 mb-10 flex text-left" key={profile.id}>
                         <div className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
                             <Image 
-                            priority={true}
-                            src={profile.profilePictureURL} 
-                            alt='profile' 
-                            width='600' height='400' 
-                            className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
+                                priority={true}
+                                src={profile.profilePictureURL} 
+                                alt='profile' 
+                                width='600' height='400' 
+                                className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"
+                            />
                             <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
                                 <p className="text-lg font-medium">{profile.name}</p>
                                 <span>{profile.role}</span>
@@ -169,8 +170,9 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                 </div>
             </div>
             <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-4 items-center">
+                <div className="flex flex-col gap-1">
                     <span className="font-semibold">Active Sprint</span>
+                    <span>Tasks that are actively being worked on.</span>
                 </div>
                 {
                     currentTasks && <SprintSection tasks={currentTasks.filter(x => x.onBoard)} />
@@ -188,7 +190,7 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                         </div>
                     }
                     {
-                        currentTasks && currentTasks.filter(x => !x.onBoard).sort((a, b) => a.id - b.id).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} />)
+                        currentTasks && currentTasks.filter(x => !x.onBoard).sort((a, b) => a.id - b.id).map(task => <TaskBox user={user} key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} />)
                     }
                 </div>
                 <Button text="Add New Task" onClick={async () => 
