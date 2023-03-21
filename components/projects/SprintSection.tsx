@@ -46,7 +46,13 @@ export default function SprintSection({ user, tasks }: SprintSectionProps)
 
     return <div className="w-full flex flex-row gap-2">
             {
-                profiles && taskList &&
+                taskList.length === 0 &&
+                <div className="w-full h-24 flex items-center justify-center">
+                    <span>No Tasks In Active Sprint</span>
+                </div>
+            }
+            {
+                profiles && taskList && taskList.length > 0 &&
                 <DragDropContext
                 onDragEnd={async (result) => {
                     const taskTmpList = [...taskList];
