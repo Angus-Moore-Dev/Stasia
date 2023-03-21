@@ -11,6 +11,10 @@ import Button from '../common/Button';
 import Image from 'next/image';
 import LoadingBox from '../LoadingBox';
 import { toast } from 'react-toastify';
+import { TaskComment } from '@/models/projects/TaskComment';
+import createNewNotification from '@/functions/createNewNotification';
+import { v4 } from 'uuid';
+import { User } from '@supabase/supabase-js';
 
 
 const style = {
@@ -21,7 +25,7 @@ const style = {
     minWidth: '400px',
     minHeight: '350px',
     maxWidth: '50vw',
-    maxHeight: '80vh',
+    maxHeight: '60vh',
     overflow: 'auto',
     border: '0px solid',
     outline: 'none',
@@ -31,13 +35,14 @@ const style = {
 
 interface TaskModalProps
 {
+    user: User;
     task: Task;
     profile?: Profile;
     show: boolean;
     setShow: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function TaskModal({ task, profile, show, setShow }: TaskModalProps)
+export default function TaskModal({ user, task, profile, show, setShow }: TaskModalProps)
 {
     const handleClose = () => setShow(false);
     const [taskTitle, setTaskTitle] = useState(task.name);
@@ -58,6 +63,8 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
     const [isFetchingMetadata, setIsFetchingMetadata] = useState(false);
     const [creatorOfTask, setCreatorOfTask] = useState<Profile>();
     const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
+    const [loadingComments, setLoadingComments] = useState(false);
+    const [messageToSendContents, setMessageToSendContents] = useState('');
     
     useEffect(() => {
         // We're doing it this way to containerise the changes inside the modal, but have external changes be reflected here in realtime.
@@ -71,6 +78,7 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
 
         const fetchAllMetadata = async () =>
         {
+            setLoadingComments(true);
             setIsFetchingMetadata(true);
             const profileOfCreator = (await supabase.from('profiles').select('name, profilePictureURL').eq('id', task.creatorId).single()).data as Profile;
             profileOfCreator.profilePictureURL = supabase.storage.from('profile.pictures').getPublicUrl(profileOfCreator.profilePictureURL).data.publicUrl!;
@@ -82,6 +90,10 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
             }
             setAllProfiles(allStaffInvoled);
             setIsFetchingMetadata(false);
+
+            const allComments = (await supabase.from('project_ticket_comments').select('*').eq('ticketId', task.id)).data as Comment[];
+            setTaskComments(allComments);
+            setLoadingComments(false);
         }
 
         fetchAllMetadata();
@@ -151,7 +163,7 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <div className='w-[50vw] h-[80vh] bg-tertiary rounded p-8 flex flex-col gap-2'>
+                <div className='w-[35vw] h-[55vh] bg-tertiary rounded p-8 flex flex-col gap-2'>
                     <div className='w-full flex flex-row items-start gap-4'>
                         <input 
                             ref={titleRef}
@@ -196,7 +208,7 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                         ref={descriptionRef}
                         value={taskDescription} 
                         onChange={(e) => { setTaskDescription(e.target.value); setShowUnsavedChanges(true); }}
-                        className='w-full text-lg bg-transparent rounded p-2 outline-none h-1/4' 
+                        className='w-full text-lg rounded p-2 outline-none h-1/2 bg-quaternary mt-2' 
                         placeholder='Description Here'
                     >
                         {task.description}
@@ -220,20 +232,8 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                             }} />
                         </div>
                     }
-                    <p className='py-2 font-medium border-b-2 border-b-primary'>Comments</p>
                     <div className='flex-grow h-full flex flex-row'>
-                        <div className='flex-grow h-full flex items-center justify-center'>
-                        {
-                            (!taskComments  || taskComments?.length === 0) &&
-                            <div className='flex-grow flex items-center justify-center'>
-                                No Comments
-                            </div>
-                        }
-                        {
-                            taskComments && taskComments.map(comment => <ContactCommentBox comment={comment} profile={new Profile()} />)
-                        }
-                        </div>
-                        <div className='w-[280px] h-full p-2 flex flex-col px-4 gap-4 bg-quaternary'>
+                        <div className='w-full h-full p-2 flex flex-col items-start px-4 gap-4'>
                             <span>Task Configuration</span>
                             {
                                 isFetchingMetadata && !creatorOfTask &&
@@ -263,17 +263,17 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                                         <div className='absolute z-50 top-16 flex flex-col gap-2 max-h-[300px] overflow-y-auto scrollbar bg-secondary rounded p-2 w-full'>
                                             <input className='w-full h-14 p-2 bg-tertiary text-zinc-100 border-b-2 border-b-primary rounded' placeholder='Search Name' />
                                             {
-                                            allProfiles.map(profile => <button className='flex flex-row items-center gap-2 transition hover:bg-primary hover:text-secondary rounded p-2'
-                                            onClick={async () => {
-                                                const res = await supabase.from('project_tickets').update({
-                                                    assigneeId: profile.id
-                                                }).eq('id', task.id);
-                                                res.error && createToast(res.error.message, true);
-                                                setShowAllProfiles(false);
-                                                setNameQuery('');
-                                                setAssigneeId(profile.id);
-                                                task.assigneeId = profile.id
-                                            }}>
+                                                allProfiles.map(profile => <button className='flex flex-row items-center gap-2 transition hover:bg-primary hover:text-secondary rounded p-2'
+                                                onClick={async () => {
+                                                    const res = await supabase.from('project_tickets').update({
+                                                        assigneeId: profile.id
+                                                    }).eq('id', task.id);
+                                                    res.error && createToast(res.error.message, true);
+                                                    setShowAllProfiles(false);
+                                                    setNameQuery('');
+                                                    setAssigneeId(profile.id);
+                                                    task.assigneeId = profile.id
+                                                }}>
                                                     <Image src={profile.profilePictureURL} alt='asfasf' width='40' height='40' className='rounded object-cover w-[40px] h-[40px]' />
                                                     <p className=''>{profile.name}</p>
                                                 </button>
@@ -297,6 +297,7 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                                         }
                                     </select>
                                 </div>
+                                <div className='flex flex-col justify-end gap-2'>
                                 {
                                     task.onBoard &&
                                     <Button text='Move to Backlog' onClick={async () => {
@@ -307,8 +308,19 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                                         !res.error && createToast('Moved Ticket to Backlog', false);
                                         if (!res.error)
                                             setShow(false);
-                                    }} className='mt-auto' />
+                                    }} />
                                 }
+                                {
+                                    task.taskState === TaskState.Completed &&
+                                    <Button text='Complete Task' onClick={async () => {
+                                        const res = await supabase.from('project_tickets').delete().eq('id', task.id);
+                                        res.error && createToast(res.error.message, true);
+                                        !res.error && createToast('Completed Task', false);
+                                        if (!res.error)
+                                            setShow(false);
+                                    }} />
+                                }
+                                </div>
                                 </>
                             }
                         </div>

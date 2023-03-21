@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabaseClient";
 import createToast from "@/functions/createToast";
 import TaskModal from "./TaskModal";
 import PlaylistAddSharpIcon from '@mui/icons-material/PlaylistAddSharp';
+import { User } from "@supabase/supabase-js";
 
 interface MajorFeatureBoxProps
 {
@@ -82,11 +83,12 @@ export function MinorFeatureBox({ feature, setFeature, deleteMinorFeature }: Min
 
 interface TaskBoxProps
 {
+    user: User;
     task: Task;
     profile: Profile | undefined;
 }
 
-export function TaskBox({ task, profile }: TaskBoxProps)
+export function TaskBox({ user, task, profile }: TaskBoxProps)
 {
     const [titleText, setTitleText] = useState(task.name);
     const [isEditable, setIsEditable] = useState(false);
@@ -168,13 +170,13 @@ export function TaskBox({ task, profile }: TaskBoxProps)
     }, [taskState]);
 
     return <>
-        <TaskModal task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
+        <TaskModal user={user} task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
         <div className='w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px] min-w-[450px]'
             onBlur={() => {setIsEditable(false)}}
             onMouseOver={() => setShowEditButton(true)}
             onMouseLeave={() => setShowEditButton(false)}
         >
-            <div className="w-36 pr-1 flex flex-row gap-4 justify-end mx-1">
+            <div className="w-40 pr-1 flex flex-row gap-4 justify-end mx-1">
                 <p>{task.id}</p>
                 <select defaultValue={taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 min-w-[128px] max-w-[128px] ${taskState === TaskState.Completed && 'text-zinc-100'}`} 
                 style={{ backgroundColor: taskColour }} onChange={async (e) => {
