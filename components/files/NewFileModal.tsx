@@ -78,6 +78,7 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
                     <div className="flex-grow bg-secondary p-8 flex items-center justify-center rounded-b flex-col">
                         <input autoFocus={true} ref={inputRef} value={fileName} onChange={(e) => {
                             setFileNameTaken(false);
+                            setIsValidFolderName(true);
                             setFileName(e.target.value);
                         }} pattern="[A-Za-z0-9]" maxLength={48} 
                         onKeyDown={(e) => {

@@ -28,4 +28,5 @@ export enum LeadStage
     PossibleLead = 'POSSIBLE_LEAD',
     ProbableLead = 'PROBABLE_LEAD',
     ContractSigned = 'CONTRACT_SIGNED',
+    StaleLead = "STALE_LEAD",
 }

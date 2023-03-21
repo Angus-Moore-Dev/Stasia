@@ -65,7 +65,7 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                         })
                     }
                 </div>
-                <div className="flex-1 min-w-[300px] h-full flex flex-col">
+                <div className="flex-1 min-w-[300px] h-full border-r-[1px] border-primary flex flex-col">
                     <p className="text-center font-medium">
                         Contract Signed
                     </p>
@@ -74,6 +74,22 @@ export default function LeadsPage({ user, leads }: LeadsPageProps)
                             leads.filter(x => x.stage === LeadStage.ContractSigned).map(lead => 
                             {
                                 return <Link href={`/leads/edit/${lead.id}`} key={lead.id} className="h-14 w-full bg-primary text-secondary font-semibold px-4 flex flex-row items-center gap-2 rounded">
+                                    <Image priority={true} src={lead.previewImageURL} alt={lead.name} width='40' height='40' className="object-cover" />
+                                    <p>{lead.name}</p>
+                                </Link>
+                            })
+                        }
+                    </div>
+                </div>
+                <div className="flex-1 min-w-[300px] h-full flex flex-col">
+                    <p className="text-center font-medium">
+                        Stale Lead
+                    </p>
+                    <div className="w-full flex-grow px-1 flex flex-col gap-2">
+                        {
+                            leads.filter(x => x.stage === LeadStage.StaleLead).map(lead => 
+                            {
+                                return <Link href={`/leads/edit/${lead.id}`} key={lead.id} className="h-14 w-full text-zinc-100 bg-tertiary font-semibold px-4 flex flex-row items-center gap-2 rounded transition hover:text-secondary hover:bg-primary">
                                     <Image priority={true} src={lead.previewImageURL} alt={lead.name} width='40' height='40' className="object-cover" />
                                     <p>{lead.name}</p>
                                 </Link>

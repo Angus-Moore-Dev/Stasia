@@ -42,7 +42,9 @@ export default function HomePage({ user }: HomePageProps)
 							<Link href='/leads'>
 								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
 							</Link>
-							<InteractiveBox title='Chat (coming soon)' icon={<ChatBubbleSharpIcon fontSize='large' />} />
+							<Link href='/chat'>
+								<InteractiveBox title='Chat' icon={<ChatBubbleSharpIcon fontSize='large' />} />
+							</Link>
 						</div>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
 							<Link href='/files'>
