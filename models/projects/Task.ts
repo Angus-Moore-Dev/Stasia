@@ -10,6 +10,7 @@ export class Task
     creatorId: string | null = null;
     taskType: TaskType = TaskType.General;
     taskState: TaskState= TaskState.NotStarted;
+    onBoard: boolean = false;
 
     constructor(projectId: string)
     {

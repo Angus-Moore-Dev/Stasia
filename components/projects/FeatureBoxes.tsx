@@ -10,6 +10,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import { supabase } from "@/lib/supabaseClient";
 import createToast from "@/functions/createToast";
 import TaskModal from "./TaskModal";
+import PlaylistAddSharpIcon from '@mui/icons-material/PlaylistAddSharp';
 
 interface MajorFeatureBoxProps
 {
@@ -21,7 +22,7 @@ export function MajorFeatureBox({ feature }: MajorFeatureBoxProps)
     return <Link href={`/projects/feature/major/${feature.id}`} className="w-full lg:w-[32%] h-96 rounded bg-tertiary flex flex-col gap-3 transition hover:bg-primary hover:text-secondary hover:cursor-pointer relative">
         {
             feature.completed &&
-            <div className="w-full h-full z-50 absolute bg-primary bg-opacity-60 flex items-center justify-center text-4xl font-bold">
+            <div className="w-full h-full z-50 absolute bg-primary bg-opacity-60 flex items-center justify-center text-4xl font-bold rounded">
                 COMPLETED
             </div>
         }
@@ -173,19 +174,21 @@ export function TaskBox({ task, profile }: TaskBoxProps)
             onMouseOver={() => setShowEditButton(true)}
             onMouseLeave={() => setShowEditButton(false)}
         >
-            <p>{task.id}</p>
-            <select defaultValue={taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 min-w-[128px] max-w-[128px] ${taskState === TaskState.Completed && 'text-zinc-100'}`} 
-            style={{ backgroundColor: taskColour }} onChange={async (e) => {
-                const res = await supabase.from('project_tickets').update({ taskType: e.target.value }).eq('id', task.id);
-                if (!res.error)
-                    setTaskType(e.target.value as TaskType);
-                else
-                    createToast(res.error.message, true);
-            }}>
-                {
-                    Object.values(TaskType).map(type => <option key={type} value={type}>{type}</option>)
-                }
-            </select>
+            <div className="w-36 pr-1 flex flex-row gap-4 justify-end mx-1">
+                <p>{task.id}</p>
+                <select defaultValue={taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 min-w-[128px] max-w-[128px] ${taskState === TaskState.Completed && 'text-zinc-100'}`} 
+                style={{ backgroundColor: taskColour }} onChange={async (e) => {
+                    const res = await supabase.from('project_tickets').update({ taskType: e.target.value }).eq('id', task.id);
+                    if (!res.error)
+                        setTaskType(e.target.value as TaskType);
+                    else
+                        createToast(res.error.message, true);
+                }}>
+                    {
+                        Object.values(TaskType).map(type => <option key={type} value={type}>{type}</option>)
+                    }
+                </select>
+            </div>
             <div className="flex flex-row flex-grow">
                 {
                     !isEditable &&
@@ -228,6 +231,16 @@ export function TaskBox({ task, profile }: TaskBoxProps)
                     />
                 }
             </div>
+            <button className="text-primary transition hover:bg-primary hover:text-secondary rounded px-1" onClick={async () => {
+                // 1. Grab all the questions that are on the board already and are in the taskState this task is in.
+                // 2. Sort them by their board index, then add the index on.
+                const res = await supabase.from('project_tickets').update({
+                    onBoard: true
+                }).eq('id', task.id);
+                res.error && createToast(res.error.message, true);
+            }}>
+                <PlaylistAddSharpIcon fontSize="small" />
+            </button>
             <select defaultValue={taskState} value={taskState} className={`bg-transparent h-full text-secondary font-bold text-center rounded-sm w-32`} 
             style={{ backgroundColor: taskStateColour }} onChange={async (e) => {
                 const res = await supabase.from('project_tickets').update({ taskState: e.target.value }).eq('id', task.id);

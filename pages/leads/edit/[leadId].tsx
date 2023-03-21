@@ -167,9 +167,13 @@ export default function EditLeadPage({ user, profile, contact }: EditLeadPagePro
                             text: 'Contract is Signed',
                             stage: LeadStage.ContractSigned,
                         },
+                        {
+                            text: 'Lead Is Stale',
+                            stage: LeadStage.StaleLead,
+                        },
                     ].map(stage => {
                         return (
-                            <button className="w-64 py-4 bg-tertiary text-zinc-100 transition hover:bg-primary hover:text-secondary font-semibold rounded aria-selected:bg-primary aria-selected:text-secondary"
+                            <button className="w-[19%] min-w-[200px] py-4 bg-tertiary text-zinc-100 transition hover:bg-primary hover:text-secondary font-semibold rounded aria-selected:bg-primary aria-selected:text-secondary"
                             aria-selected={stage.stage === contactData.stage}
                             onClick={() => {
                                 setContactData({...contactData, stage: stage.stage});

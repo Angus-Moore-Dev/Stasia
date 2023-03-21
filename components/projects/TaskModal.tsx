@@ -297,13 +297,18 @@ export default function TaskModal({ task, profile, show, setShow }: TaskModalPro
                                         }
                                     </select>
                                 </div>
-                                {/* <div className='flex flex-col'>
-                                    <small className='text-primary font-semibold'>Major Feature</small>
-                                    <div className='flex flex-row items-center gap-2'>
-                                        <Image src={creatorOfTask?.profilePictureURL} alt='asfasf' width='40' height='40' className='rounded object-cover w-[40px] h-[40px]' />
-                                        <p className='font-medium'>{creatorOfTask.name}</p>
-                                    </div>
-                                </div> */}
+                                {
+                                    task.onBoard &&
+                                    <Button text='Move to Backlog' onClick={async () => {
+                                        const res = await supabase.from('project_tickets').update({
+                                            onBoard: false,
+                                        }).eq('id', task.id);
+                                        res.error && createToast(res.error.message, true);
+                                        !res.error && createToast('Moved Ticket to Backlog', false);
+                                        if (!res.error)
+                                            setShow(false);
+                                    }} className='mt-auto' />
+                                }
                                 </>
                             }
                         </div>

@@ -1,10 +1,10 @@
 import Button from "@/components/common/Button";
 import { MajorFeatureBox, TaskBox } from "@/components/projects/FeatureBoxes";
+import SprintSection from "@/components/projects/SprintSection";
 import createNewNotification from "@/functions/createNewNotification";
 import createToast from "@/functions/createToast";
 import { supabase } from "@/lib/supabaseClient";
 import { Contact } from "@/models/Contact";
-import { Message } from "@/models/chat/Message";
 import { Profile } from "@/models/me/Profile";
 import { MajorFeature } from "@/models/projects/MajorFeature";
 import { CommercialisationType, Project, ProjectType } from "@/models/projects/Project";
@@ -16,6 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 
 interface ProjectIdPageProps
@@ -41,10 +42,6 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
 
     const removeTask = useCallback((id: number) => {
         setCurrentTasks(currentTasks => [...currentTasks?.filter(x => x.id !== id) ?? []]);
-    }, []);
-
-    const updateTask = useCallback((task: Task) => {
-        
     }, []);
 
     useEffect(() => {
@@ -99,6 +96,9 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
             }} className="mr-auto" />
             <Button text='Edit Project Details' onClick={() => {
                 router.push(`/projects/edit?id=${project.id}`);
+            }} />
+            <Button text='Invite External User' onClick={() => {
+                alert('todo!');
             }} />
         </div>
         <div className="flex-grow w-full flex flex-col gap-6">
@@ -170,7 +170,15 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
             </div>
             <div className="flex flex-col gap-2">
                 <div className="flex flex-row gap-4 items-center">
-                    <span className="font-semibold">Tasks</span>
+                    <span className="font-semibold">Active Sprint</span>
+                </div>
+                {
+                    currentTasks && <SprintSection tasks={currentTasks.filter(x => x.onBoard)} />
+                }
+            </div>
+            <div className="flex flex-col gap-2">
+                <div className="flex flex-row gap-4 items-center">
+                    <span className="font-semibold">Backlog</span>
                 </div>
                 <div className="flex flex-col gap-[2px] overflow-y-auto scrollbar">
                     {
@@ -180,7 +188,7 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                         </div>
                     }
                     {
-                        currentTasks && currentTasks.sort((a, b) => a.id - b.id).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} />)
+                        currentTasks && currentTasks.filter(x => !x.onBoard).sort((a, b) => a.id - b.id).map(task => <TaskBox key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} />)
                     }
                 </div>
                 <Button text="Add New Task" onClick={async () => 
@@ -194,9 +202,6 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
 						createNewNotification(profile, `${profile.name} Created A Task For ${project.name}`, `${profile.name} created a new task for the project ${project.name}`, profile.profilePictureURL);
                     }
                 }} className="w-fit" />
-                <div className="flex flex-col gap-2 overflow-y-auto scrollbar max-h-[40vh] mt-4 mb-10">
-                    <span className="font-semibold">{project.name} Discussion</span>
-                </div>
             </div>
         </div>
     </div>
