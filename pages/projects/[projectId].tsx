@@ -175,7 +175,7 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                     <span>Tasks that are actively being worked on.</span>
                 </div>
                 {
-                    currentTasks && <SprintSection tasks={currentTasks.filter(x => x.onBoard)} />
+                    currentTasks && <SprintSection user={user} tasks={currentTasks.filter(x => x.onBoard)} />
                 }
             </div>
             <div className="flex flex-col gap-2">

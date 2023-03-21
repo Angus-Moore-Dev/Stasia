@@ -6,13 +6,15 @@ import { supabase } from "@/lib/supabaseClient";
 import createToast from "@/functions/createToast";
 import TaskModal from "./TaskModal";
 import { Profile } from "@/models/me/Profile";
+import { User } from "@supabase/supabase-js";
 
 interface SprintSectionProps
 {
+    user: User;
     tasks: Task[];
 }
 
-export default function SprintSection({ tasks }: SprintSectionProps)
+export default function SprintSection({ user, tasks }: SprintSectionProps)
 {
     // When this updates on onDragEnd, we then check differences and update the ones that are updated.
     // Most of the updated tickets will be from changing their drag position.
@@ -70,7 +72,7 @@ export default function SprintSection({ tasks }: SprintSectionProps)
                         >
                             <span className="w-full border-b-primary border-b-2">Not Started</span>
                             {taskList.filter(x => x.taskState === TaskState.NotStarted).map((item, index) => (
-                                <DraggableTicket key={item.id} task={item} index={index} profile={profiles.find(x => x.id === item.assigneeId)} />
+                                <DraggableTicket user={user} key={item.id} task={item} index={index} profile={profiles.find(x => x.id === item.assigneeId)} />
                             ))}
                             {provided.placeholder}
                         </div>
@@ -85,7 +87,7 @@ export default function SprintSection({ tasks }: SprintSectionProps)
                         >
                             <span className="w-full border-b-primary border-b-2">In Progress</span>
                             {taskList.filter(x => x.taskState === TaskState.InProgress).map((item, index) => (
-                                <DraggableTicket key={item.id} task={item} index={index} profile={profiles.find(x => x.id === item.assigneeId)} />
+                                <DraggableTicket user={user} key={item.id} task={item} index={index} profile={profiles.find(x => x.id === item.assigneeId)} />
                             ))}
                             {provided.placeholder}
                         </div>
@@ -100,7 +102,7 @@ export default function SprintSection({ tasks }: SprintSectionProps)
                         >
                             <span className="w-full border-b-primary border-b-2">Requires Review</span>
                             {taskList.filter(x => x.taskState === TaskState.RequiresReview).map((item, index) => (
-                                <DraggableTicket key={item.id} task={item} index={index} profile={profiles.find(x => x.id === item.assigneeId)} />
+                                <DraggableTicket user={user} key={item.id} task={item} index={index} profile={profiles.find(x => x.id === item.assigneeId)} />
                             ))}
                             {provided.placeholder}
                         </div>
@@ -115,7 +117,7 @@ export default function SprintSection({ tasks }: SprintSectionProps)
                         >
                             <span className="w-full border-b-primary border-b-2">Completed</span>
                             {taskList.filter(x => x.taskState === TaskState.Completed).map((item, index) => (
-                                <DraggableTicket key={item.id} task={item} index={index} profile={profiles.find(x => x.id === item.assigneeId)} />
+                                <DraggableTicket user={user} key={item.id} task={item} index={index} profile={profiles.find(x => x.id === item.assigneeId)} />
                             ))}
                             {provided.placeholder}
                         </div>
@@ -129,11 +131,12 @@ export default function SprintSection({ tasks }: SprintSectionProps)
 
 interface DraggableTicketInterface
 {
+    user: User;
     task: Task;
     index: number;
     profile: Profile | undefined;
 }
-function DraggableTicket({ task, index, profile }: DraggableTicketInterface)
+function DraggableTicket({ user, task, index, profile }: DraggableTicketInterface)
 {
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [taskColour, setTaskColour] = useState('');
@@ -172,7 +175,7 @@ function DraggableTicket({ task, index, profile }: DraggableTicketInterface)
     }, [task.taskType]);
 
     return <>
-        <TaskModal task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
+        <TaskModal user={user} task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
         <Draggable key={task.id} draggableId={`${task.id}`} index={index}>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} 
