@@ -25,7 +25,7 @@ const style = {
     minWidth: '400px',
     minHeight: '350px',
     maxWidth: '50vw',
-    maxHeight: '60vh',
+    maxHeight: '75vh',
     overflow: 'auto',
     border: '0px solid',
     outline: 'none',
@@ -163,7 +163,7 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <div className='w-[35vw] h-[55vh] bg-tertiary rounded p-8 flex flex-col gap-2'>
+                <div className='w-[35vw] h-[75vh] bg-tertiary rounded p-8 flex flex-col gap-2'>
                     <div className='w-full flex flex-row items-start gap-4'>
                         <input 
                             ref={titleRef}
