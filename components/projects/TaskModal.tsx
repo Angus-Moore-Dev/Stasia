@@ -15,6 +15,7 @@ import { TaskComment } from '@/models/projects/TaskComment';
 import createNewNotification from '@/functions/createNewNotification';
 import { v4 } from 'uuid';
 import { User } from '@supabase/supabase-js';
+import { useClickAway } from 'react-use';
 
 
 const style = {
@@ -44,6 +45,12 @@ interface TaskModalProps
 
 export default function TaskModal({ user, task, profile, show, setShow }: TaskModalProps)
 {
+    const ref = useRef<HTMLButtonElement>(null);
+    useClickAway(ref, () => 
+    {
+        setShowAllProfiles(false);
+    });
+
     const handleClose = () => setShow(false);
     const [taskTitle, setTaskTitle] = useState(task.name);
     const [taskDescription, setTaskDescription] = useState(task.description);
@@ -253,7 +260,8 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
                                 </div>
                                 <div className='flex flex-col relative'>
                                     <small className='text-primary font-semibold'>Assigned To</small>
-                                    <button className='flex flex-row items-center gap-2 transition hover:bg-tertiary rounded px-2 py-1 aria-checked:bg-primary aria-checked:text-secondary' onClick={() => {setShowAllProfiles(!showAllProfiles); setNameQuery('')}} 
+                                    <button ref={ref}
+                                    className='flex flex-row items-center gap-2 transition hover:bg-tertiary rounded px-2 py-1 aria-checked:bg-primary aria-checked:text-secondary' onClick={() => {setShowAllProfiles(!showAllProfiles); setNameQuery('')}} 
                                     aria-checked={showAllProfiles}>
                                         <Image src={allProfiles.find(x => x.id === assigneeId)?.profilePictureURL ?? '/blank_pfp.jpg'} alt='asfasf' width='40' height='40' className='rounded object-cover w-[40px] h-[40px]' />
                                         <p className='font-medium'>{allProfiles.find(x => x.id === assigneeId)?.name ?? 'No One (Click to Select)'}</p>

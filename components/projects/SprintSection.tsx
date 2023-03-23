@@ -188,6 +188,7 @@ function DraggableTicket({ user, task, index, profile }: DraggableTicketInterfac
                 className="bg-tertiary p-2 rounded text-zinc-100 transition hover:bg-primary hover:text-secondary w-full h-fit px-4 flex flex-col gap-3 group text-left hover:cursor-pointer" onClick={() => {
                     setShowTaskModal(true);
                 }}>
+                    <p>Task {task.id}</p>
                     <div className="flex-grow font-medium">
                         {task.name}
                     </div>
