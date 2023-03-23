@@ -5,6 +5,8 @@ A better way to organise your files, customer relationships, internal communicat
 
 This is currently being used for my own internal management and for my friends, but if this ends up becoming popular then I will make it easier for you to run your own instance (since there are a ton of row level policies for Supabase).
 
+This is designed so that you can have fun creating your startup and managing the other side of product development. I just want people to have fun.
+
 # Table of Contents
 * [Getting Started](#getting-started)
 * [Creating a New Contact](#creating-a-new-contact)
