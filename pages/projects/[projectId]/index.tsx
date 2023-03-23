@@ -79,7 +79,6 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                 setCurrentTasks(currentTasks => {
                     const allTasks = [...currentTasks ?? []];
                     allTasks[allTasks.findIndex(x => x.id === message.id)] = message;
-                    console.log('updating task::', message.id);
                     return allTasks;
                 });
             }
@@ -89,11 +88,15 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
         setRealtimeTicketChannel(channel);
     }, []);
 
+
     return <div className='w-full min-h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
         <div className="w-full flex flex-row items-center">
             <Button text='Back to Projects' onClick={() => {
                 router.push('/projects');
             }} className="mr-auto" />
+            <Button text='Project Roadmap' onClick={() => {
+                router.push(`/projects/${project.id}/roadmap`);
+            }} />
             <Button text='Edit Project Details' onClick={() => {
                 router.push(`/projects/edit?id=${project.id}`);
             }} />

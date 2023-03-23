@@ -8,6 +8,7 @@ import Notification from "@/models/Notification";
 import { supabase } from "@/lib/supabaseClient";
 import VisibilitySharpIcon from '@mui/icons-material/VisibilitySharp';
 import { Profile } from "@/models/me/Profile";
+import { useClickAway } from "react-use";
 
 interface NotificationMenuProps
 {
@@ -16,6 +17,8 @@ interface NotificationMenuProps
 
 export default function NotificationMenu({ profile }: NotificationMenuProps)
 {
+    const ref = useRef<HTMLButtonElement>(null);
+    useClickAway(ref, () => setShowNotificationMenu(false));
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotificationMenu, setShowNotificationMenu] = useState(false);
     const [unseenNotificationCount, setUnseenNotificationCount] = useState(false);
@@ -63,7 +66,8 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
         <audio hidden ref={audioRef}>
             <source src='/notificationSound.mp3' />
         </audio>
-        <button className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
+        <button ref={ref}
+        className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
         aria-checked={showNotificationMenu}
         onClick={() => setShowNotificationMenu(!showNotificationMenu)}>
             {

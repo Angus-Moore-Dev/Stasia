@@ -20,23 +20,16 @@ interface MajorFeatureBoxProps
 
 export function MajorFeatureBox({ feature }: MajorFeatureBoxProps)
 {
-    return <Link href={`/projects/feature/major/${feature.id}`} className="w-full lg:w-[32%] h-96 rounded bg-tertiary flex flex-col gap-3 transition hover:bg-primary hover:text-secondary hover:cursor-pointer relative">
-        {
-            feature.completed &&
-            <div className="w-full h-full z-50 absolute bg-primary bg-opacity-60 flex items-center justify-center text-4xl font-bold rounded">
-                COMPLETED
-            </div>
-        }
+    return <Link href={`/projects/feature/major/${feature.id}`} className="w-full min-h-[80px] rounded bg-tertiary flex flex-col gap-3 transition hover:bg-primary hover:text-secondary hover:cursor-pointer relative px-4">
         <div className="w-full h-full p-2 flex flex-col gap-3">
-            <p className="text-lg font-semibold">{feature.name}</p>
-            <small className="pb-1 border-b-[1px] border-b-primary w-full">Description</small>
-            <p className="-mt-1 overflow-y-auto scrollbar">{feature.description ? feature.description : 'No Description...'}</p>
-            <small className="">Objective</small>
-            <p className="-mt-3 overflow-y-auto scrollbar">{feature.objective ? feature.objective : 'No Objective...'}</p>
-            <div className="flex-grow flex items-end flex-row justify-between">
-                <small>Click to Open</small>
-                <small>{feature.id}</small>
+            <div className="flex flex-row items-center justify-between">
+                <p className="text-lg font-semibold">{feature.name}</p>
+                {
+                    feature.completed &&
+                    <p className="text-lg font-semibold text-primary">COMPLETED</p>
+                }
             </div>
+            <small>Click to Open</small>
         </div>
     </Link>
 }
@@ -55,25 +48,31 @@ export function MinorFeatureBox({ feature, setFeature, deleteMinorFeature }: Min
     const [featureData, setfeatureData] = useState(feature);
     useEffect(() => setFeature(featureData), [featureData]);
     
-    return <div className="w-[49%] h-[750px] rounded bg-tertiary p-4 flex flex-col gap-2">
+    return <div className="w-[49%] h-fit rounded bg-tertiary p-4 flex flex-col gap-2">
         <div className="flex flex-row justify-between items-center">
             <span className="font-medium">New Minor Feature</span>
             <Button className="text-red-500 transition hover:bg-red-500 hover:text-zinc-100 rounded w-fit" text='Flatline' onClick={() => deleteMinorFeature()} />
         </div>
         <input value={featureData.name} onChange={(e) => setfeatureData({...featureData, name: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium text-lg rounded' placeholder="Minor Feature Name" />
-        <textarea value={featureData.description} onChange={(e) => setfeatureData({...featureData, description: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium rounded h-64' placeholder="Description" />
-        <textarea value={featureData.objective} onChange={(e) => setfeatureData({...featureData, objective: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium rounded h-32' placeholder="Objective" />
-        <span>Feature Type</span>
-        <select defaultValue={feature.featureType} className="w-64 p-2 bg-quaternary text-zinc-100 font-semibold -mt-2" onChange={(e) => setfeatureData({...featureData, featureType: e.target.value as FeatureType})}>
-            {
-                Object.values(FeatureType).map(type => <option key={type} value={type}>{type.valueOf()}</option>)
-            }
-        </select>
-        <span>Expected Completion Date</span>
-        <input value={featureData.expectedCompletionDate} type='date' className="bg-quaternary text-zinc-100 font-medium rounded p-2 w-64 -mt-2" style={{colorScheme: 'dark'}} onChange={(e) => 
-        {
-            setfeatureData({...featureData, expectedCompletionDate: e.target.value});
-        }} />
+        <textarea value={featureData.description} onChange={(e) => setfeatureData({...featureData, description: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium rounded h-20' placeholder="Description" />
+        <textarea value={featureData.objective} onChange={(e) => setfeatureData({...featureData, objective: e.target.value})} className='w-full p-2 outline-none bg-quaternary font-medium rounded h-14' placeholder="Objective" />
+        <div className="w-full flex flex-row justify-start gap-4">
+            <div className="flex flex-col gap-2">
+                <span>Feature Type</span>
+                <select defaultValue={feature.featureType} className="w-64 p-2 bg-quaternary text-zinc-100 font-semibold -mt-2" onChange={(e) => setfeatureData({...featureData, featureType: e.target.value as FeatureType})}>
+                    {
+                        Object.values(FeatureType).map(type => <option key={type} value={type}>{type.valueOf()}</option>)
+                    }
+                </select>
+            </div>
+            <div className="flex flex-col gap-2">
+                <span>Expected Completion Date</span>
+                <input value={featureData.expectedCompletionDate} type='date' className="bg-quaternary text-zinc-100 font-medium rounded p-2 w-64 -mt-2" style={{colorScheme: 'dark'}} onChange={(e) => 
+                {
+                    setfeatureData({...featureData, expectedCompletionDate: e.target.value});
+                }} />
+            </div>
+        </div>
         <small>id: {feature.id}</small>
     </div>
 }
