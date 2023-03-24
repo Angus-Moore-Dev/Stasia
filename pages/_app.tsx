@@ -38,6 +38,10 @@ export default function App({ Component, pageProps }: AppProps) {
 			// Currently sessionStorage is only being used for Blob URL caching, so it's safe to use this to revoke URLs
 			sessionStorage.clear();
 		}
+		
+		supabase.auth.onAuthStateChange((stateChange) => {
+			console.log('AUTH STATE CHANGE!!!!::', stateChange);
+		})
 
 		return () => {
 			Router.events.off("routeChangeStart", start);

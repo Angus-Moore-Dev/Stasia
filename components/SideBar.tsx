@@ -11,6 +11,7 @@ import { SvgIconTypeMap } from '@mui/material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import Tooltip from '@mui/material/Tooltip';
 import { useState } from 'react';
+import { v4 } from 'uuid';
 
 const allPagesAvailable = [
     {
@@ -88,7 +89,7 @@ export default function SideBar()
 {
     return <div className="w-10 min-w-[60px] bg-tertiary py-16 min-h-full border-quaternary border-r-2 hidden md:flex flex-col gap-3 items-center justify-start">
         {
-            allPagesAvailable.map(page => <QuickNavBox route={page.route} name={page.name} Icon={page.icon} />)
+            allPagesAvailable.map(page => <QuickNavBox key={v4()} route={page.route} name={page.name} Icon={page.icon} />)
         }
     </div>
 }

@@ -45,7 +45,7 @@ interface TaskModalProps
 
 export default function TaskModal({ user, task, profile, show, setShow }: TaskModalProps)
 {
-    const ref = useRef<HTMLButtonElement>(null);
+    const ref = useRef<HTMLDivElement>(null);
     useClickAway(ref, () => 
     {
         setShowAllProfiles(false);
@@ -260,7 +260,7 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
                                 </div>
                                 <div className='flex flex-col relative'>
                                     <small className='text-primary font-semibold'>Assigned To</small>
-                                    <button ref={ref}
+                                    <button 
                                     className='flex flex-row items-center gap-2 transition hover:bg-tertiary rounded px-2 py-1 aria-checked:bg-primary aria-checked:text-secondary' onClick={() => {setShowAllProfiles(!showAllProfiles); setNameQuery('')}} 
                                     aria-checked={showAllProfiles}>
                                         <Image src={allProfiles.find(x => x.id === assigneeId)?.profilePictureURL ?? '/blank_pfp.jpg'} alt='asfasf' width='40' height='40' className='rounded object-cover w-[40px] h-[40px]' />
@@ -268,7 +268,7 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
                                     </button>
                                     {
                                         showAllProfiles && 
-                                        <div className='absolute z-50 top-16 flex flex-col gap-2 max-h-[300px] overflow-y-auto scrollbar bg-secondary rounded p-2 w-full'>
+                                        <div ref={ref} className='absolute z-50 top-16 flex flex-col gap-2 max-h-[300px] overflow-y-auto scrollbar bg-secondary rounded p-2 w-full'>
                                             <input className='w-full h-14 p-2 bg-tertiary text-zinc-100 border-b-2 border-b-primary rounded' placeholder='Search Name' />
                                             {
                                                 allProfiles.map(profile => <button className='flex flex-row items-center gap-2 transition hover:bg-primary hover:text-secondary rounded p-2'

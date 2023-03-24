@@ -17,7 +17,7 @@ export default async function createNewNotification(profile: Profile, title: str
     notification.created_at = new Date(Date.now()).toLocaleString('en-au', {timeStyle: 'medium', dateStyle: 'medium', hour12: false});
     notification.userId = profile.id;
     notification.showTo = ['*'];
-    notification.pageRoute = window.location.href;
+    notification.pageRoute = window.location.pathname;
     notification.previewImageURL = previewImageURL ? previewImageURL : '';
     await supabase.from('notifications').insert(notification);
 }
