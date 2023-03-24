@@ -110,10 +110,13 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
                             }}>
                                 <div className="w-full flex justify-between items-center">
                                     <span className="font-bold">{event.summary}</span>
-                                    <button className="text-primary group-hover:text-secondary">
-                                        <span className="pr-1 font-bold">{event.attendees.length}</span>
+                                    {
+                                        event.attendees && (event.attendees.length ?? 0 > 0) &&
+                                        <button className="text-primary group-hover:text-secondary">
+                                        <span className="pr-1 font-bold">{event.attendees?.length}</span>
                                         <PersonSharpIcon fontSize="small" />
                                     </button>
+                                    }
                                 </div>
                                 <div className="w-full flex items-center justify-start gap-1">
                                     <span>{new Date(Date.parse(event.start.dateTime)).toLocaleDateString('en-au', { hour: '2-digit', minute: '2-digit', weekday: 'short'}).split(' ').slice(1,)} -</span>
