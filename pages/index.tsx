@@ -31,7 +31,7 @@ export default function HomePage({ user }: HomePageProps)
 				<div className='min-h-full flex-grow flex flex-col p-8 w-full max-w-[1920px]'>
 					<div className='flex-grow flex flex-col gap-3 items-center justify-center'>
 						<Image src={logo} alt='Stasia' width='400' height='350' className='mx-auto' />
-						<span className='mb-4 font-medium'>Because Multiple Vendors For Your Startup Sucks.</span>
+						<span className='mb-4 font-medium'>Because Running a Business Shouldn't Bore.</span>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
 							<Link href='/customers'>
 								<InteractiveBox title='Customers (coming soon)' icon={<AttachMoneySharpIcon fontSize='large' />}  />

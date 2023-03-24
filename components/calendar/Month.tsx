@@ -98,20 +98,19 @@ interface DayProps
 function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrentlySelectedId: setShowBox }: DayProps)
 {
     const [id] = useState(v4());
-    const ref = useRef<HTMLButtonElement>(null);
-    useClickAway(ref, () => {
-        setShowBox('');
-    });
-    return <div className="relative flex flex-col mt-4">
+
+    return <div id={`day-calendar-${id}`} className="relative flex flex-col mt-4">
         {
             (new Date(Date.now()).getMonth() === month && new Date(Date.now()).getDate() === day) &&
             <span className="absolute bottom-10">Today</span>
         }
-        <button ref={ref}
+        <button 
         id={`calendar-popup-${id}`} key={day} className="w-10 h-10 rounded text-zinc-100 transition 
         hover:text-secondary hover:bg-primary font-semibold aria-selected:text-primary aria-selected:bg-tertiary 
-        aria-selected:hover:text-secondary aria-selected:hover:bg-primary"
-        aria-selected={new Date(Date.now()).getMonth() === month && new Date(Date.now()).getDate() === day}
+        aria-selected:hover:text-secondary aria-selected:hover:bg-primary
+        aria-checked:bg-primary aria-checked:text-secondary"
+        aria-checked={showBox === id}
+        aria-selected={new Date(Date.now()).getMonth() === month && new Date(Date.now()).getDate() === day && showBox !== id}
         onClick={() => {
             if (showBox === id)
                 setShowBox('');
@@ -121,10 +120,7 @@ function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrently
             {day}
         </button>
         {
-            showBox === id &&
-            <div className="absolute right-12 z-50">
-                <EventList monthNumber={month} monthText={monthText} day={day} />
-            </div>
+            showBox === id && <EventList monthNumber={month} monthText={monthText} day={day} setCurrentlySelectedId={setShowBox} currentlySelectedId={showBox} id={id} />
         }
     </div>
 }

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { Dispatch, RefObject, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import LoadingBox from "./LoadingBox";
 import Button from "./common/Button";
 import { v4 } from "uuid";
@@ -17,7 +17,7 @@ interface NotificationMenuProps
 
 export default function NotificationMenu({ profile }: NotificationMenuProps)
 {
-    const ref = useRef<HTMLButtonElement>(null);
+    const ref = useRef<HTMLDivElement>(null);
     useClickAway(ref, () => setShowNotificationMenu(false));
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotificationMenu, setShowNotificationMenu] = useState(false);
@@ -66,7 +66,7 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
         <audio hidden ref={audioRef}>
             <source src='/notificationSound.mp3' />
         </audio>
-        <button ref={ref}
+        <button 
         className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
         aria-checked={showNotificationMenu}
         onClick={() => setShowNotificationMenu(!showNotificationMenu)}>
@@ -80,7 +80,7 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
         </button>
         {
             showNotificationMenu &&
-            <div className="w-96 min-h-[384px] max-h-[50vh] bg-quaternary rounded absolute z-50 top-12 mr-36 p-2 flex flex-col gap-1">
+            <div ref={ref} className="w-96 min-h-[384px] max-h-[50vh] bg-quaternary rounded absolute z-50 top-12 mr-36 p-2 flex flex-col gap-1">
                 <span className="px-4 font-medium">Notifications</span>
                 {
                     notifications.length === 0 &&
@@ -126,13 +126,13 @@ interface NotificationEventProps
 {
     notification: Notification;
     setShowNotificationMenu: Dispatch<SetStateAction<boolean>>;
-
 }
 
 function NotificationEvent({ notification, setShowNotificationMenu }: NotificationEventProps)
 {
+
     const router = useRouter();
-    return <div className="group w-full p-2 bg-tertiary rounded transition hover:bg-primary hover:text-secondary hover:cursor-pointer flex flex-row gap-4" onClick={() => {
+    return <button className="group w-full p-2 bg-tertiary rounded transition hover:bg-primary hover:text-secondary hover:cursor-pointer flex flex-row gap-4 text-left" onClick={() => {
         setShowNotificationMenu(false);
         router.push(notification.pageRoute);
     }}>
@@ -145,5 +145,5 @@ function NotificationEvent({ notification, setShowNotificationMenu }: Notificati
                 <small className="text-xs pt-2 text-zinc-400 group-hover:text-secondary">{notification.created_at}</small>
             </div>
         </div>
-    </div>
+    </button>
 }

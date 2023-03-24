@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Button from "./common/Button";
 import { supabase } from "@/lib/supabaseClient";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import LoadingBox from "./LoadingBox";
 import { Router, useRouter } from "next/router";
 import logo from '../public/logo.png';
+import GoogleIcon from '@mui/icons-material/Google';
 
 export default function SignInPage()
 {
@@ -14,14 +15,23 @@ export default function SignInPage()
     const [password, setPassword] = useState('');
     const [isSigningIn, setIsSigningIn] = useState(false);
 
+    useEffect(() => {
+        supabase.auth.getSession().then(async res => {
+            if (res.data.session)
+            {
+                router.push('/');
+            }
+        })
+    }, []);
+
     return <div className="h-full w-full max-w-6xl flex flex-col items-center justify-center mx-auto">
-        <form className="flex flex-col gap-4 p-4 rounded bg-tertiary justify-start">
+        <div className="flex flex-col gap-4 p-4 rounded bg-tertiary justify-start">
             <div>
                 <Image placeholder="blur" src={logo} alt='logo' height='600' width='500' className="mb-10" />
             </div>
             <span>Sign in to Stasia</span>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Username" type="email" />
-            <input value={password} onChange={(e) => setPassword(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Password" type='password' />
+            {/* <input value={email} onChange={(e) => setEmail(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Username" type="email" />
+            <input value={password} onChange={(e) => setPassword(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Password" type='password' /> */}
             {
                 isSigningIn &&
                 <div className="mx-auto">
@@ -30,48 +40,30 @@ export default function SignInPage()
             }
             {
                 !isSigningIn &&
-                <Button text='Sign In' onClick={async () => {
-                    setIsSigningIn(true);
-                    const res = await supabase.auth.signInWithPassword({
-                        email: email,
-                        password: password
+                <>
+                <button className="w-full p-2 bg-secondary text-primary font-bold rounded flex flex-row gap-4 items-center justify-center transition hover:bg-primary hover:text-secondary"
+                onClick={async () => {
+                    const { error } = await supabase.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: {
+                            scopes: 'https://www.googleapis.com/auth/calendar',
+                            queryParams: {
+                                access_type: 'offline',
+                                prompt: 'consent',
+                            },
+                            redirectTo: window.location.origin
+                        }
                     });
-    
-                    if (res.data.session)
+                    if (error)
                     {
-                        toast.success('Sign in Success.',
-                        {
-                            position: "bottom-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "colored",
-                            style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
-                        });
-                        router.push('/');
-                        setIsSigningIn(false);
+                        console.log(error);
                     }
-                    else
-                    {
-                        toast.error(res.error?.message, 
-                        {
-                            position: "bottom-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                            theme: "colored",
-                            style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
-                        });
-                        setIsSigningIn(false);
-                    }
-                }} />
+                }}>
+                    <GoogleIcon fontSize="medium" />
+                    <span>Sign In With Google</span>
+                </button>
+                </>
             }
-        </form>
+        </div>
     </div>
 }
