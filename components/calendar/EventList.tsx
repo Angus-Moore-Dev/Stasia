@@ -95,13 +95,13 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
                     </div>
                 }
                 {
-                    events && events.length === 0 &&
+                    events && events?.length === 0 &&
                     <div className="flex-grow h-full flex items-center justify-center">
                         <span>No Events</span>
                     </div>
                 }
                 {
-                    events && events.length > 0 &&
+                    events && events?.length > 0 &&
                     <div className="flex-grow h-full flex flex-col gap-2 p-2">
                         {
                             events.sort((a, b) => Date.parse(a.start.dateTime) - Date.parse(b.start.dateTime)).map(event => <div className="group bg-tertiary rounded w-full min-h-[40px] px-2 py-1 font-medium transition hover:bg-primary hover:text-secondary hover:cursor-pointer flex flex-col gap-2"
