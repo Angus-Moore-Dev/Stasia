@@ -28,7 +28,7 @@ export default function AppNavbar()
                 setProfile(profileData);
             });
         }
-    }, []);
+    }, [user]);
     return (
         <div className="w-full min-h-[30] p-0 md:px-32 bg-tertiary flex flex-row items-center justify-center md:justify-start py-1 relative">
             <Link href='/' className="">
