@@ -6,4 +6,5 @@ export class Profile
     role = '';
     location = '';
     team = '';
+    email: string = '';
 }

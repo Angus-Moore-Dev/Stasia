@@ -2,15 +2,17 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import EventList from "./EventList";
 import { v4 } from "uuid";
 import { useClickAway } from "react-use";
+import { Event } from "@/models/calendar/Event";
 
 interface MonthProps
 {
     month: number;
     showEvents: string;
     setShowEvents: Dispatch<SetStateAction<string>>;
+    events: Event[];
 }
 
-export default function Month({ month, showEvents, setShowEvents }: MonthProps)
+export default function Month({ month, showEvents, setShowEvents, events }: MonthProps)
 {
     const [monthText, setMonthText] = useState('');
     const [daysInMonth, setDaysInMonth] = useState(0);
@@ -79,7 +81,7 @@ export default function Month({ month, showEvents, setShowEvents }: MonthProps)
             {
                 Array.from(Array(daysInMonth).keys()).map(x => 
                 {
-                    return <Day monthText={monthText} month={month} day={x} currentlySelectedId={showEvents} setCurrentlySelectedId={setShowEvents} />
+                    return <Day monthText={monthText} month={month} day={x} currentlySelectedId={showEvents} setCurrentlySelectedId={setShowEvents} events={events.filter(x1 => new Date(Date.parse(x1.start.dateTime)).getDate() === x)} />
                 })
             }
         </div>
@@ -93,9 +95,10 @@ interface DayProps
     monthText: string;
     month: number;
     day: number;
+    events: Event[];
 }
 
-function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrentlySelectedId: setShowBox }: DayProps)
+function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrentlySelectedId: setShowBox, events }: DayProps)
 {
     const [id] = useState(v4());
 
@@ -107,8 +110,9 @@ function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrently
         <button 
         id={`calendar-popup-${id}`} key={day} className="w-10 h-10 rounded text-zinc-100 transition 
         hover:text-secondary hover:bg-primary font-semibold aria-selected:text-primary aria-selected:bg-tertiary 
-        aria-selected:hover:text-secondary aria-selected:hover:bg-primary
+        aria-selected:hover:text-secondary aria-selected:hover:bg-primary aria-expanded:border-primary aria-expanded:border-2
         aria-checked:bg-primary aria-checked:text-secondary"
+        aria-expanded={events.length > 0}
         aria-checked={showBox === id}
         aria-selected={new Date(Date.now()).getMonth() === month && new Date(Date.now()).getDate() === day && showBox !== id}
         onClick={() => {
@@ -120,7 +124,7 @@ function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrently
             {day}
         </button>
         {
-            showBox === id && <EventList monthNumber={month} monthText={monthText} day={day} setCurrentlySelectedId={setShowBox} currentlySelectedId={showBox} id={id} />
+            showBox === id && <EventList monthNumber={month} monthText={monthText} day={day} setCurrentlySelectedId={setShowBox} currentlySelectedId={showBox} id={id} events={events} />
         }
     </div>
 }

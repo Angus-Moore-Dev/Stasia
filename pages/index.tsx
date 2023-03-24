@@ -53,7 +53,9 @@ export default function HomePage({ user }: HomePageProps)
 							<Link href='/projects'>
 								<InteractiveBox title='Projects' icon={<CodeSharpIcon fontSize='large' />} />
 							</Link>
-							<InteractiveBox title='Calendar (coming soon)' icon={<CalendarMonthSharpIcon fontSize='large' />} />
+							<Link href='/calendar'>
+								<InteractiveBox title='Calendar' icon={<CalendarMonthSharpIcon fontSize='large' />} />
+							</Link>
 							<InteractiveBox title='Staff (coming soon)' icon={<BadgeIcon fontSize='large' />}  />
 						</div>
 					</div>
