@@ -1,8 +1,10 @@
+import LoadingBox from "@/components/LoadingBox";
 import Month from "@/components/calendar/Month";
 import { supabase } from "@/lib/supabaseClient";
 import { Event } from "@/models/calendar/Event";
 import { Session, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { GetServerSidePropsContext } from "next";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -37,6 +39,13 @@ export default function Calendar({ session }: CalendarProps)
     return <div className="w-full h-full flex flex-col gap-4 p-8 max-w-[1920px] mx-auto">
         <span>Calendar / Events</span>
         <div className="w-full h-full flex flex-col gap-4 justify-center items-center mx-auto">
+            {
+                !allEvents &&
+                <div className="w-full h-full flex flex-col items-center justify-center">
+                    <LoadingBox content={<Image src='/favicon.ico' alt='logo' width='25' height='25' />} />
+                    <span>Loading Calendar</span>
+                </div>
+            }
             {
                 allEvents &&
                 Array.from(Array(13).keys()).map(x => <Month month={x} showEvents={showEvents} setShowEvents={setShowEvents} events={allEvents.filter(x1 => new Date(Date.parse(x1.start.dateTime)).getMonth() === x)} />)
