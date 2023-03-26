@@ -16,6 +16,7 @@ import createNewNotification from '@/functions/createNewNotification';
 import { v4 } from 'uuid';
 import { User } from '@supabase/supabase-js';
 import { useClickAway } from 'react-use';
+import { MajorFeature } from '@/models/projects/MajorFeature';
 
 
 const style = {
@@ -57,6 +58,7 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
     const [showUnsavedChanges, setShowUnsavedChanges] = useState(false);
     const [taskColour, setTaskColour] = useState('');
     const [taskStateColour, setTaskStateColour] = useState('');
+    const [majorFeatureId, setMajorFeatureId] = useState(task.majorFeatureId);
     const [taskType, setTaskType] = useState(task.taskType);
     const [taskComments, setTaskComments] = useState<Comment[]>();
     const [taskState, setTaskState] = useState(task.taskState);
@@ -72,6 +74,8 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
     const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
     const [loadingComments, setLoadingComments] = useState(false);
     const [messageToSendContents, setMessageToSendContents] = useState('');
+
+    const [majorFeatures, setMajorFeatures] = useState<MajorFeature[]>();
     
     useEffect(() => {
         // We're doing it this way to containerise the changes inside the modal, but have external changes be reflected here in realtime.
@@ -82,6 +86,7 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
         setTaskType(task.taskType);
         setAssigneeId(task.assigneeId);
         setTaskState(task.taskState);
+        setMajorFeatureId(task.majorFeatureId);
 
         const fetchAllMetadata = async () =>
         {
@@ -99,6 +104,7 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
             setIsFetchingMetadata(false);
 
             const allComments = (await supabase.from('project_ticket_comments').select('*').eq('ticketId', task.id)).data as Comment[];
+            setMajorFeatures((await supabase.from('project_major_features').select('id, name').eq('projectId', task.projectId)).data as MajorFeature[]);
             setTaskComments(allComments);
             setLoadingComments(false);
         }
@@ -243,13 +249,13 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
                         <div className='w-full h-full p-2 flex flex-col items-start px-4 gap-4'>
                             <span>Task Configuration</span>
                             {
-                                isFetchingMetadata && !creatorOfTask &&
-                                <div className='flex-grow flex items-center justify-center'>
+                                (isFetchingMetadata || !creatorOfTask || !majorFeatures) &&
+                                <div className='flex-grow w-full flex items-center justify-center'>
                                     <LoadingBox />
                                 </div>
                             }
                             {
-                                !isFetchingMetadata && creatorOfTask &&
+                                !isFetchingMetadata && creatorOfTask && majorFeatures &&
                                 <>
                                 <div className='flex flex-col'>
                                     <small className='text-primary font-semibold'>Created by</small>
@@ -302,6 +308,20 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
                                     }}>
                                         {
                                             Object.values(TaskState).map(type => <option key={type} value={type}>{type}</option>)
+                                        }
+                                    </select>
+                                </div>
+                                <div className='flex flex-col'>
+                                    <small className='text-primary font-semibold'>Major Feature</small>
+                                    <select defaultValue={majorFeatureId ?? ''} className='mx-2 w-48 bg-primary text-secondary font-bold rounded text-center' onChange={async (e) => {
+                                        const res = await supabase.from('project_tickets').update({
+                                            majorFeatureId: e.target.value
+                                        }).eq('id', task.id);
+                                        res.error && createToast(res.error.message, true);
+                                    }}>
+                                        <option value='' className='text-center'>No Major Feature</option>
+                                        {
+                                            majorFeatures.map(feature => <option value={feature.id} className='text-left'>{feature.name}</option>)
                                         }
                                     </select>
                                 </div>

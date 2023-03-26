@@ -17,6 +17,7 @@ export default function Calendar({ session }: CalendarProps)
 {
     const router = useRouter();
     const { code } = router.query;
+
     // the id of the actively selected box.
     const [showEvents, setShowEvents] = useState('');
     const [googleAuthCode] = useState(code ? code : '');
@@ -29,11 +30,31 @@ export default function Calendar({ session }: CalendarProps)
                 'Authorization': `Bearer ${session.provider_token}`
             }
         }).then(async res => {
-            const response = await res.json();
-            console.log(response);
-            setAllEvents(response.items);
+            if (res.status === 401)
+            {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        scopes: 'https://www.googleapis.com/auth/calendar',
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent',
+                        },
+                        redirectTo: `${window.location.origin}/calendar`
+                    }
+                });
+                if (error)
+                {
+                    console.log(error);
+                }
+            }
+            else
+            {
+                const response = await res.json();
+                console.log(response);
+                setAllEvents(response.items);
+            }
         })
-        .catch(err => console.error(err));
     }, []);
 
     return <div className="w-full h-full flex flex-col gap-4 p-8 max-w-[1920px] mx-auto">
@@ -48,7 +69,13 @@ export default function Calendar({ session }: CalendarProps)
             }
             {
                 allEvents &&
-                Array.from(Array(13).keys()).map(x => <Month month={x} showEvents={showEvents} setShowEvents={setShowEvents} events={allEvents.filter(x1 => new Date(Date.parse(x1.start.dateTime)).getMonth() === x)} />)
+                Array.from(Array(13).keys()).map(x => <Month 
+                    month={x} 
+                    showEvents={showEvents} 
+                    setShowEvents={setShowEvents} 
+                    events={allEvents.filter(x1 => new Date(Date.parse(x1.start.dateTime)).getMonth() === x)} 
+                    setAllEvents={setAllEvents}
+                />)
             }
         </div>
     </div>
@@ -68,7 +95,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 			}
 		}
 	}
-
 
 	return {
 		props: {

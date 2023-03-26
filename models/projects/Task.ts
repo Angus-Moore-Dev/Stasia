@@ -11,6 +11,7 @@ export class Task
     taskType: TaskType = TaskType.General;
     taskState: TaskState= TaskState.NotStarted;
     onBoard: boolean = false;
+    important: boolean = false;
 
     constructor(projectId: string)
     {

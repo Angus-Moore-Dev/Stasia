@@ -165,7 +165,10 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                         router.push(`/projects/feature/major/new?id=${project.id}`)
                     }} />
                 </div>
-                <span>Click on a major feature to view its minor features and associated tasks.</span>
+                <span>
+                    Click on a major feature to view its minor features and associated tasks. <br />
+                    Mark as uncompleted if more work needs doing.
+                </span>
                 <div className="w-full flex flex-row flex-wrap gap-2 items-center pt-2">
                 {
                     majorFeatures && majorFeatures.map(feature => <MajorFeatureBox feature={feature} />)
@@ -178,7 +181,7 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                     <span>Tasks that are actively being worked on.</span>
                 </div>
                 {
-                    currentTasks && <SprintSection user={user} tasks={currentTasks.filter(x => x.onBoard)} />
+                    majorFeatures && currentTasks && <SprintSection user={user} tasks={currentTasks.filter(x => x.onBoard)} majorFeatures={majorFeatures} />
                 }
             </div>
             <div className="flex flex-col gap-2">

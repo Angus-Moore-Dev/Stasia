@@ -1,5 +1,4 @@
-import { User, useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
+import { User } from '@supabase/auth-helpers-react';
 import CodeSharpIcon from '@mui/icons-material/CodeSharp';
 import PersonOutlineSharpIcon from '@mui/icons-material/PersonOutlineSharp';
 import PersonSharpIcon from '@mui/icons-material/PersonSharp';
@@ -7,12 +6,10 @@ import ChatBubbleSharpIcon from '@mui/icons-material/ChatBubbleSharp';
 import CalendarMonthSharpIcon from '@mui/icons-material/CalendarMonthSharp';
 import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabaseClient';
 import { GetServerSidePropsContext } from 'next';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import BadgeIcon from '@mui/icons-material/Badge';
-import SignInPage from '@/components/SignInPage';
 import logo from '../public/logo.png';
 import Image from 'next/image';
 
