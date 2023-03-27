@@ -22,15 +22,17 @@ interface EventListProps
     currentlySelectedId: string;
     setCurrentlySelectedId: Dispatch<SetStateAction<string>>;
     events: Event[];
+    setAllEvents: Dispatch<SetStateAction<Event[] | undefined>>;
 }
 
-export default function EventList({ monthNumber, monthText, day, id, currentlySelectedId, setCurrentlySelectedId, events }: EventListProps)
+export default function EventList({ monthNumber, monthText, day, id, currentlySelectedId, setCurrentlySelectedId, events, setAllEvents }: EventListProps)
 {
     const formattedDateTime = `2023-${monthNumber + 1 < 10 ? `0${monthNumber + 1}` : monthNumber + 1}-${day < 10 ? `0${day}` : day}T00:00`;
     const ref = useRef<HTMLDivElement>(null);
     const [offset, setoffset] = useState('right-12');
     const [heightOffset, setHeightOffset] = useState('top-0');
     const [showNewEventBox, setShowNewEventBox] = useState(false);
+    const [viewEventDetails, setViewEventDetails] = useState(false);
     const [showInvitePeopleBox, setShowInvitePeopleBox] = useState(false);
 
     const [eventName, setEventName] = useState('');
@@ -81,7 +83,6 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
             }
         }
 
-        // TODO: Api calls for getting all events on this day.
     }, [currentlySelectedId]);
 
     return <div id={`popup-calendar-${id}`} ref={ref} hidden={currentlySelectedId !== id} className={`w-80 h-96 bg-tertiary overflow-y-auto scrollbar rounded flex flex-col absolute ${offset} ${heightOffset} z-30`} 
@@ -105,17 +106,15 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
                     <div className="flex-grow h-full flex flex-col gap-2 p-2">
                         {
                             events.sort((a, b) => Date.parse(a.start.dateTime) - Date.parse(b.start.dateTime)).map(event => <div className="group bg-tertiary rounded w-full min-h-[40px] px-2 py-1 font-medium transition hover:bg-primary hover:text-secondary hover:cursor-pointer flex flex-col gap-2"
-                            onClick={() => {
-                                alert('on click event view, plus notice on new stuff');
-                            }}>
+                            onClick={() => setViewEventDetails(true)}>
                                 <div className="w-full flex justify-between items-center">
                                     <span className="font-bold">{event.summary}</span>
                                     {
                                         event.attendees && (event.attendees.length ?? 0 > 0) &&
-                                        <button className="text-primary group-hover:text-secondary">
-                                        <span className="pr-1 font-bold">{event.attendees?.length}</span>
-                                        <PersonSharpIcon fontSize="small" />
-                                    </button>
+                                        <button className="text-primary group-hover:text-secondary flex flex-row items-center justify-center">
+                                            <span className="pr-1 font-bold">{event.attendees?.length}</span>
+                                            <PersonSharpIcon fontSize="small" />
+                                        </button>
                                     }
                                 </div>
                                 <div className="w-full flex items-center justify-start gap-1">
@@ -157,36 +156,69 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
                         {
                             eventName && eventDescription && eventLocation && startDateTime && endDateTime &&
                             <Button text='Create Event' onClick={async () => {
+                                const event = {
+                                    'summary': eventName,
+                                    'location': eventLocation,
+                                    'description': eventDescription,
+                                    'start': {
+                                        'dateTime': new Date(Date.parse(`2023-${monthNumber + 1 < 10 ? `0${monthNumber + 1}` : monthNumber + 1}-${day < 10 ? `0${day}` : day}T${startDateTime}`)).toISOString(),
+                                        'timeZone': 'Australia/Brisbane',
+                                    },
+                                    'end': {
+                                        'dateTime': new Date(Date.parse(`2023-${monthNumber + 1 < 10 ? `0${monthNumber + 1}` : monthNumber + 1}-${day < 10 ? `0${day}` : day}T${endDateTime}`)).toISOString(),
+                                        'timeZone': 'Australia/Brisbane',
+                                    },
+                                    'attendees': emailInvitees.map(x => { return { 'email': x } }),
+                                    'reminders': {
+                                        'useDefault': false,
+                                        'overrides': [
+                                            {'method': 'email', 'minutes': 24 * 60},
+                                            {'method': 'popup', 'minutes': 60 },
+                                            {'method': 'popup', 'minutes': 10 },
+                                        ],
+                                    },
+                                }
+                                console.log(event);
                                 const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all', {
                                     method: 'POST',
                                     headers: { 'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.provider_token}` },
-                                    body: JSON.stringify({
-                                        'summary': eventName,
-                                        'location': eventLocation,
-                                        'description': eventDescription,
-                                        'start': {
-                                            'dateTime': new Date(Date.parse(`2023-${monthNumber + 1 < 10 ? `0${monthNumber + 1}` : monthNumber + 1}-${day < 10 ? `0${day}` : day}T${startDateTime}`)).toISOString(),
-                                            'timeZone': 'Australia/Brisbane',
-                                        },
-                                        'end': {
-                                            'dateTime': new Date(Date.parse(`2023-${monthNumber + 1 < 10 ? `0${monthNumber + 1}` : monthNumber + 1}-${day < 10 ? `0${day}` : day}T${endDateTime}`)).toISOString(),
-                                            'timeZone': 'Australia/Brisbane',
-                                        },
-                                        'attendees': [
-                                            emailInvitees.length > 0 && emailInvitees.map(x => { return { email: x } })
-                                        ],
-                                        'reminders': {
-                                            'useDefault': false,
-                                            'overrides': [
-                                                {'method': 'email', 'minutes': 24 * 60},
-                                                {'method': 'popup', 'minutes': 60 },
-                                                {'method': 'popup', 'minutes': 10 },
-                                            ],
-                                        },
-                                    })
+                                    body: JSON.stringify(event)
                                 });
                                 if (res.status < 400)
                                 {
+                                    
+                                    await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=2023-01-01T00:00:00-10:30', {
+                                        method: 'GET',
+                                        headers: {
+                                            'Authorization': `Bearer ${await (await supabase.auth.getSession()).data?.session?.provider_token}`
+                                        }
+                                    }).then(async res => {
+                                        if (res.status === 401)
+                                        {
+                                            const { error } = await supabase.auth.signInWithOAuth({
+                                                provider: 'google',
+                                                options: {
+                                                    scopes: 'https://www.googleapis.com/auth/calendar',
+                                                    queryParams: {
+                                                        access_type: 'offline',
+                                                        prompt: 'consent',
+                                                    },
+                                                    redirectTo: `${window.location.origin}/calendar`
+                                                }
+                                            });
+                                            if (error)
+                                            {
+                                                console.log(error);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            const response = await res.json();
+                                            console.log(response);
+                                            setAllEvents(response.items);
+                                        }
+                                    });
+                                    console.log('calendar_event_creation_res::', await res.json());
                                     createToast('Successfully Created Event Invite!', false);
                                     setShowNewEventBox(false);
                                     setCurrentlySelectedId('');
@@ -226,6 +258,17 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
                                     </div>
                                 </button>)
                             }
+                        </div>
+                    </div>
+                }
+                {
+                    viewEventDetails &&
+                    <div className="w-full h-[396px] absolute z-40 top-8 bg-quaternary p-2 flex flex-col">
+                        <div className="w-full h-8 flex justify-between gap-4 items-center">
+                            <button className="text-primary transition p-2 rounded hover:bg-primary hover:text-secondary flex items-center" onClick={() => setViewEventDetails(false)}>
+                                <KeyboardBackspaceSharpIcon fontSize="small" />
+                            </button>
+                            <span className="font-semibold w-full pl-14">Event Details</span>
                         </div>
                     </div>
                 }

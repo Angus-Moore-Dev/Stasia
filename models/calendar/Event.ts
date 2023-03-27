@@ -11,5 +11,14 @@ export class Event
     created: string = ''; // ISO String
     start: { dateTime: string, timeZone: string } = { dateTime: '', timeZone: '' };
     end: { dateTime: string, timeZone: string } = { dateTime: '', timeZone: '' };
-    attendees: { email: string, organizer: boolean, self: boolean, responseStatus: string }[] = [];
+    organizer: {
+        email: string,
+        displayName: string,
+    } = { email: '', displayName: ''};
+    attendees: { 
+        email: string, 
+        organizer: boolean, 
+        self: boolean, 
+        responseStatus: "needsAction" | 'declined' | 'tenative' | 'accepted',
+    }[] = [];
 }

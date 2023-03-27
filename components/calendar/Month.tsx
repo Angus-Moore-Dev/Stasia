@@ -9,10 +9,11 @@ interface MonthProps
     month: number;
     showEvents: string;
     setShowEvents: Dispatch<SetStateAction<string>>;
+    setAllEvents: Dispatch<SetStateAction<Event[] | undefined>>;
     events: Event[];
 }
 
-export default function Month({ month, showEvents, setShowEvents, events }: MonthProps)
+export default function Month({ month, showEvents, setShowEvents, events, setAllEvents }: MonthProps)
 {
     const [monthText, setMonthText] = useState('');
     const [daysInMonth, setDaysInMonth] = useState(0);
@@ -81,7 +82,7 @@ export default function Month({ month, showEvents, setShowEvents, events }: Mont
             {
                 Array.from(Array(daysInMonth).keys()).map(x => 
                 {
-                    return <Day monthText={monthText} month={month} day={x} currentlySelectedId={showEvents} setCurrentlySelectedId={setShowEvents} events={events.filter(x1 => new Date(Date.parse(x1.start.dateTime)).getDate() === x)} />
+                    return <Day monthText={monthText} month={month} day={x} currentlySelectedId={showEvents} setCurrentlySelectedId={setShowEvents} events={events.filter(x1 => new Date(Date.parse(x1.start.dateTime)).getDate() === x)} setAllEvents={setAllEvents} />
                 })
             }
         </div>
@@ -96,9 +97,10 @@ interface DayProps
     month: number;
     day: number;
     events: Event[];
+    setAllEvents: Dispatch<SetStateAction<Event[] | undefined>>;
 }
 
-function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrentlySelectedId: setShowBox, events }: DayProps)
+function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrentlySelectedId: setShowBox, events, setAllEvents }: DayProps)
 {
     const [id] = useState(v4());
 
@@ -124,7 +126,7 @@ function Day({ monthText, month, day, currentlySelectedId: showBox, setCurrently
             {day}
         </button>
         {
-            showBox === id && <EventList monthNumber={month} monthText={monthText} day={day} setCurrentlySelectedId={setShowBox} currentlySelectedId={showBox} id={id} events={events} />
+            showBox === id && <EventList monthNumber={month} monthText={monthText} day={day} setCurrentlySelectedId={setShowBox} currentlySelectedId={showBox} id={id} events={events} setAllEvents={setAllEvents} />
         }
     </div>
 }

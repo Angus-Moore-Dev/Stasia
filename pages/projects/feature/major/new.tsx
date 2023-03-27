@@ -13,6 +13,7 @@ import { MinorFeatureBox } from "@/components/projects/FeatureBoxes";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
 import createNewNotification from "@/functions/createNewNotification";
+import createToast from "@/functions/createToast";
 
 interface MajorFeatureProps
 {
@@ -72,10 +73,12 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
 							style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
 						});
 					}
-					else
-					{
-						createNewNotification(profile, `${profile.name} Created A New Major Feature`, `${profile.name} created a new feature for the project ${projectName}, ${majorFeature.name}.`, profile.profilePictureURL);
-					}
+				}
+				if (!featureRes.error)
+				{
+					createToast('Created New Feature!', false);
+					await createNewNotification(profile, `${profile.name} Created A New Major Feature`, `${profile.name} created a new feature for the project ${projectName}, ${majorFeature.name}.`, profile.profilePictureURL);
+					router.push(`/projects/${projectId}`);
 				}
             }} className="" />
         </div>

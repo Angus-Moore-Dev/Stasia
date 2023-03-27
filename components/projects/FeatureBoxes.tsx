@@ -175,7 +175,7 @@ export function TaskBox({ user, task, profile }: TaskBoxProps)
             onMouseOver={() => setShowEditButton(true)}
             onMouseLeave={() => setShowEditButton(false)}
         >
-            <div className="w-40 pr-1 flex flex-row gap-4 justify-end mx-1">
+            <div className="w-40 pr-1 flex flex-row gap-4 justify-between mx-1">
                 <p>{task.id}</p>
                 <select defaultValue={taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 min-w-[128px] max-w-[128px] ${taskState === TaskState.Completed && 'text-zinc-100'}`} 
                 style={{ backgroundColor: taskColour }} onChange={async (e) => {

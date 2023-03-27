@@ -7,7 +7,7 @@ export default function createToast(text: string, error: boolean)
         toast.error(text, 
         {
             position: "bottom-right",
-            autoClose: 5000,
+            autoClose: 1500,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
@@ -22,7 +22,7 @@ export default function createToast(text: string, error: boolean)
         toast.success(text,
         {
             position: "bottom-right",
-            autoClose: 5000,
+            autoClose: 1500,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,

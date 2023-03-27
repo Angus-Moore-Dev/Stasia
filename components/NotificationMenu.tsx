@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 import VisibilitySharpIcon from '@mui/icons-material/VisibilitySharp';
 import { Profile } from "@/models/me/Profile";
 import { useClickAway } from "react-use";
+import VisibilityOffSharpIcon from '@mui/icons-material/VisibilityOffSharp';
 
 interface NotificationMenuProps
 {
@@ -66,22 +67,34 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
         <audio hidden ref={audioRef}>
             <source src='/notificationSound.mp3' />
         </audio>
-        <button 
-        className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
-        aria-checked={showNotificationMenu}
-        onClick={() => setShowNotificationMenu(!showNotificationMenu)}>
-            {
-                unseenNotificationCount &&
-                <div className="w-10 h-4 absolute top-2 ml-3 bg-red-500 text-zinc-100 font-bold flex items-center justify-center text-xs rounded">
-                    new
-                </div>
-            }
-            <VisibilitySharpIcon fontSize="small" />
-        </button>
+        {
+            !showNotificationMenu &&
+            <button 
+            className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
+            aria-checked={showNotificationMenu}
+            onClick={() => setShowNotificationMenu(true)}>
+                {
+                    unseenNotificationCount &&
+                    <div className="w-10 h-4 absolute top-2 ml-3 bg-red-500 text-zinc-100 font-bold flex items-center justify-center text-xs rounded">
+                        new
+                    </div>
+                }
+                <VisibilitySharpIcon fontSize="small" />
+            </button>
+        }
+        {
+            showNotificationMenu &&
+            <button 
+            className="text-zinc-100 transition hover:text-primary mr-10 hidden md:flex aria-checked:text-primary"
+            aria-checked={showNotificationMenu}
+            onClick={() => setShowNotificationMenu(false)}>
+                <VisibilityOffSharpIcon fontSize="small" />
+            </button>
+        }
         {
             showNotificationMenu &&
             <div ref={ref} className="w-96 min-h-[384px] max-h-[50vh] bg-quaternary rounded absolute z-50 top-12 mr-36 p-2 flex flex-col gap-1">
-                <span className="px-4 font-medium">Notifications</span>
+                <span className="px-4 font-medium w-full bg-tertiary">Notifications</span>
                 {
                     notifications.length === 0 &&
                     <div className="flex-grow flex items-center justify-center">
@@ -130,7 +143,6 @@ interface NotificationEventProps
 
 function NotificationEvent({ notification, setShowNotificationMenu }: NotificationEventProps)
 {
-
     const router = useRouter();
     return <button className="group w-full p-2 bg-tertiary rounded transition hover:bg-primary hover:text-secondary hover:cursor-pointer flex flex-row gap-4 text-left" onClick={() => {
         setShowNotificationMenu(false);
