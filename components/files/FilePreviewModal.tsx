@@ -12,7 +12,8 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    maxWidth: '75vw',
+    maxWidth: '90vw',
+    maxHeight: '90vh',
     border: '0px solid',
     outline: 'none'
 };

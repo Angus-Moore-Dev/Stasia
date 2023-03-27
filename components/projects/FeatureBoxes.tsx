@@ -242,7 +242,7 @@ export function TaskBox({ user, task, profile }: TaskBoxProps)
             }}>
                 <PlaylistAddSharpIcon fontSize="small" />
             </button>
-            <select defaultValue={taskState} value={taskState} className={`bg-transparent h-full text-secondary font-bold text-center rounded-sm w-32`} 
+            <select defaultValue={taskState} value={taskState} className={`bg-transparent text-secondary font-bold text-center rounded-sm w-32 h-6`} 
             style={{ backgroundColor: taskStateColour }} onChange={async (e) => {
                 const res = await supabase.from('project_tickets').update({ taskState: e.target.value }).eq('id', task.id);
                 if (!res.error)
