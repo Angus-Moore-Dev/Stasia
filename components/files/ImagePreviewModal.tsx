@@ -77,9 +77,6 @@ export default function ImagePreviewModal({ filePath, file, show, setShow, setRe
                         <div className="py-1 flex flex-row items-center justify-between px-8">
                             <span>{file.name.slice(0, 100)}{file.name.length > 100 && '...'}</span>
                             <div className="flex flex-row gap-2 items-center">
-                                <button className="px-2 transition font-semibold text-primary hover:bg-primary hover:text-secondary rounded">
-                                    <ShareSharpIcon fontSize="medium" />
-                                </button>
                                 {
                                     isDeleting &&
                                     <LinearProgress color="inherit" className="text-red-500 h-2 w-16 rounded" />

@@ -54,7 +54,45 @@ export default function Calendar({ session }: CalendarProps)
                 console.log(response);
                 setAllEvents(response.items);
             }
-        })
+        });
+
+        const update = setInterval(async () => {
+            
+            const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=2023-01-01T00:00:00-10:30', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${session.provider_token}`
+                }
+            })
+            console.log('updating calendar::', res.status);
+            if (res.status === 401)
+            {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        scopes: 'https://www.googleapis.com/auth/calendar',
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent',
+                        },
+                        redirectTo: `${window.location.origin}/calendar`
+                    }
+                });
+                if (error)
+                {
+                    console.log(error);
+                }
+            }
+            else
+            {
+                const response = await res.json();
+                console.log(response);
+                setAllEvents(response.items);
+            }
+
+            
+        }, 30 * 1000);
+        return () => clearInterval(update)
     }, []);
 
     return <div className="w-full h-full flex flex-col gap-4 p-8 max-w-[1920px] mx-auto">
