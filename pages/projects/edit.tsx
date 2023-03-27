@@ -34,10 +34,10 @@ export default function NewProjectPage({ user, profiles, profile, contacts, proj
     const [staffInvolved, setStaffInvolved] = useState<string[]>(project.peopleInvolved);
     const [contractedContactId, setContractedContactId] = useState(project.contractedContactId); // For contracts only.
 
-    return <div className='w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
+    return <div className='w-full h-full min-h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
         <div className="w-full flex items-center gap-2">
-            <Button text='Back to Projects' onClick={() => {
-                router.push('/projects');
+            <Button text={`Back to ${project.name}`} onClick={() => {
+                router.push(`/projects/${project.id}`);
             }} className="mr-auto" />
             <Button text='Update Project' onClick={async () => {
                 const updatedProject = new Project();

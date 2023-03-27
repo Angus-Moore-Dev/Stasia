@@ -17,7 +17,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-
+import AssignmentSharpIcon from '@mui/icons-material/AssignmentSharp';
+import ForumSharpIcon from '@mui/icons-material/ForumSharp';
+import KeySharpIcon from '@mui/icons-material/KeySharp';
+import LibraryBooksSharpIcon from '@mui/icons-material/LibraryBooksSharp';
+import ViewTimelineSharpIcon from '@mui/icons-material/ViewTimelineSharp';
 
 interface ProjectIdPageProps
 {
@@ -32,60 +36,12 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
 {
     const router = useRouter();
     const [majorFeatures, setMajorFeatures] = useState<MajorFeature[]>();
-    const [currentTasks, setCurrentTasks] = useState<Task[]>();
-    const [realtimeTicketChannel, setRealtimeTicketChannel] = useState<RealtimeChannel>();
-
-    // These are the updaters for supabase. There's gotta be a faster way for this.
-    const addNewTask = useCallback((task: Task) => {
-        setCurrentTasks(tasks => [...tasks ?? [], task]);
-    }, []);
-
-    const removeTask = useCallback((id: number) => {
-        setCurrentTasks(currentTasks => [...currentTasks?.filter(x => x.id !== id) ?? []]);
-    }, []);
 
     useEffect(() => {
         supabase.from('project_major_features').select('*').eq('projectId', project.id).then(res => 
         {
             setMajorFeatures(res.data as MajorFeature[]);
         });
-
-        supabase.from('project_tickets').select('*').eq('projectId', project.id).then(res =>
-        {
-            setCurrentTasks(res.data as Task[]);
-        })
-
-        const channel = supabase.channel('table-db-changes')
-        .on('postgres_changes', {event: '*', schema: 'public', table: 'project_tickets'}, (payload) => {
-            console.log('payload::', payload);
-            if (payload.eventType === 'INSERT')
-            {
-                console.log('realtime insert of ticket')
-                const message = payload.new as Task;
-                if (message.projectId === project.id)
-                {
-                    addNewTask(message);
-                }
-            }
-            else if (payload.eventType === 'DELETE')
-            {
-                console.log('realtime delete of ticket')
-                removeTask(payload.old.id);
-            }
-            else if (payload.eventType === 'UPDATE')
-            {
-                console.log('realtime update of ticket::', payload.new as Task);
-                const message = payload.new as Task;
-                setCurrentTasks(currentTasks => {
-                    const allTasks = [...currentTasks ?? []];
-                    allTasks[allTasks.findIndex(x => x.id === message.id)] = message;
-                    return allTasks;
-                });
-            }
-        }).subscribe((status) => {
-            console.log('tasks::', status);
-        });
-        setRealtimeTicketChannel(channel);
     }, []);
 
 
@@ -94,9 +50,6 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
             <Button text='Back to Projects' onClick={() => {
                 router.push('/projects');
             }} className="mr-auto" />
-            <Button text='Project Roadmap' onClick={() => {
-                router.push(`/projects/${project.id}/roadmap`);
-            }} />
             <Button text='Edit Project Details' onClick={() => {
                 router.push(`/projects/edit?id=${project.id}`);
             }} />
@@ -158,6 +111,41 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                 }
                 </div>
             </div>
+            <div className="flex flex-col w-full gap-2">
+                <span className="font-semibold">Project Services</span>
+                <section className="flex flex-row flex-wrap w-full gap-2 justify-center items-center">
+                    <Link href={`/projects/${project.id}/tasks`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
+                        <div className="flex flex-row items-center gap-2">
+                            <AssignmentSharpIcon fontSize="large" />
+                            <span className="pt-[2px]">Tasks</span>
+                        </div>
+                    </Link>
+                    <Link href={`/projects/${project.id}/discussion`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
+                        <div className="flex flex-row items-center gap-2">
+                            <ForumSharpIcon fontSize="large" />
+                            <span className="pt-[2px]">Discussion</span>
+                        </div>
+                    </Link>
+                    <Link href={`/projects/${project.id}/documentation`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
+                        <div className="flex flex-row items-center gap-2">
+                            <LibraryBooksSharpIcon fontSize="large" />
+                            <span className="pt-[2px]">Documentation</span>
+                        </div>
+                    </Link>
+                    <Link href={`/projects/${project.id}/secrets`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
+                        <div className="flex flex-row items-center gap-2">
+                            <KeySharpIcon fontSize="large" />
+                            <span className="pt-[2px]">Secrets Management</span>
+                        </div>
+                    </Link>
+                    <Link href={`/projects/${project.id}/roadmap`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
+                        <div className="flex flex-row items-center gap-2">
+                            <ViewTimelineSharpIcon fontSize="large" />
+                            <span className="pt-[2px]">Roadmap</span>
+                        </div>
+                    </Link>
+                </section>
+            </div>
             <div className="flex flex-col w-full">
                 <div className="flex flex-row gap-4 items-center">
                     <span className="font-semibold">Major Features</span>
@@ -174,42 +162,6 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                     majorFeatures && majorFeatures.map(feature => <MajorFeatureBox feature={feature} />)
                 }
                 </div>
-            </div>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-1">
-                    <span className="font-semibold">Active Sprint</span>
-                    <span>Tasks that are actively being worked on.</span>
-                </div>
-                {
-                    majorFeatures && currentTasks && <SprintSection user={user} tasks={currentTasks.filter(x => x.onBoard)} majorFeatures={majorFeatures} />
-                }
-            </div>
-            <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-4 items-center">
-                    <span className="font-semibold">Backlog</span>
-                </div>
-                <div className="flex flex-col gap-[2px] overflow-y-auto scrollbar">
-                    {
-                        currentTasks && currentTasks.length === 0 &&
-                        <div className="flex items-center justify-start h-14 w-full px-16">
-                            No Active Tasks
-                        </div>
-                    }
-                    {
-                        currentTasks && currentTasks.filter(x => !x.onBoard).sort((a, b) => a.id - b.id).map(task => <TaskBox user={user} key={task.id} task={task} profile={profiles.find(x => x.id === task.assigneeId)} />)
-                    }
-                </div>
-                <Button text="Add New Task" onClick={async () => 
-                {
-                    if (currentTasks)
-                    {
-                        const task = new Task(project.id);
-                        task.creatorId = user.id;
-                        const res = await supabase.from('project_tickets').insert(task);
-                        createToast(res?.error ? res.error.message : 'Successfully Created New Task', res.error !== null);
-						createNewNotification(profile, `${profile.name} Created A Task For ${project.name}`, `${profile.name} created a new task for the project ${project.name}`, profile.profilePictureURL);
-                    }
-                }} className="w-fit" />
             </div>
         </div>
     </div>
