@@ -24,7 +24,7 @@ export default function Calendar({ session }: CalendarProps)
     const [allEvents, setAllEvents] = useState<Event[]>();
 
     useEffect(() => {
-        fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=2023-01-01T00:00:00-10:30', {
+        fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=2023-01-01T00:00:00-10:00', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${session.provider_token}`

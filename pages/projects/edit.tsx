@@ -1,7 +1,7 @@
 
 import Button from "@/components/common/Button";
 import { Profile } from "@/models/me/Profile";
-import { CommercialisationType, Project, ProjectType } from "@/models/projects/Project";
+import { CommercialisationType, Project, ProjectTier, ProjectType } from "@/models/projects/Project";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { User } from "@supabase/supabase-js"
 import { GetServerSidePropsContext } from "next";
@@ -33,6 +33,8 @@ export default function NewProjectPage({ user, profiles, profile, contacts, proj
     const [industry, setIndustry] = useState(project.industry);
     const [staffInvolved, setStaffInvolved] = useState<string[]>(project.peopleInvolved);
     const [contractedContactId, setContractedContactId] = useState(project.contractedContactId); // For contracts only.
+    const [projectTier, setProjectTier] = useState<ProjectTier>(project.projectTier);
+
 
     return <div className='w-full h-full min-h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
         <div className="w-full flex items-center gap-2">
@@ -49,6 +51,7 @@ export default function NewProjectPage({ user, profiles, profile, contacts, proj
                 updatedProject.peopleInvolved = staffInvolved;
                 updatedProject.projectType = projectType ?? ProjectType.Other;
                 updatedProject.commercialisationType = commercialisationType ?? CommercialisationType.None;
+                updatedProject.projectTier = projectTier ?? ProjectTier.Tertiary;
                 updatedProject.contractedContactId = contractedContactId;
                 const res = await supabase.from('projects').update(updatedProject).eq('id', updatedProject.id);
                 if (res.error)
@@ -80,7 +83,6 @@ export default function NewProjectPage({ user, profiles, profile, contacts, proj
                         theme: "colored",
                         style: { backgroundColor: '#00fe49', color: '#090909', fontFamily: 'Rajdhani', fontWeight: '800' }
                     });
-                    createNewNotification(profile, `${profile.name} Updated a Project`, `${profile.name} updated the information for project, ${project.name}.`, profile.profilePictureURL);
                     router.push(`/projects/${updatedProject.id}`);
                 }
             }} />
@@ -105,6 +107,16 @@ export default function NewProjectPage({ user, profiles, profile, contacts, proj
                             font-semibold text-lg transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary"
                             aria-selected={projectType === type}
                             onClick={() => setProjectType(type)}>
+                                {type}
+                            </button>
+                            )
+                        }
+                        <span>Project Tier</span>
+                        {
+                            Object.values(ProjectTier).map(type => <button className="w-80 p-4 rounded bg-tertiary text-primary 
+                            font-semibold text-lg transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary"
+                            aria-selected={projectTier === type}
+                            onClick={() => setProjectTier(type)}>
                                 {type}
                             </button>
                             )

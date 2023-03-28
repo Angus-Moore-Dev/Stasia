@@ -132,7 +132,7 @@ function QuickNavBox({ route, name, Icon }: QuickNavBoxProps)
 function SmallerQuickNavBox({ route, name, Icon, dynamicId }: SmallerQuickNavBoxProps)
 {
     const [showTooltip, setShowTooltip] = useState(false);
-    return <Link href={route(dynamicId)} className='w-10 h-10 rounded bg-tertiary text-primary transition duration-150 
+    return <Link href={route(dynamicId)} className='w-10 h-10 rounded  text-primary transition duration-150 
     hover:border-secondary hover:text-secondary hover:bg-primary flex items-center justify-center relative mx-auto'
     onMouseOver={() => setShowTooltip(true)}
     onMouseLeave={() => setShowTooltip(false)}
@@ -163,7 +163,7 @@ export default function SideBar()
                 <QuickNavBox key={v4()} route={page.route} name={page.name} Icon={page.icon} />
                 {
                     projectId && page.name === 'Projects' &&
-                    <div className='flex flex-col gap-4 border-y-2 border-t-primary border-b-primary py-2 my-2'>
+                    <div className='flex flex-col gap-4 border-b-2 border-b-primary py-2 my-2 bg-quaternary rounded'>
                     {
                         page.quickNav.map(subPage => <SmallerQuickNavBox route={subPage.route} name={subPage.name} Icon={subPage.icon} dynamicId={projectId as string} />)
                     }

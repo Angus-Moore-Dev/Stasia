@@ -38,7 +38,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 
     const project = (await supabaseClient.from('projects').select('*').eq('id', context.query['projectId']).single()).data as Project;
 
-
     return {
         props: {
             user: session.user,

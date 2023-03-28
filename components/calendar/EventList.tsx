@@ -11,6 +11,7 @@ import createToast from "@/functions/createToast";
 import { Profile } from "@/models/me/Profile";
 import Image from "next/image";
 import PersonSharpIcon from '@mui/icons-material/PersonSharp';
+import { v4 } from "uuid";
 
 
 interface EventListProps
@@ -42,6 +43,7 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
     const [endDateTime, setEndDateTime] = useState<string>('');
     const [emailInvitees, setEmailInvitees] = useState<string[]>([]);
 
+    const [selectedEventDetails, setSelectedEventDetails] = useState<Event>();
     const [allStaff, setAllStaff] = useState<Profile[]>();
 
     useClickAway(ref, (e) => {
@@ -106,7 +108,7 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
                     <div className="flex-grow h-full flex flex-col gap-2 p-2">
                         {
                             events.sort((a, b) => Date.parse(a.start.dateTime) - Date.parse(b.start.dateTime)).map(event => <div className="group bg-tertiary rounded w-full min-h-[40px] px-2 py-1 font-medium transition hover:bg-primary hover:text-secondary hover:cursor-pointer flex flex-col gap-2"
-                            onClick={() => setViewEventDetails(true)}>
+                            onClick={() => {setViewEventDetails(true); setSelectedEventDetails(event)}}>
                                 <div className="w-full flex justify-between items-center">
                                     <span className="font-bold">{event.summary}</span>
                                     {
@@ -262,13 +264,40 @@ export default function EventList({ monthNumber, monthText, day, id, currentlySe
                     </div>
                 }
                 {
-                    viewEventDetails &&
+                    viewEventDetails && selectedEventDetails && allStaff &&
                     <div className="w-full h-[396px] absolute z-40 top-8 bg-quaternary p-2 flex flex-col">
                         <div className="w-full h-8 flex justify-between gap-4 items-center">
-                            <button className="text-primary transition p-2 rounded hover:bg-primary hover:text-secondary flex items-center" onClick={() => setViewEventDetails(false)}>
+                            <button className="text-primary transition p-2 rounded hover:bg-primary hover:text-secondary flex items-center" onClick={() => {
+                                setViewEventDetails(false);
+                                setSelectedEventDetails(undefined);
+                            }}>
                                 <KeyboardBackspaceSharpIcon fontSize="small" />
                             </button>
                             <span className="font-semibold w-full pl-14">Event Details</span>
+                        </div>
+                        <div className="flex-grow flex flex-col mt-4 px-4 gap-2 pb-10 overflow-y-auto scrollbar">
+                            <span className="text-lg font-semibold">{selectedEventDetails.summary}</span>
+                            <span className="font-medium">{selectedEventDetails.description}</span>
+                            <span className="">Location: <span className="font-medium">{selectedEventDetails.location}</span></span>
+                            {
+                                selectedEventDetails.attendees?.length > 0 &&
+                                <span>People Attending This Event</span> 
+                            }
+                            {
+                                selectedEventDetails.attendees?.length > 0 
+                                &&
+                                allStaff.filter(x => selectedEventDetails.attendees?.some(x1 => x1.email === x.email)).map(profile =>
+                                <div key={profile.id} className="w-full flex flex-row gap-4 items-center bg-tertiary rounded transition hover:bg-primary hover:text-secondary">
+                                    <Image src={profile.profilePictureURL} alt={v4()} width={40} height={40} className="object-cover w-[40px] h-[40px]" />
+                                    <span>{profile.name}</span>
+                                </div>)
+                            }
+                            {
+                                selectedEventDetails.attendees?.length === 0 &&
+                                <div className="flex items-center justify-center">
+                                    No other people are attending this event.
+                                </div>
+                            }
                         </div>
                     </div>
                 }

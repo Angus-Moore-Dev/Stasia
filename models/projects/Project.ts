@@ -9,19 +9,16 @@ export class Project
     peopleInvolved: string[] = []; // User IDs
     contractedContactId: string = ''; // Contact ID of the user, for contractual applications only.
     industry: string = '';
+    projectTier: ProjectTier = ProjectTier.Tertiary;
 }
 
 export enum ProjectType
 {
     NoSpecificType = "No Specific Type",
-    Design = "Design",
     Marketing = "Marketing",
-    UserResearch = "User Research",
     Software = "Software",
     Hardware = "Hardware",
-    Business = "Business", // This is for things like new ventures
     Graphical = "Graphical", // Videos, Advertising, Media
-    Financial = "Financial",
     Other = "Other",
 }
 
@@ -34,4 +31,14 @@ export enum CommercialisationType
     FreemiumSubscription = "Subscription with Free Tier",
     Contractual = "Contractual",
     Other = "Other",
+}
+
+export enum ProjectTier
+{
+    // Core project that is crucial to your startup. Example: "Startup Website" or "Startup Software Idea".
+    Primary = "Primary", 
+    // Secondary project. Maybe outreach or marketing attempts. For Instance, "Email Templates" or "Internal Admin Tool". Could also be a contracted codebase if you're an agency.
+    Secondary = "Secondary", 
+    // Background project. For instance, "Learn Supabase".
+    Tertiary = "Tertiary", 
 }

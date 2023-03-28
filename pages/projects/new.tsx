@@ -1,7 +1,7 @@
 
 import Button from "@/components/common/Button";
 import { Profile } from "@/models/me/Profile";
-import { CommercialisationType, Project, ProjectType } from "@/models/projects/Project";
+import { CommercialisationType, Project, ProjectTier, ProjectType } from "@/models/projects/Project";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { User } from "@supabase/supabase-js"
 import { GetServerSidePropsContext } from "next";
@@ -31,6 +31,7 @@ export default function NewProjectPage({ user, profiles, profile, contacts }: Pr
     const [commercialisationType, setCommercialisationType] = useState<CommercialisationType>();
     const [industry, setIndustry] = useState('');
     const [staffInvolved, setStaffInvolved] = useState<string[]>([]);
+    const [projectTier, setProjectTier] = useState<ProjectTier>();
     const [contractedContactId, setContractedContactId] = useState(''); // For contracts only.
 
     return <div className='w-full h-full flex flex-col items-center justify-center gap-4 max-w-[1920px] p-8 mx-auto'>
@@ -48,6 +49,7 @@ export default function NewProjectPage({ user, profiles, profile, contacts }: Pr
                 project.peopleInvolved = staffInvolved;
                 project.projectType = projectType ?? ProjectType.Other;
                 project.commercialisationType = commercialisationType ?? CommercialisationType.None;
+                project.projectTier = projectTier ?? ProjectTier.Tertiary;
                 project.contractedContactId = contractedContactId;
                 const res = await supabase.from('projects').insert(project);
                 if (res.error)
@@ -108,6 +110,16 @@ export default function NewProjectPage({ user, profiles, profile, contacts }: Pr
                             </button>
                             )
                         }
+                        <span>Project Tier</span>
+                        {
+                            Object.values(ProjectTier).map(type => <button className="w-80 p-4 rounded bg-tertiary text-primary 
+                            font-semibold text-lg transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary"
+                            aria-selected={projectTier === type}
+                            onClick={() => setProjectTier(type)}>
+                                {type}
+                            </button>
+                            )
+                        }
                     </div>
                     <div className="flex flex-col gap-2">
                         <span>Commercialisation Type</span>
@@ -138,7 +150,7 @@ export default function NewProjectPage({ user, profiles, profile, contacts }: Pr
                 </div>
             </div>
             <div className="w-1/2 flex flex-col gap-4">
-                <span>Staff Involved (Click to Apply)</span>
+                <span>People Involved (Click to Apply)</span>
                 <div className="w-full max-h-full flex flex-row gap-4 flex-wrap overflow-y-auto scrollbar pb-10">
                     {
                         profiles.map(profile => <button className="h-80 w-64 mb-10 flex text-left " 
