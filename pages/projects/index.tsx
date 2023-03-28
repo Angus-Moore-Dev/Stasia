@@ -1,5 +1,5 @@
 import Button from "@/components/common/Button";
-import { Project } from "@/models/projects/Project";
+import { Project, ProjectTier } from "@/models/projects/Project";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { User } from "@supabase/supabase-js"
 import { GetServerSidePropsContext } from "next";
@@ -61,8 +61,9 @@ interface ProjectBoxProps
 
 function ProjectBox({ project }: ProjectBoxProps)
 {
-	return <Link href={`/projects/${project.id}`} className="w-80 h-64 rounded bg-tertiary p-4 flex flex-col gap-2 transition hover:bg-primary hover:text-secondary hover:cursor-pointer">
-		<p className="text-xl font-semibold">{project.name}</p>
+	return <Link href={`/projects/${project.id}`} className={`group w-80 h-64 rounded bg-tertiary p-4 flex flex-col gap-2 transition hover:bg-primary hover:text-secondary hover:cursor-pointer
+	${project.projectTier === ProjectTier.Primary && 'border-b-4 border-primary'} ${project.projectTier === ProjectTier.Secondary && 'border-b-4 border-zinc-100'}`}>
+		<p className={`text-xl font-semibold ${project.projectTier === ProjectTier.Primary && 'text-primary group-hover:text-secondary'}`}>{project.name}</p>
 		<p className="pt-2 flex-grow overflow-y-auto scrollbar">
 			{project.description}
 		</p>
