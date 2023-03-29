@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { v4 } from "uuid";
 import { toast } from "react-toastify";
 import createNewNotification from "@/functions/createNewNotification";
+import { Tooltip } from "@mui/material";
 
 interface ProectsPageProps
 {
@@ -112,12 +113,15 @@ export default function NewProjectPage({ user, profiles, profile, contacts }: Pr
                         }
                         <span>Project Tier</span>
                         {
-                            Object.values(ProjectTier).map(type => <button className="w-80 p-4 rounded bg-tertiary text-primary 
-                            font-semibold text-lg transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary"
-                            aria-selected={projectTier === type}
-                            onClick={() => setProjectTier(type)}>
-                                {type}
-                            </button>
+                            Object.values(ProjectTier).map(type => <Tooltip title={type === ProjectTier.Primary ? 'Startup Codebase, Website, Internal tools.' : type === ProjectTier.Secondary ? 'Email Templates, Sales Scripts, Graphical Media.' : 'Any other project you have!'} 
+                            placement="right">
+                                <button className="w-80 p-4 rounded bg-tertiary text-primary 
+                                font-semibold text-lg transition hover:bg-primary hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary relative"
+                                aria-selected={projectTier === type}
+                                onClick={() => setProjectTier(type)}>
+                                    <span>{type}</span>
+                                </button>
+                            </Tooltip>
                             )
                         }
                     </div>

@@ -78,7 +78,7 @@ function ProjectBox({ project }: ProjectBoxProps)
 	${project.projectTier === ProjectTier.Primary && 'border-b-4 border-primary'} ${project.projectTier === ProjectTier.Secondary && 'border-b-4 border-zinc-100'}`}>
 		<p className={`text-xl font-semibold ${project.projectTier === ProjectTier.Primary && 'text-primary group-hover:text-secondary'}`}>{project.name}</p>
 		<p className="pt-2 flex-grow overflow-y-auto scrollbar">
-			{project.description}
+			{project.description.slice(0, 225)}...
 		</p>
 		<div className="w-full flex flex-row justify-between">
 			<small className="font-medium">{project.projectType.valueOf()} - {project.commercialisationType.valueOf()}</small>
