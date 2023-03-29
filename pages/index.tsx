@@ -72,28 +72,14 @@ export default function HomePage({ user, session }: HomePageProps)
 						<Image src={logo} alt='Stasia' width='400' height='350' className='mx-auto' />
 						<span className='mb-4 font-medium'>The Universal Toolkit For Your Startup.</span>
 						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
-							<Link href='/customers'>
-								<InteractiveBox title='Customers (coming soon)' icon={<AttachMoneySharpIcon fontSize='large' />}  />
-							</Link>
-							<Link href='/contacts'>
-								<InteractiveBox title='Contacts' icon={<PersonSharpIcon fontSize='large' />} />
-							</Link>
-							<Link href='/leads'>
-								<InteractiveBox title='Leads' icon={<PersonOutlineSharpIcon fontSize='large' />} />
-							</Link>
-							<Link href='/chat'>
-								<InteractiveBox title='Chat' icon={<ChatBubbleSharpIcon fontSize='large' />} />
-							</Link>
-						</div>
-						<div className='flex flex-row flex-wrap gap-3 items-center justify-center'>
-							<Link href='/files'>
-								<InteractiveBox title='Files' icon={<AccountTreeIcon fontSize='large' />} />
-							</Link>
 							<Link href='/projects'>
 								<InteractiveBox title='Projects' icon={<CodeSharpIcon fontSize='large' />} />
 							</Link>
-							<Link href='/calendar'>
-								<InteractiveBox title='Calendar' icon={<CalendarMonthSharpIcon fontSize='large' />} />
+							<Link href='/files'>
+								<InteractiveBox title='Files' icon={<AccountTreeIcon fontSize='large' />} />
+							</Link>
+							<Link href='/contacts'>
+								<InteractiveBox title='Contacts' icon={<PersonSharpIcon fontSize='large' />} />
 							</Link>
 							<InteractiveBox title='Team (Coming Soon)' icon={<BadgeIcon fontSize='large' />}  />
 						</div>

@@ -21,27 +21,9 @@ import ViewTimelineSharpIcon from '@mui/icons-material/ViewTimelineSharp';
 
 const allPagesAvailable = [
     {
-        route: '/customers',
-        name: 'Customers',
-        icon: () => <AttachMoneySharpIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
         route: '/contacts',
         name: 'Contacts',
         icon: () => <PersonSharpIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
-        route: '/leads',
-        name: 'Leads',
-        icon: () => <PersonOutlineSharpIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
-        route: '/chat',
-        name: 'Chat',
-        icon: () => <ChatBubbleSharpIcon fontSize='medium' />,
         quickNav: [],
     },
     {
@@ -81,12 +63,6 @@ const allPagesAvailable = [
                 icon: () => <ViewTimelineSharpIcon fontSize='small' />,
             }
         ]
-    },
-    {
-        route: '/calendar',
-        name: 'calendar',
-        icon: () => <CalendarMonthSharpIcon fontSize='medium' />,
-        quickNav: [],
     },
     {
         route: '/staff',

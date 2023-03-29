@@ -134,9 +134,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 		}
 	}
 
-	return {
-		props: {
-			session: session
-		}
-	}
+    return {
+        redirect: {
+            destination: '/',
+            permanent: false,
+        }
+    }
+	// return {
+	// 	props: {
+	// 		session: session
+	// 	}
+	// }
 }
