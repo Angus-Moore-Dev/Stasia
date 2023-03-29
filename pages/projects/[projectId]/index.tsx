@@ -129,7 +129,7 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                     <Link href={`/projects/${project.id}/roadmap`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
                         <div className="flex flex-row items-center gap-2">
                             <ViewTimelineSharpIcon fontSize="large" />
-                            <span className="pt-[2px]">Roadmap</span>
+                            <span className="pt-[2px]">Plasia Board</span>
                         </div>
                     </Link>
                     <Link href={`/projects/${project.id}/documentation`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">

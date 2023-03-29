@@ -21,27 +21,9 @@ import ViewTimelineSharpIcon from '@mui/icons-material/ViewTimelineSharp';
 
 const allPagesAvailable = [
     {
-        route: '/customers',
-        name: 'Customers',
-        icon: () => <AttachMoneySharpIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
         route: '/contacts',
         name: 'Contacts',
         icon: () => <PersonSharpIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
-        route: '/leads',
-        name: 'Leads',
-        icon: () => <PersonOutlineSharpIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
-        route: '/chat',
-        name: 'Chat',
-        icon: () => <ChatBubbleSharpIcon fontSize='medium' />,
         quickNav: [],
     },
     {
@@ -66,6 +48,11 @@ const allPagesAvailable = [
                 icon: () => <ForumSharpIcon fontSize='small' />,
             },
             {
+                name: 'Plasia Board',
+                route: (id: string) => `/projects/${id}/roadmap`,
+                icon: () => <ViewTimelineSharpIcon fontSize='small' />,
+            },
+            {
                 name: 'Documentation',
                 route: (id: string) => `/projects/${id}/documentation`,
                 icon: () => <LibraryBooksSharpIcon fontSize='small' />,
@@ -75,22 +62,12 @@ const allPagesAvailable = [
                 route: (id: string) => `/projects/${id}/secrets`,
                 icon: () => <KeySharpIcon fontSize='small' />,
             },
-            {
-                name: 'Roadmap',
-                route: (id: string) => `/projects/${id}/roadmap`,
-                icon: () => <ViewTimelineSharpIcon fontSize='small' />,
-            }
+            
         ]
     },
     {
-        route: '/calendar',
-        name: 'calendar',
-        icon: () => <CalendarMonthSharpIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
         route: '/staff',
-        name: 'staff',
+        name: 'Team',
         icon: () => <BadgeIcon fontSize='medium' />,
         quickNav: [],
     },
