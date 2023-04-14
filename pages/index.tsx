@@ -12,9 +12,6 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import BadgeIcon from '@mui/icons-material/Badge';
 import logo from '../public/logo.png';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { Event } from '@/models/calendar/Event';
-import { supabase } from '@/lib/supabaseClient';
 
 interface HomePageProps
 {
@@ -25,44 +22,6 @@ interface HomePageProps
 
 export default function HomePage({ user, session }: HomePageProps)
 {
-	const [todaysEvents, setTodaysEvents] = useState<Event[]>();
-	const timeRightNow = new Date(Date.now());
-	const time24HoursFroMNow = new Date(Date.now() + 60 * 60 * 24 * 1000);
-	console.log(timeRightNow);
-	useEffect(() => {
-		fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeRightNow.toISOString()}&timeMax=${time24HoursFroMNow.toISOString()}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${session.provider_token}`
-            }
-        }).then(async res => {
-            if (res.status === 401)
-            {
-                const { error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        scopes: 'https://www.googleapis.com/auth/calendar',
-                        queryParams: {
-                            access_type: 'offline',
-                            prompt: 'consent',
-                        },
-                        redirectTo: `${window.location.origin}/calendar`
-                    }
-                });
-                if (error)
-                {
-                    console.log(error);
-                }
-            }
-            else
-            {
-                const response = await res.json();
-                console.log(response);
-                setTodaysEvents(response.items);
-            }
-        });
-	}, []);
-
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center bg-secondary">
 			{
