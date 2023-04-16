@@ -22,6 +22,8 @@ import ForumSharpIcon from '@mui/icons-material/ForumSharp';
 import KeySharpIcon from '@mui/icons-material/KeySharp';
 import LibraryBooksSharpIcon from '@mui/icons-material/LibraryBooksSharp';
 import ViewTimelineSharpIcon from '@mui/icons-material/ViewTimelineSharp';
+import { TaskCategory } from "@/models/projects/TaskCategory";
+import CategoryBox from "@/components/projects/CategoryBox";
 
 interface ProjectIdPageProps
 {
@@ -32,7 +34,7 @@ interface ProjectIdPageProps
     contact: Contact | null;
 }
 
-export default function ProjectIdPage({ user, project, profile, profiles, contact }: ProjectIdPageProps)
+export default function ProjectIdPage({ project, profiles, contact, }: ProjectIdPageProps)
 {
     const router = useRouter();
     const [majorFeatures, setMajorFeatures] = useState<MajorFeature[]>();
@@ -103,7 +105,6 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                             />
                             <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
                                 <p className="text-lg font-medium">{profile.name}</p>
-                                <span>{profile.role}</span>
                             </div>
                         </div>
                     </div>
@@ -126,7 +127,7 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                             <span className="pt-[2px]">Discussion</span>
                         </div>
                     </Link>
-                    <Link href={`/projects/${project.id}/roadmap`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
+                    <Link href={`/projects/${project.id}/plasia`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
                         <div className="flex flex-row items-center gap-2">
                             <ViewTimelineSharpIcon fontSize="large" />
                             <span className="pt-[2px]">Plasia Board</span>
@@ -197,13 +198,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     const profile = (await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
     profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
 
+    
 	return {
 		props: {
 			user: session?.user ?? null,
             profiles: profiles,
             project,
             contact,
-            profile
+            profile,
 		}
 	}
 }

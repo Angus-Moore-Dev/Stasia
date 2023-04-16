@@ -93,8 +93,8 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
         }
         {
             showNotificationMenu &&
-            <div ref={ref} className="w-96 min-h-[384px] max-h-[50vh] bg-quaternary rounded absolute z-50 top-12 mr-36 p-2 flex flex-col gap-1">
-                <span className="px-4 font-medium w-full bg-tertiary">Notifications</span>
+            <div ref={ref} className="w-96 min-h-[384px] max-h-[50vh] bg-quaternary rounded absolute z-50 top-12 mr-36 flex flex-col gap-1">
+                <span className="px-4 font-medium w-full bg-tertiary rounded-t">Notifications</span>
                 {
                     notifications.length === 0 &&
                     <div className="flex-grow flex items-center justify-center">
@@ -103,7 +103,7 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
                 }
                 {
                     notifications.length > 0 &&
-                    <div className="flex-grow  flex flex-col overflow-y-auto scrollbar">
+                    <div className="flex-grow  flex flex-col overflow-y-auto scrollbar p-2">
                         <div className="flex-grow flex flex-col gap-1">
                         <span>Today</span>
                         {
@@ -128,7 +128,6 @@ export default function NotificationMenu({ profile }: NotificationMenuProps)
                         </div>
                     </div>
                 }
-                <Button text='Close Menu' onClick={() => setShowNotificationMenu(false)} />
             </div>
         }
     </>

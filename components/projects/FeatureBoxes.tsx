@@ -12,6 +12,7 @@ import createToast from "@/functions/createToast";
 import TaskModal from "./TaskModal";
 import PlaylistAddSharpIcon from '@mui/icons-material/PlaylistAddSharp';
 import { User } from "@supabase/supabase-js";
+import { TaskCategory } from "@/models/projects/TaskCategory";
 
 interface MajorFeatureBoxProps
 {
@@ -85,9 +86,10 @@ interface TaskBoxProps
     user: User;
     task: Task;
     profile: Profile | undefined;
+    categories: TaskCategory[];
 }
 
-export function TaskBox({ user, task, profile }: TaskBoxProps)
+export function TaskBox({ user, task, profile, categories }: TaskBoxProps)
 {
     const [titleText, setTitleText] = useState(task.name);
     const [isEditable, setIsEditable] = useState(false);
@@ -103,7 +105,6 @@ export function TaskBox({ user, task, profile }: TaskBoxProps)
         setTaskType(task.taskType);
         setTitleText(task.name);
         setTaskState(task.taskState);
-        console.log('NEW TASK STATE::', task.taskState);
     }, [task]);
 
     useEffect(() => 
@@ -169,14 +170,17 @@ export function TaskBox({ user, task, profile }: TaskBoxProps)
     }, [taskState]);
 
     return <>
-        <TaskModal user={user} task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} />
-        <div className='w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px] min-w-[450px]'
+        <TaskModal user={user} task={task} profile={profile} show={showTaskModal} setShow={setShowTaskModal} categories={categories} />
+        <div className={`w-full px-2 bg-tertiary text-zinc-100 transition hover:bg-quaternary hover:cursor-pointer flex flex-row items-center gap-4 rounded min-h-[39px] min-w-[450px]
+        ${
+            task.important && 'border-l-4 border-red-500 hover:bg-red-500'
+        }`}
             onBlur={() => {setIsEditable(false)}}
             onMouseOver={() => setShowEditButton(true)}
             onMouseLeave={() => setShowEditButton(false)}
         >
-            <div className="w-40 pr-1 flex flex-row gap-4 justify-between mx-1">
-                <p>{task.id}</p>
+            <div className="w-40 pr-1 flex flex-row gap-4 justify-start mx-1">
+                <p className="w-6">{task.id}</p>
                 <select defaultValue={taskType} className={`bg-transparent h-full hover:text-zinc-100 font-semibold text-center rounded-sm w-32 min-w-[128px] max-w-[128px] ${taskState === TaskState.Completed && 'text-zinc-100'}`} 
                 style={{ backgroundColor: taskColour }} onChange={async (e) => {
                     const res = await supabase.from('project_tickets').update({ taskType: e.target.value }).eq('id', task.id);
@@ -194,7 +198,7 @@ export function TaskBox({ user, task, profile }: TaskBoxProps)
                 {
                     !isEditable &&
                     <>
-                        <button className="w-fit text-left px-2 font-medium mr-2" onClick={() => setShowTaskModal(true)} style={{
+                        <button className="w-fit text-left px-2 font-medium mr-2" onDoubleClick={() => setShowTaskModal(true)} style={{
                             color: titleText ? '#fffff': '#7f7f7f',
                         }}>
                             {titleText ? titleText : 'No Task Description'}
@@ -205,10 +209,10 @@ export function TaskBox({ user, task, profile }: TaskBoxProps)
                                 setIsEditable(true);
                                 inputRef.current?.focus();
                             }} className="transition hover:text-primary">
-                                <CreateIcon fontSize="small" />
+                                <CreateIcon fontSize="small" className="h-4" />
                             </button>
                         }
-                        <div className="flex-grow -my-1" onClick={() => setShowTaskModal(true)} />
+                        <div className="flex-grow -my-1" onDoubleClick={() => setShowTaskModal(true)} />
                     </>
                 }
                 {
@@ -218,7 +222,11 @@ export function TaskBox({ user, task, profile }: TaskBoxProps)
                         value={titleText}
                         onChange={(e) => setTitleText(e.target.value)} 
                         readOnly={!isEditable} 
-                        onBlur={() => setIsEditable(false)}
+                        onBlur={async () => {
+                            setIsEditable(false);
+                            // update
+                            const res = await supabase.from('project_tickets').update({ name: titleText }).eq('id', task.id);
+                        }}
                         maxLength={200}
                         className={`bg-transparent outline-none px-2 flex-grow font-medium rounded text-zinc-100`}
                         placeholder="Provide a Task Title Here"
