@@ -356,7 +356,6 @@ function DraggableTicket({ user, task, index, profile, majorFeature, categories 
                                 { majorFeature.name.length >= 22 ? `${majorFeature.name.slice(0, 22)}...` : majorFeature.name }
                             </div>
                         }
-                        <span>{task.position}</span>
                     </div>
                 </div>
             )}

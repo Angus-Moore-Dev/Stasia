@@ -70,8 +70,8 @@ export default function FilesPage({ user }: FilesPageProps)
 			<NewFolderModal show={showNewFolderModal} setShow={setShowNewFolderModal} setRefreshing={setIsRefreshing} currentFolderId={currentFolderId} setCurrentFolderId={setCurrentFolderId} />
 			<NewFileModal show={showNewFileModal} setShow={setShowNewFileModal} setRefreshing={setIsRefreshing} currentFolderId={currentFolderId} setCurrentFolderId={setCurrentFolderId} allFileNamesInFolder={files?.map(x => x.name) ?? []} />
 		</div>
-		<div className="w-full mx-auto flex-grow flex flex-col bg-tertiary rounded">
-			<div className="px-8 bg-quaternary py-4 rounded-t font-medium">
+		<div className="w-full mx-auto flex-grow flex flex-col bg-quaternary rounded">
+			<div className="px-8 bg-tertiary py-4 rounded-t font-medium">
 				<button className="transition hover:text-primary" onClick={() => setCurrentFolderId('')}>jensen_labs</button>
 				{
 					currentFolderId.split('/').map((folderName, index) => {

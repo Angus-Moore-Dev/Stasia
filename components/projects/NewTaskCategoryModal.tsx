@@ -74,6 +74,12 @@ export default function NewTaskCategoryModal({ open, onClose, projectId }: NewTa
                             <Button text="Cancel" onClick={onClose} className="bg-transparent rounded" />
                             <Button text="Create" onClick={async () => 
                             {
+                                if (name.length < 1)
+                                {
+                                    createToast('Please provide a name.', true);
+                                    return;
+                                }
+
                                 setIsSaving(true);
                                 const category = new TaskCategory();
                                 category.projectId = projectId;
