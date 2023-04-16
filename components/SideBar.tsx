@@ -102,7 +102,7 @@ function QuickNavBox({ route, name, Icon }: QuickNavBoxProps)
         <Icon />
         {
             showTooltip &&
-            <small className='px-2 py-1 rounded bg-primary text-secondary font-bold absolute left-14 capitalize'>
+            <small className='px-2 py-1 rounded bg-primary text-secondary font-bold absolute left-14 capitalize z-50'>
                 {name}
             </small>
         }
