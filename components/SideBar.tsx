@@ -49,7 +49,7 @@ const allPagesAvailable = [
             },
             {
                 name: 'Plasia Board',
-                route: (id: string) => `/projects/${id}/roadmap`,
+                route: (id: string) => `/projects/${id}/plasia`,
                 icon: () => <ViewTimelineSharpIcon fontSize='small' />,
             },
             {
@@ -90,8 +90,12 @@ interface SmallerQuickNavBoxProps
 
 function QuickNavBox({ route, name, Icon }: QuickNavBoxProps)
 {
+    const router = useRouter();
     const [showTooltip, setShowTooltip] = useState(false);
-    return <Link href={route} className='w-10 h-10 rounded bg-tertiary  text-primary transition duration-150 hover:border-secondary hover:text-secondary hover:bg-primary flex items-center justify-center relative'
+    return <Link href={route} className={`w-10 h-10 rounded  text-primary transition duration-150 hover:border-secondary hover:text-secondary hover:bg-primary flex items-center justify-center relative
+    ${
+        router.pathname.split('/')[1]?.toLowerCase() === name.toLocaleLowerCase() ? 'bg-primary text-secondary' : 'bg-tertiary'
+    }`}
     onMouseOver={() => setShowTooltip(true)}
     onMouseLeave={() => setShowTooltip(false)}
     >
@@ -108,16 +112,21 @@ function QuickNavBox({ route, name, Icon }: QuickNavBoxProps)
 
 function SmallerQuickNavBox({ route, name, Icon, dynamicId }: SmallerQuickNavBoxProps)
 {
+    const router = useRouter();
     const [showTooltip, setShowTooltip] = useState(false);
-    return <Link href={route(dynamicId)} className='w-10 h-10 rounded  text-primary transition duration-150 
-    hover:border-secondary hover:text-secondary hover:bg-primary flex items-center justify-center relative mx-auto'
+    return <Link href={route(dynamicId)} className={`w-10 h-10 rounded  text-primary transition duration-150 
+    hover:border-secondary hover:text-secondary hover:bg-primary flex items-center justify-center relative mx-auto
+    ${
+        // This is because the 3rd index will be the project id and it only appears then anyway.
+        router.pathname.split('/')[3]?.toLowerCase().includes(name.toLocaleLowerCase().split(' ')[0]) && 'bg-primary text-secondary'
+    }`}
     onMouseOver={() => setShowTooltip(true)}
     onMouseLeave={() => setShowTooltip(false)}
     >
         <Icon />
         {
             showTooltip &&
-            <small className='px-2 py-1 rounded bg-tertiary text-zinc-100 font-bold absolute left-14 capitalize'>
+            <small className={`px-2 py-1 rounded bg-tertiary text-zinc-100 font-bold absolute left-14 capitalize z-50`}>
                 {name}
             </small>
         }
@@ -142,7 +151,7 @@ export default function SideBar()
                     projectId && page.name === 'Projects' &&
                     <div className='flex flex-col gap-4 border-b-2 border-b-primary py-2 my-2 bg-quaternary rounded'>
                     {
-                        page.quickNav.map(subPage => <SmallerQuickNavBox route={subPage.route} name={subPage.name} Icon={subPage.icon} dynamicId={projectId as string} />)
+                        page.quickNav.map((subPage: { route: (id: string) => string; name: string; icon: any; }) => <SmallerQuickNavBox route={subPage.route} name={subPage.name} Icon={subPage.icon} dynamicId={projectId as string} />)
                     }
                     </div>
                 }

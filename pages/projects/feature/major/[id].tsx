@@ -14,22 +14,22 @@ import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
 import createToast from "@/functions/createToast";
 import createNewNotification from "@/functions/createNewNotification";
+import FeatureDeletionDialog from "@/components/projects/FeatureDeletionDialog";
 
 interface MajorFeatureProps
 {
     majorFeatureData: MajorFeature;
-	minorFeaturesData: MinorFeature[];
     user: User;
 	profiles: Profile[];
 	profile: Profile;
 }
 
-export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesData, profiles, profile }: MajorFeatureProps)
+export default function NewMajorFeature({ user, majorFeatureData, profiles, profile }: MajorFeatureProps)
 {
     const router = useRouter();
 	const [majorFeature, setMajorFeature] = useState(majorFeatureData);
-	const [minorFeatures, setMinorFeatures] = useState<MinorFeature[]>(minorFeaturesData);
-	const [completed, setCompleted] = useState(majorFeatureData.completed)
+	const [completed, setCompleted] = useState(majorFeatureData.completed);
+	const [showDeletionDialog, setShowDeletionDialog] = useState(false);
 
     return <div className='w-full h-full min-h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto'>
         <div className="w-full flex flex-row items-center justify-start">
@@ -38,15 +38,6 @@ export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesD
             }} className="mr-auto" />
 			<Button text='Update Major Feature' onClick={async () => {
 				const featureRes = await supabase.from('project_major_features').update(majorFeature).eq('id', majorFeature.id);
-				for (const minorFeature of minorFeatures)
-				{
-					const res = await supabase.from('project_minor_features').upsert(minorFeature);
-					console.log(res);
-					if (res.error)
-					{
-						createToast(res.error.message, true);
-					}
-				}
 
 				if (featureRes.error)
 				{
@@ -88,6 +79,10 @@ export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesD
 					}
 				}} className='text-red-500 hover:bg-red-500 hover:text-zinc-100' />
 			}
+			<Button text='Delete Major Feature' onClick={async () => {
+				setShowDeletionDialog(true);
+			}} className="text-red-500 hover:bg-red-500 hover:text-zinc-100" />
+			<FeatureDeletionDialog show={showDeletionDialog} setShow={setShowDeletionDialog} feature={majorFeature}  />
 		</div>
 		<div className="flex-grow w-full flex flex-col gap-2">
 			<div className="w-full flex flex-row gap-8">
@@ -129,31 +124,6 @@ export default function NewMajorFeature({ user, majorFeatureData, minorFeaturesD
 					</div>
 				</div>
 			</div>
-			<div className="flex flex-col w-full items-center">
-				<div className="w-full flex flex-row items-center gap-4">
-					<span className="">Minor Features</span>
-					<Button text='Add Minor Feature' onClick={() => {
-						const newMinorFeature = new MinorFeature();
-						newMinorFeature.majorFeatureId = majorFeature.id;
-						newMinorFeature.staffInvolved = majorFeature.peopleInvolved;
-						setMinorFeatures(minorFeatures => [...minorFeatures, newMinorFeature]);
-					}} />
-				</div>
-				<span className="w-full">A minor feature is an isolated component that is required to make the major feature work. A small part of a bigger picture.</span>
-			</div>
-			<div className="w-full flex flex-row flex-wrap gap-2 pb-10">
-				{
-					minorFeatures.map(feature => <MinorFeatureBox key={feature.id} feature={feature} setFeature={(feature) => 
-					{
-						let features = [...minorFeatures];
-						features[features.findIndex(x => x.id === feature.id)] = feature;
-						setMinorFeatures(features);
-					}} deleteMinorFeature={() => {
-						console.log('deleting::', feature.id);
-						setMinorFeatures(minorFeatures.filter(x => x !== feature));
-					}} />)
-				}
-			</div>
 		</div>
     </div>
 }
@@ -175,7 +145,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 
 	const majorFeature = (await supabaseClient.from('project_major_features').select('*').eq('id', context.query['id']).single()).data as MajorFeature;
 	const staffInvolved = (await supabaseClient.from('profiles').select('*').in('id', majorFeature.peopleInvolved)).data as Profile[];
-	const minorFeatures = (await supabaseClient.from('project_minor_features').select('*').eq('majorFeatureId', majorFeature.id)).data as MinorFeature[];
 	for (const profile of staffInvolved)
 	{
 		profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl;
@@ -188,7 +157,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
 		props: {
 			user: session?.user ?? null,
 			majorFeatureData: majorFeature,
-			minorFeaturesData: minorFeatures,
 			profiles: staffInvolved,
 			profile: profile,
 		}

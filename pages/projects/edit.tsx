@@ -86,6 +86,9 @@ export default function NewProjectPage({ user, profiles, profile, contacts, proj
                     router.push(`/projects/${updatedProject.id}`);
                 }
             }} />
+            <Button text='Delete Project' onClick={async () => {
+                alert('dialog for deletion');
+            }} className="text-red-500 hover:bg-red-500 hover:text-zinc-100" />
         </div>
         <div className="flex-grow flex flex-row gap-4 justify w-full min-h-full">
             <div className='w-1/2 flex flex-col gap-4'>

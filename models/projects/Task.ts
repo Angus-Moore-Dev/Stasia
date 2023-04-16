@@ -5,17 +5,19 @@ export class Task
     description: string = '';
     projectId: string = ''; // the project this is attached to.
     majorFeatureId: string | null = null; // If attached solely to a major feature, it goes here (also will be populated for minor features too).
-    minorFeatureId: string | null = null; // If attached to a minor feature, it goes here.
     assigneeId: string | null = null;
     creatorId: string | null = null;
     taskType: TaskType = TaskType.General;
     taskState: TaskState= TaskState.NotStarted;
     onBoard: boolean = false;
     important: boolean = false;
+    categoryId!: string; // The category this task belongs to.
+    position: number; // The position of this task on the board.
 
     constructor(projectId: string)
     {
         this.projectId = projectId;
+        this.position = 0;
     }
 }
 
