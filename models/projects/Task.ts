@@ -2,6 +2,7 @@ export class Task
 {
     id!: number; // This helps us figure out how many tickets have been created for a given project.
     name: string = '';
+    created_at!: string; // This is the date the task was created. Supabase handled.
     description: string = '';
     projectId: string = ''; // the project this is attached to.
     majorFeatureId: string | null = null; // If attached solely to a major feature, it goes here (also will be populated for minor features too).

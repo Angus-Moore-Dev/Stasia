@@ -86,6 +86,15 @@ input {
   background-color: #090909;
 }
 
+.react-flow__controls > path {
+  fill: red;
+}
+
 .react-flow__minimap {
   background-color: #090909;
+}
+
+.react-flow__minimap-mask {
+  background-color: #090909;
+  fill: #090909d8;
 }

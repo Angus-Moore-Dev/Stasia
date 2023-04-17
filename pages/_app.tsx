@@ -55,7 +55,7 @@ export default function App({ Component, pageProps }: AppProps) {
 		<SessionContextProvider supabaseClient={supabase} initialSession={pageProps.initialSession}>
 			<Head>
 				<title>Stasia</title>
-				<link rel='icon' href='/logo.ico' />
+				<link rel='icon' href='/favicon.ico' />
 			</Head>
 			<div className='min-w-screen min-h-screen flex flex-row'>
 				<SideBar />
