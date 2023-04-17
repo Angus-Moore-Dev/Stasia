@@ -83,7 +83,7 @@ export default function PlasiaVisualBoard({ user, projectName }: ProjectRoadmapP
                         setNodes((nodes) => [...nodes, { id: v4(), type: 'textUpdater', position: { x: 0, y: 0 }, data: { value: 123 } }]);
                     }} className="bg-tertiary w-48" />
                 </Panel>
-                    <Background variant={BackgroundVariant.Cross} color="#00240b" gap={25} size={5} />
+                    <Background variant={BackgroundVariant.Cross} color="#00240b" gap={88} size={5} />
                     <Controls />
                     <MiniMap 
                         zoomable

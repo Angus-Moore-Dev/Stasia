@@ -29,6 +29,7 @@ export enum TaskState
     InProgress = "In Progress",
     RequiresReview = "Requires Review", // In the event this requires another user to review.
     Completed = "Completed",
+    Archived = "Archived" // For when a ticket has been completed and is no longer on the page (viewable and useable for statistics)
 }
 
 

@@ -21,18 +21,6 @@ import ViewTimelineSharpIcon from '@mui/icons-material/ViewTimelineSharp';
 
 const allPagesAvailable = [
     {
-        route: '/contacts',
-        name: 'Contacts',
-        icon: () => <PersonSharpIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
-        route: '/files',
-        name: 'Files',
-        icon: () => <AccountTreeIcon fontSize='medium' />,
-        quickNav: [],
-    },
-    {
         route: '/projects',
         name: 'Projects',
         icon: () => <CodeSharpIcon fontSize='medium' />,
@@ -64,6 +52,18 @@ const allPagesAvailable = [
             },
             
         ]
+    },
+    {
+        route: '/files',
+        name: 'Files',
+        icon: () => <AccountTreeIcon fontSize='medium' />,
+        quickNav: [],
+    },
+    {
+        route: '/contacts',
+        name: 'Contacts',
+        icon: () => <PersonSharpIcon fontSize='medium' />,
+        quickNav: [],
     },
     {
         route: '/staff',
