@@ -46,7 +46,7 @@ export default function SprintSection({ user, tasks, majorFeatures, categories }
             }
         });
         setTaskList(tasks);
-    }, [tasks, profiles]);
+    }, [tasks]);
 
 
     useEffect(() => {

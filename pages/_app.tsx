@@ -41,7 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
 		}
 		
 		supabase.auth.onAuthStateChange((stateChange) => {
-			console.log('AUTH STATE CHANGE!!!!::', stateChange);
+			// Anything we want to do here?
 		})
 
 		return () => {
