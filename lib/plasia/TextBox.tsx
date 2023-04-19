@@ -11,7 +11,7 @@ type BorderedBox = Node<NodeData>;
 /**
  * This is a bordered box so that uses can containerise stuff.
  */
-export default function BorderedBox({ data, selected, dragging }: NodeProps<NodeData>) {
+export default function TextBox({ data, selected, dragging }: NodeProps<NodeData>) {
     const [isEditable, setIsEditable] = useState(false);
     const [text, setText] = useState("Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores inventore assumenda totam, ipsa dolorum praesentium facere reprehenderit sapiente enim veritatis, non veniam beatae saepe esse placeat officiis ex fugiat necessitatibus voluptate alias numquam molestias neque quod doloremque. Tenetur debitis nihil ipsum quidem sint tempore, sapiente voluptate nam aliquam modi ullam unde quis optio fugiat consequuntur officia maiores! Adipisci, eligendi debitis.");
     const thinVineer = useRef<HTMLDivElement>(null);
@@ -67,8 +67,11 @@ export default function BorderedBox({ data, selected, dragging }: NodeProps<Node
             // set the thin vineer to the height of the textarea, to preserve the film over the top.
             setIsEditable(false);
         }}
-        ref={textareaRef} value={text} onChange={(e) => setText(e.target.value)} className="w-full h-full bg-quaternary focus:outline-none outline-none scrollbar
-        aria-disabled:cursor-default aria-disabled:hover:cursor-grab cursor-grab border-2 rounded-xl border-primary p-4 block p-auto" style={{ display: 'block' }}
-        aria-disabled={!isEditable || selected} />
+        ref={textareaRef} value={text} onChange={(e) => setText(e.target.value)} className="w-full h-full bg-transparent focus:outline-none outline-none scrollbar p-2
+        aria-disabled:cursor-default aria-disabled:hover:cursor-grab cursor-grab"
+        aria-disabled={!isEditable || selected}
+        onResize={(event) => {
+            console.log(event);
+        }} />
     </>
 }

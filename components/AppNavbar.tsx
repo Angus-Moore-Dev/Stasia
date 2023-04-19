@@ -19,10 +19,8 @@ export default function AppNavbar()
     {
         if (user)
         {
-            console.log(user.id);
             supabase.from('profiles').select('*').eq('id', user?.id).single().then(async data => {
                 const profileData = data.data as Profile;
-                console.log('profileData::', profileData);
                 const url = supabase.storage.from('profile.pictures').getPublicUrl(profileData.profilePictureURL).data.publicUrl ?? '';
                 profileData.profilePictureURL = url;
                 setProfile(profileData);
@@ -40,7 +38,7 @@ export default function AppNavbar()
                     <NotificationMenu profile={profile} />
                     <span>{profile.name}</span>
                     <Link href='/me' className="w-[40px] h-[40px]">
-                        <Image src={profile.profilePictureURL} alt='profile' className="rounded transition hover:border-[1px] hover:border-primary object-cover h-full w-full" width='40' height='40' />
+                        <Image src={profile.profilePictureURL} alt='profile' className="rounded transition hover:shadow-sm hover:shadow-primary object-cover h-full w-full" width='40' height='40' />
                     </Link>
                 </section>
             }

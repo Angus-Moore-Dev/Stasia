@@ -18,6 +18,7 @@ import ForumSharpIcon from '@mui/icons-material/ForumSharp';
 import KeySharpIcon from '@mui/icons-material/KeySharp';
 import LibraryBooksSharpIcon from '@mui/icons-material/LibraryBooksSharp';
 import ViewTimelineSharpIcon from '@mui/icons-material/ViewTimelineSharp';
+import EngineeringSharpIcon from '@mui/icons-material/EngineeringSharp';
 
 const allPagesAvailable = [
     {
