@@ -70,46 +70,47 @@ export default function ProjectIdPage({ project, profiles, contact, }: ProjectId
                     <span className="font-medium">{`${project.industry ? `${project.industry } -` : ''} `}{project.commercialisationType}</span>
                 </div>
             </div>
-            {
-                contact &&
-                <div className="w-full flex flex-col gap-2">
-                    <span className="font-semibold">Contacts / Customers For Whom This Project Applies</span>
-                    <div className="h-80 w-64 mb-10 flex text-left">
-                        <Link href={`/contacts/${contact.id}`} className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
-                            <Image 
-                            priority={true}
-                            src={contact.previewImageURL} 
-                            alt='profile' 
-                            width='600' height='400' 
-                            className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
-                            <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
-                                <p className="text-lg font-medium">{contact.name}</p>
-                                <span>{contact.organisations.join(", ")}</span>
-                            </div>
-                        </Link>
-                    </div>
-                </div>
-            }
-            <div className="w-full flex flex-col gap-2">
-                <span className="font-semibold">People Involved In This Project</span>
-                <div className="w-full flex flex-row gap-4 flex-wrap">
+            <div className="w-full flex flex-row flex-wrap">
                 {
-                    profiles.map(profile => <div className="h-80 w-64 mb-10 flex text-left" key={profile.id}>
-                        <div className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
-                            <Image 
+                    contact &&
+                    <div className="flex flex-col gap-2 pr-4 mr-4 border-r-primary border-r-2">
+                        <span className="font-semibold">Contacts / Customers</span>
+                        <div className="h-80 w-64 mb-10 flex text-left">
+                            <Link href={`/contacts/${contact.id}`} className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
+                                <Image 
                                 priority={true}
-                                src={profile.profilePictureURL} 
+                                src={contact.previewImageURL} 
                                 alt='profile' 
                                 width='600' height='400' 
-                                className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"
-                            />
-                            <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
-                                <p className="text-lg font-medium">{profile.name}</p>
-                            </div>
+                                className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
+                                <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
+                                    <p className="text-lg font-medium">{contact.name}</p>
+                                </div>
+                            </Link>
                         </div>
                     </div>
-                    )
                 }
+                <div className="flex flex-col gap-2">
+                    <span className="font-semibold">People Involved In This Project</span>
+                    <div className="w-full flex flex-row gap-4 flex-wrap">
+                    {
+                        profiles.map(profile => <div className="h-80 w-64 mb-10 flex text-left" key={profile.id}>
+                            <div className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
+                                <Image 
+                                    priority={true}
+                                    src={profile.profilePictureURL} 
+                                    alt='profile' 
+                                    width='600' height='400' 
+                                    className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"
+                                />
+                                <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
+                                    <p className="text-lg font-medium">{profile.name}</p>
+                                </div>
+                            </div>
+                        </div>
+                        )
+                    }
+                    </div>
                 </div>
             </div>
             <div className="flex flex-col w-full gap-2">

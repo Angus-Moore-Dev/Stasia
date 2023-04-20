@@ -32,6 +32,7 @@ export default function AppNavbar()
             <Link href='/' className="">
                 <Image src={logo} placeholder="blur" width='200' height='250' alt='logo' className="object-cover" />
             </Link>
+            <small className="ml-0 md:ml-10">Organisation Here</small>
             {
                 user && profile &&
                 <section className="flex-grow flex justify-end items-center gap-4">

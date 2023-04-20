@@ -67,7 +67,7 @@ export default function TextBox({ data, selected, dragging }: NodeProps<NodeData
             // set the thin vineer to the height of the textarea, to preserve the film over the top.
             setIsEditable(false);
         }}
-        ref={textareaRef} value={text} onChange={(e) => setText(e.target.value)} className="w-full h-full bg-transparent focus:outline-none outline-none scrollbar p-2
+        ref={textareaRef} spellCheck={false} value={text} onChange={(e) => setText(e.target.value)} className="w-full h-full bg-transparent focus:outline-none outline-none scrollbar p-2
         aria-disabled:cursor-default aria-disabled:hover:cursor-grab cursor-grab"
         aria-disabled={!isEditable || selected}
         onResize={(event) => {

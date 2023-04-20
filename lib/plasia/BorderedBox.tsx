@@ -67,7 +67,7 @@ export default function BorderedBox({ data, selected, dragging }: NodeProps<Node
             // set the thin vineer to the height of the textarea, to preserve the film over the top.
             setIsEditable(false);
         }}
-        ref={textareaRef} value={text} onChange={(e) => setText(e.target.value)} className="w-full h-full bg-quaternary focus:outline-none outline-none scrollbar
+        ref={textareaRef} spellCheck={false} value={text} onChange={(e) => setText(e.target.value)} className="w-full h-full bg-quaternary focus:outline-none outline-none scrollbar
         aria-disabled:cursor-default aria-disabled:hover:cursor-grab cursor-grab border-2 rounded-xl border-primary p-4 block p-auto" style={{ display: 'block' }}
         aria-disabled={!isEditable || selected} />
     </>

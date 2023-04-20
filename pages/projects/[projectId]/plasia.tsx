@@ -112,7 +112,6 @@ export default function PlasiaVisualBoard({ user, projectName }: ProjectRoadmapP
                             }} className="bg-tertiary w-48" />
                         </Panel>
                             <Background variant={BackgroundVariant.Cross} color="#00fe493f" gap={88} size={5} />
-                            <Controls />
                             <MiniMap 
                                 zoomable
                                 pannable
