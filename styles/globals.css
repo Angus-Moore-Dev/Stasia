@@ -50,8 +50,10 @@ h3 {
 }
 
 :root {
+  /* font-family: 'Inter', sans-serif; */
   font-family: 'Rajdhani', sans-serif;
   font-size: large;
+  /* font-size: ; */
   background-color: #090909;
   margin: 0;
   color: white;

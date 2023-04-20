@@ -74,7 +74,7 @@ interface ProjectBoxProps
 
 function ProjectBox({ project }: ProjectBoxProps)
 {
-	return <Link href={`/projects/${project.id}`} className={`group w-80 h-64 rounded bg-tertiary p-4 flex flex-col gap-2 transition hover:bg-primary hover:text-secondary hover:cursor-pointer
+	return <Link href={`/projects/${project.id}`} className={`group w-96 h-64 rounded bg-tertiary p-4 flex flex-col gap-2 transition hover:bg-primary hover:text-secondary hover:cursor-pointer
 	${project.projectTier === ProjectTier.Primary && 'border-b-4 border-primary'} ${project.projectTier === ProjectTier.Secondary && 'border-b-4 border-zinc-100'}`}>
 		<p className={`text-xl font-semibold ${project.projectTier === ProjectTier.Primary && 'text-primary group-hover:text-secondary'}`}>{project.name}</p>
 		<p className="pt-2 flex-grow overflow-y-auto scrollbar">
