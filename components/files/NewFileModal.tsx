@@ -48,6 +48,7 @@ export default function NewFileModal({ show, setShow, setRefreshing, currentFold
             type: 'text/markdown',
             lastModified: Date.now()
         });
+
         await supabase.storage.from('general.files').upload(currentFolderId ? `${currentFolderId}/${file.name}` : `${file.name}`, file);
         setIsCreatingNewFile(false);
         setShow(false);

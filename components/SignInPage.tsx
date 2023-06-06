@@ -47,6 +47,10 @@ export default function SignInPage()
                     {
                         toast.error(error.message);
                     }
+                    else
+                    {
+                        router.push('/');
+                    }
                     setIsSigningIn(false);
                 }} />
             }

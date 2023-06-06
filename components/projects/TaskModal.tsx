@@ -396,7 +396,9 @@ export default function TaskModal({ user, task, profile, show, setShow, categori
                                 {
                                     task.taskState === TaskState.Completed &&
                                     <Button text='Complete Task' onClick={async () => {
-                                        const res = await supabase.from('project_tickets').delete().eq('id', task.id);
+                                        const res = await supabase.from('project_tickets').update({
+                                            taskState: TaskState.Archived
+                                        }).eq('id', task.id);
                                         res.error && createToast(res.error.message, true);
                                         !res.error && createToast('Completed Task', false);
                                         if (!res.error)

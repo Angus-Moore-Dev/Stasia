@@ -93,13 +93,13 @@ export default function NewProjectPage({ user, profiles, profile, contacts, proj
         <div className="flex-grow flex flex-row gap-4 justify w-full min-h-full">
             <div className='w-1/2 flex flex-col gap-4'>
                 <span>Create New Project</span>
-                <div className="w-1/2 flex flex-row items-center gap-2">
+                <div className="w-full flex flex-row items-center gap-2">
                     <input value={projectName} onChange={(e) => setProjectName(e.target.value)} className="text-zinc-100 bg-transparent p-2 outline-none w-full border-b-primary border-b-2 text-lg font-semibold" placeholder="Project Name" />
                 </div>
-                <div className="w-1/2 flex flex-row items-center gap-2">
-                    <input value={projectDescription} onChange={(e) => setProjectDescription(e.target.value)} className="text-zinc-100 bg-transparent p-2 outline-none w-full border-b-primary border-b-2 text-lg" placeholder="Project Description" />
+                <div className="w-full flex flex-row items-center gap-2">
+                    <textarea value={projectDescription} onChange={(e) => setProjectDescription(e.target.value)} className="text-zinc-100 bg-transparent p-2 outline-none w-full border-b-primary border-b-2 text-lg h-28 scrollbar" placeholder="Project Description" />
                 </div>
-                <div className="w-1/2 flex flex-row items-center gap-2">
+                <div className="w-full flex flex-row items-center gap-2">
                     <input value={industry} onChange={(e) => setIndustry(e.target.value)} className="text-zinc-100 bg-transparent p-2 outline-none w-full border-b-primary border-b-2 text-lg" placeholder="Industry" />
                 </div>
                 <div className="w-full flex flex-row flex-wrap gap-2">

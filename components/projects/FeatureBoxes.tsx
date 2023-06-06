@@ -91,11 +91,11 @@ interface TaskBoxProps
 
 export function TaskBox({ user, task, profile, categories }: TaskBoxProps)
 {
+    const inputRef = useRef<HTMLInputElement>(null);
     const [titleText, setTitleText] = useState(task.name);
     const [isEditable, setIsEditable] = useState(false);
     const [taskType, setTaskType] = useState<TaskType>(task.taskType);
     const [taskColour, setTaskColour] = useState('');
-    const inputRef = useRef<HTMLInputElement>(null);
     const [showEditButton, setShowEditButton] = useState(false);
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [taskState, setTaskState] = useState(task.taskState);

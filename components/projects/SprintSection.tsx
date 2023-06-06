@@ -12,6 +12,7 @@ import ReportSharpIcon from '@mui/icons-material/ReportSharp';
 import ReportOffSharpIcon from '@mui/icons-material/ReportOffSharp';
 import { MajorFeature } from "@/models/projects/MajorFeature";
 import { TaskCategory } from "@/models/projects/TaskCategory";
+import Button from "../common/Button";
 
 
 
@@ -48,23 +49,6 @@ export default function SprintSection({ user, tasks, majorFeatures, categories }
         setTaskList(tasks);
     }, [tasks]);
 
-
-    useEffect(() => {
-        // Update after we've rerendered those changes, so it's optimistically updated.
-        // for (const task of taskList)
-        // {
-        //     if (task.taskState !== tasks.find(x => x.id === task.id)?.taskState || task.position !== tasks.find(x => x.id === task.id)?.position)
-        //     {
-        //         // If the task's state has updated or its position has moved, we need to save that.
-        //         supabase.from('tasks').update({ taskState: task.taskState, position: task.position }).eq('id', task.id).then(res => {
-        //             res.error && createToast(res.error.message, true);
-        //         });
-            
-        //     }
-        // }
-    }, [taskList]);
-
-
     return <div className="w-full flex-grow flex flex-col lg:flex-row gap-2 scrollbar">
             {
                 taskList.length === 0 &&
@@ -81,10 +65,8 @@ export default function SprintSection({ user, tasks, majorFeatures, categories }
                 }}
                 onDragEnd={async (result) => {
                     // This fires after the last update occurs.
-                    console.log('ended firing::');
                     if (!result.destination) return;
                     // This fires on every single event.
-                    console.log('result::', result.source.index, result.destination.index);
 
                     if (result.source.droppableId === result.destination.droppableId) // Moving in the same column
                     {
@@ -175,7 +157,7 @@ export default function SprintSection({ user, tasks, majorFeatures, categories }
                         ref={provided.innerRef}
                         className="flex flex-col gap-1 w-full lg:w-1/4 bg-quaternary p-2 rounded"
                         >
-                            <span className="w-full border-b-primary border-b-2 font-semibold">Not Started</span>
+                            <span className="w-full border-b-primary border-b-2 font-semibold pb-2">Not Started</span>
                             {taskList.filter(x => x.taskState === TaskState.NotStarted).sort((a, b) => a.position - b.position).map((item, index) => (
                                 <DraggableTicket 
                                     user={user} 
@@ -198,7 +180,7 @@ export default function SprintSection({ user, tasks, majorFeatures, categories }
                         ref={provided.innerRef}
                         className="flex flex-col gap-1 w-full lg:w-1/4 bg-quaternary p-2 rounded"
                         >
-                            <span className="w-full border-b-primary border-b-2 font-semibold">In Progress</span>
+                            <span className="w-full border-b-primary border-b-2 font-semibold pb-2">In Progress</span>
                             {taskList.filter(x => x.taskState === TaskState.InProgress).sort((a, b) => a.position - b.position).map((item, index) => (
                                 <DraggableTicket 
                                     user={user} 
@@ -221,7 +203,7 @@ export default function SprintSection({ user, tasks, majorFeatures, categories }
                         ref={provided.innerRef}
                         className="flex flex-col gap-1 w-full lg:w-1/4 bg-quaternary p-2 rounded"
                         >
-                            <span className="w-full border-b-primary border-b-2 font-semibold">Requires Review (Testing)</span>
+                            <span className="w-full border-b-primary border-b-2 font-semibold pb-2">Requires Review (Testing)</span>
                             {taskList.filter(x => x.taskState === TaskState.RequiresReview).sort((a, b) => a.position - b.position).map((item, index) => (
                                 <DraggableTicket 
                                     user={user} 
@@ -244,7 +226,20 @@ export default function SprintSection({ user, tasks, majorFeatures, categories }
                         ref={provided.innerRef}
                         className="flex flex-col gap-1 w-full lg:w-1/4 bg-quaternary p-2 rounded"
                         >
-                            <span className="w-full border-b-primary border-b-2 font-semibold">Completed</span>
+                            <div className="w-full flex flex-row gap-2 items-center border-b-primary border-b-2 pb-2">
+                                <span className="font-semibold">Completed</span>
+                                <Button text='Clear Completed' onClick={async () => {
+                                    // Set all tasks in the taskList that are completed to be be archived.
+                                    const completedTasks = taskList.filter(x => x.taskState === TaskState.Completed);
+                                    for (const task of completedTasks)
+                                    {
+                                        const res = await supabase.from('project_tickets').update({ 
+                                            taskState: TaskState.Archived 
+                                        }).eq('id', task.id);
+                                        res.error && createToast(res.error.message, true);
+                                    }
+                                }} className="text-xs" />
+                            </div>
                             {taskList.filter(x => x.taskState === TaskState.Completed).sort((a, b) => a.position - b.position).map((item, index) => (
                                 <DraggableTicket 
                                     user={user} 
@@ -330,19 +325,6 @@ function DraggableTicket({ user, task, index, profile, majorFeature, categories 
                         <div className="w-32 flex justify-center rounded font-semibold group-hover:text-zinc-100 text-zinc-100" style={{ backgroundColor: taskColour }}>
                             {task.taskType}
                         </div>
-                        {
-                            showImportantButton &&
-                            <button className="ml-auto rounded text-red-500 transition hover:bg-red-500 hover:text-zinc-100 flex items-center justify-center py-[1px] px-1
-                            aria-checked:text-zinc-100 aria-checked:hover:text-red-500 aria-checked:hover:bg-zinc-100"
-                            aria-checked={task.important}
-                            onClick={async () => {
-                                const res = await supabase.from('project_tickets').update({ important: !task.important }).eq('id', task.id);
-                                res.error && createToast(res.error.message, true);
-                            }}>
-                                { !task.important && <ReportSharpIcon fontSize="small" /> }
-                                { task.important && <ReportOffSharpIcon fontSize="small" /> }
-                            </button>
-                        }
                     </div>
                     <div className="flex-grow pb-3 text-base" onDoubleClick={() => setShowTaskModal(true)}>
                         {task.name}

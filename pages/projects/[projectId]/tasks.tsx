@@ -11,7 +11,7 @@ import { Contact } from "@/models/Contact";
 import { Profile } from "@/models/me/Profile";
 import { MajorFeature } from "@/models/projects/MajorFeature";
 import { Project } from "@/models/projects/Project";
-import { Task } from "@/models/projects/Task";
+import { Task, TaskState } from "@/models/projects/Task";
 import { TaskCategory } from "@/models/projects/TaskCategory";
 import { User, createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -53,7 +53,7 @@ export default function ProjectTasks({ user, project, profile, profiles, contact
             setMajorFeatures(res.data as MajorFeature[]);
         });
 
-        supabase.from('project_tickets').select('*').eq('projectId', project.id).then(res =>
+        supabase.from('project_tickets').select('*').eq('projectId', project.id).neq('taskState', TaskState.Archived).then(res =>
         {
             setCurrentTasks(res.data as Task[]);
         })
@@ -187,8 +187,7 @@ export default function ProjectTasks({ user, project, profile, profiles, contact
                         task.creatorId = user.id;
                         if (selectedCategory)
                             task.categoryId = selectedCategory;
-                        const res = await supabase.from('project_tickets').insert(task);
-                        createToast(res?.error ? res.error.message : 'Successfully Created New Task', res.error !== null);
+                        await supabase.from('project_tickets').insert(task);
                         createNewNotification(profile, `${profile.name} Created A Task For ${project.name}`, `${profile.name} created a new task for the project ${project.name}`, profile.profilePictureURL);
                     }
                 }} className="w-fit" />
