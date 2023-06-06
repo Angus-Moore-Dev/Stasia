@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import AppNavbar from '@/components/AppNavbar';
 import AppFooter from '@/components/AppFooter';
 import Head from 'next/head';
-import { Router } from 'next/router';
+import { Router, useRouter } from 'next/router';
 import LoadingBox from '@/components/LoadingBox';
 import Image from 'next/image';
 import { ToastContainer } from 'react-toastify';
@@ -15,6 +15,7 @@ import SideBar from '@/components/SideBar';
 
 
 export default function App({ Component, pageProps }: AppProps) {
+	const router = useRouter();
 	const [supabase] = useState(() => createBrowserSupabaseClient());
 	const [loading, setLoading] = useState(false);
 	const [pageName, setPageName] = useState('');
@@ -40,7 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
 		}
 		
 		supabase.auth.onAuthStateChange((stateChange) => {
-			console.log('AUTH STATE CHANGE!!!!::', stateChange);
+			// Anything we want to do here?
 		})
 
 		return () => {

@@ -12,7 +12,7 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import BadgeIcon from '@mui/icons-material/Badge';
 import logo from '../public/logo.png';
 import Image from 'next/image';
-
+import EngineeringSharpIcon from '@mui/icons-material/EngineeringSharp';
 interface HomePageProps
 {
 	session: Session;

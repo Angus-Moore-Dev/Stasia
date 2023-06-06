@@ -2,20 +2,23 @@ export class Task
 {
     id!: number; // This helps us figure out how many tickets have been created for a given project.
     name: string = '';
+    created_at!: string; // This is the date the task was created. Supabase handled.
     description: string = '';
     projectId: string = ''; // the project this is attached to.
     majorFeatureId: string | null = null; // If attached solely to a major feature, it goes here (also will be populated for minor features too).
-    minorFeatureId: string | null = null; // If attached to a minor feature, it goes here.
     assigneeId: string | null = null;
     creatorId: string | null = null;
     taskType: TaskType = TaskType.General;
     taskState: TaskState= TaskState.NotStarted;
     onBoard: boolean = false;
     important: boolean = false;
+    categoryId!: string; // The category this task belongs to.
+    position: number; // The position of this task on the board.
 
     constructor(projectId: string)
     {
         this.projectId = projectId;
+        this.position = 0;
     }
 }
 
@@ -26,6 +29,7 @@ export enum TaskState
     InProgress = "In Progress",
     RequiresReview = "Requires Review", // In the event this requires another user to review.
     Completed = "Completed",
+    Archived = "Archived" // For when a ticket has been completed and is no longer on the page (viewable and useable for statistics)
 }
 
 

@@ -10,7 +10,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#00fe49',
+        // primary: '#ffaa00', // Deus Ex Gold
+        primary: '#00fe49', // Stasia Green.
         secondary: '#090909',
         tertiary: '#131517',
         quaternary: '#0e0e0e'

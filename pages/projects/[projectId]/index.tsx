@@ -22,6 +22,8 @@ import ForumSharpIcon from '@mui/icons-material/ForumSharp';
 import KeySharpIcon from '@mui/icons-material/KeySharp';
 import LibraryBooksSharpIcon from '@mui/icons-material/LibraryBooksSharp';
 import ViewTimelineSharpIcon from '@mui/icons-material/ViewTimelineSharp';
+import { TaskCategory } from "@/models/projects/TaskCategory";
+import CategoryBox from "@/components/projects/CategoryBox";
 
 interface ProjectIdPageProps
 {
@@ -32,7 +34,7 @@ interface ProjectIdPageProps
     contact: Contact | null;
 }
 
-export default function ProjectIdPage({ user, project, profile, profiles, contact }: ProjectIdPageProps)
+export default function ProjectIdPage({ project, profiles, contact, }: ProjectIdPageProps)
 {
     const router = useRouter();
     const [majorFeatures, setMajorFeatures] = useState<MajorFeature[]>();
@@ -68,47 +70,47 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                     <span className="font-medium">{`${project.industry ? `${project.industry } -` : ''} `}{project.commercialisationType}</span>
                 </div>
             </div>
-            {
-                contact &&
-                <div className="w-full flex flex-col gap-2">
-                    <span className="font-semibold">Contacts / Customers For Whom This Project Applies</span>
-                    <div className="h-80 w-64 mb-10 flex text-left">
-                        <Link href={`/contacts/${contact.id}`} className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
-                            <Image 
-                            priority={true}
-                            src={contact.previewImageURL} 
-                            alt='profile' 
-                            width='600' height='400' 
-                            className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
-                            <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
-                                <p className="text-lg font-medium">{contact.name}</p>
-                                <span>{contact.organisations.join(", ")}</span>
-                            </div>
-                        </Link>
-                    </div>
-                </div>
-            }
-            <div className="w-full flex flex-col gap-2">
-                <span className="font-semibold">People Involved In This Project</span>
-                <div className="w-full flex flex-row gap-4 flex-wrap">
+            <div className="w-full flex flex-row flex-wrap">
                 {
-                    profiles.map(profile => <div className="h-80 w-64 mb-10 flex text-left" key={profile.id}>
-                        <div className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
-                            <Image 
+                    contact &&
+                    <div className="flex flex-col gap-2 pr-4 mr-4 border-r-primary border-r-2">
+                        <span className="font-semibold">Contacts / Customers</span>
+                        <div className="h-80 w-64 mb-10 flex text-left">
+                            <Link href={`/contacts/${contact.id}`} className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
+                                <Image 
                                 priority={true}
-                                src={profile.profilePictureURL} 
+                                src={contact.previewImageURL} 
                                 alt='profile' 
                                 width='600' height='400' 
-                                className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"
-                            />
-                            <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
-                                <p className="text-lg font-medium">{profile.name}</p>
-                                <span>{profile.role}</span>
-                            </div>
+                                className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"  />
+                                <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
+                                    <p className="text-lg font-medium">{contact.name}</p>
+                                </div>
+                            </Link>
                         </div>
                     </div>
-                    )
                 }
+                <div className="flex flex-col gap-2">
+                    <span className="font-semibold">People Involved In This Project</span>
+                    <div className="w-full flex flex-row gap-4 flex-wrap">
+                    {
+                        profiles.map(profile => <div className="h-80 w-64 mb-10 flex text-left" key={profile.id}>
+                            <div className="group w-full h-full rounded bg-tertiary text-zinc-100 font-medium hover:cursor-pointer flex flex-col">
+                                <Image 
+                                    priority={true}
+                                    src={profile.profilePictureURL} 
+                                    alt='profile' 
+                                    width='600' height='400' 
+                                    className="object-cover rounded-t-sm w-full min-w-[256px] min-h-[320px]"
+                                />
+                                <div className="p-2 flex flex-col gap-2 bg-tertiary rounded-b transition group-hover:bg-primary group-hover:text-secondary aria-selected:bg-primary aria-selected:text-secondary">
+                                    <p className="text-lg font-medium">{profile.name}</p>
+                                </div>
+                            </div>
+                        </div>
+                        )
+                    }
+                    </div>
                 </div>
             </div>
             <div className="flex flex-col w-full gap-2">
@@ -126,7 +128,7 @@ export default function ProjectIdPage({ user, project, profile, profiles, contac
                             <span className="pt-[2px]">Discussion</span>
                         </div>
                     </Link>
-                    <Link href={`/projects/${project.id}/roadmap`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
+                    <Link href={`/projects/${project.id}/plasia`} className="w-full md:w-[19.5%] min-w-[200px] h-48 bg-tertiary hover:bg-primary hover:text-secondary transition hover:bg-green font-bold text-lg flex flex-col items-center justify-center gap-2 rounded p-4 border-b-4 border-b-primary">
                         <div className="flex flex-row items-center gap-2">
                             <ViewTimelineSharpIcon fontSize="large" />
                             <span className="pt-[2px]">Plasia Board</span>
@@ -197,13 +199,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) =>
     const profile = (await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single()).data as Profile;
     profile.profilePictureURL = supabaseClient.storage.from('profile.pictures').getPublicUrl(profile.profilePictureURL).data.publicUrl!;
 
+    
 	return {
 		props: {
 			user: session?.user ?? null,
             profiles: profiles,
             project,
             contact,
-            profile
+            profile,
 		}
 	}
 }

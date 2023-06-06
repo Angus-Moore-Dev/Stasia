@@ -28,8 +28,6 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
 {
     const router = useRouter();
 	const [majorFeature, setMajorFeature] = useState(new MajorFeature(projectId));
-	const [minorFeatures, setMinorFeatures] = useState<MinorFeature[]>([]);
-	useEffect(() => console.log(minorFeatures), [minorFeatures]);
 
     return <div className='w-full h-full min-h-full flex flex-col items-center justify-start gap-4 max-w-[1920px] p-8 mx-auto'>
         <div className="w-full flex flex-row items-center justify-between">
@@ -54,25 +52,6 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
 						theme: "colored",
 						style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
 					});
-				}
-				for (const minorFeature of minorFeatures)
-				{
-					const res = await supabase.from('project_minor_features').insert(minorFeature);
-					if (res.error)
-					{
-						toast.error(res.error?.message, 
-						{
-							position: "bottom-right",
-							autoClose: 5000,
-							hideProgressBar: false,
-							closeOnClick: true,
-							pauseOnHover: true,
-							draggable: true,
-							progress: undefined,
-							theme: "colored",
-							style: { backgroundColor: '#090909', color: '#ef4444', fontFamily: 'Rajdhani', fontWeight: '800' }
-						});
-					}
 				}
 				if (!featureRes.error)
 				{
@@ -120,31 +99,6 @@ export default function NewMajorFeature({ user, projectName, projectId, profiles
                     }
 				</div>
 			</div>
-		</div>
-		<div className="flex flex-col w-full items-center">
-			<div className="w-full flex flex-row items-center gap-4">
-				<span className="">Minor Features</span>
-				<Button text='Add Minor Feature' onClick={() => {
-					const newMinorFeature = new MinorFeature();
-					newMinorFeature.majorFeatureId = majorFeature.id;
-					newMinorFeature.staffInvolved = majorFeature.peopleInvolved;
-					setMinorFeatures(minorFeatures => [...minorFeatures, newMinorFeature]);
-				}} />
-			</div>
-			<span className="w-full">A minor feature is an isolated component that is required to make the major feature work. A small part of a bigger picture.</span>
-		</div>
-		<div className="w-full flex flex-row flex-wrap gap-2 pb-10">
-			{
-				minorFeatures.map(feature => <MinorFeatureBox key={feature.id} feature={feature} setFeature={(feature) => 
-				{
-					let features = [...minorFeatures];
-					features[features.findIndex(x => x.id === feature.id)] = feature;
-					setMinorFeatures(features);
-				}} deleteMinorFeature={() => {
-					console.log('deleting::', feature.id);
-					setMinorFeatures(minorFeatures.filter(x => x !== feature));
-				}} />)
-			}
 		</div>
     </div>
 }

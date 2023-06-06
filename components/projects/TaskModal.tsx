@@ -17,6 +17,7 @@ import { v4 } from 'uuid';
 import { User } from '@supabase/supabase-js';
 import { useClickAway } from 'react-use';
 import { MajorFeature } from '@/models/projects/MajorFeature';
+import { TaskCategory } from '@/models/projects/TaskCategory';
 
 
 const style = {
@@ -41,10 +42,11 @@ interface TaskModalProps
     task: Task;
     profile?: Profile;
     show: boolean;
+    categories: TaskCategory[];
     setShow: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function TaskModal({ user, task, profile, show, setShow }: TaskModalProps)
+export default function TaskModal({ user, task, profile, show, setShow, categories }: TaskModalProps)
 {
     const ref = useRef<HTMLDivElement>(null);
     useClickAway(ref, () => 
@@ -63,7 +65,8 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
     const [taskComments, setTaskComments] = useState<Comment[]>();
     const [taskState, setTaskState] = useState(task.taskState);
     const [assigneeId, setAssigneeId] = useState(task.assigneeId);
-    const titleRef = useRef<HTMLInputElement>(null);
+    const [categoriesData, setCategoriesData] = useState(categories);
+    const titleRef = useRef<HTMLTextAreaElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
     const [showAllProfiles, setShowAllProfiles] = useState(false);
@@ -80,7 +83,6 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
     useEffect(() => {
         // We're doing it this way to containerise the changes inside the modal, but have external changes be reflected here in realtime.
         // That way, we're not passing a setTask object down here and then requiring some nasty callback prop hell.
-        console.log('udpating task description::', task.description);
         setTaskTitle(task.name);
         setTaskDescription(task.description);
         setTaskType(task.taskType);
@@ -111,6 +113,10 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
 
         fetchAllMetadata();
     }, [task]);
+
+    useEffect(() => {
+        setCategoriesData(categories);
+    }, [categories]);
 
     useEffect(() => // There has to be a way to automatically configure this.
     {
@@ -176,27 +182,34 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <div className='w-[35vw] h-[75vh] bg-tertiary rounded p-8 flex flex-col gap-2'>
-                    <div className='w-full flex flex-row items-start gap-4'>
-                        <input 
+                <div className={`w-[50vw] h-[75vh] bg-tertiary rounded p-8 flex flex-col gap-2 ${task.important && 'border-4 border-red-500'}`}>
+                    {
+                        task.important &&
+                        <span className='flex items-center justify-center bg-red-500 -m-8 mb-4 font-semibold'>
+                            <span className='text-white'>IMPORTANT</span>
+                        </span>
+                    }
+                    <div className='w-full flex flex-row items-start gap-4 h-40'>
+                        <textarea 
                             ref={titleRef}
                             value={taskTitle}
-                            maxLength={255}
+                            maxLength={200}
                             onChange={(e) => setTaskTitle(e.target.value)} 
-                            className='w-full text-xl font-semibold bg-transparent outline-none focus:border-b-2 border-b-primary scrollbar h-full'
+                            className='w-full text-lg font-semibold bg-transparent outline-none focus:border-b-2 border-b-primary scrollbar h-full'
                             placeholder='Enter Title Here'
                             contentEditable={true}
-                            onKeyDown={async (e) => {
-                                if (e.key === 'Enter')
+                            onKeyUp={() => {
+                                // Adjust the height of the textarea to fit the content.
+                            }}
+                            onBlur={async () => {
+                                if (taskTitle !== task.name)
                                 {
-                                    const res = await supabase.from('project_tickets').update({ name: taskTitle }).eq('id', task.id);
+                                    const res = await supabase.from('project_tickets').update({
+                                        name: taskTitle
+                                    }).eq('id', task.id);
                                     if (res.error)
                                     {
                                         createToast(res.error.message, true);
-                                    }
-                                    else
-                                    {
-                                        titleRef.current?.blur();
                                     }
                                 }
                             }}
@@ -247,7 +260,23 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
                     }
                     <div className='flex-grow h-full flex flex-row'>
                         <div className='w-full h-full p-2 flex flex-col items-start px-4 gap-4'>
-                            <span>Task Configuration</span>
+                            <div className='w-full flex flex-row gap-2'>
+                                <span>Task Configuration</span>
+                                <Button text={task.important ? 'Mark as Not Important' : 'Mark as Important'} onClick={async () => {
+                                    const res = await supabase.from('project_tickets').update({
+                                        important: !task.important
+                                    }).eq('id', task.id);
+                                    res.error && createToast(res.error.message, true);
+                                    !res.error && createToast('Marked Task as Important', false);
+                                }} className='text-red-500 bg-transparent hover:bg-red-500 hover:text-zinc-100 ml-auto w-fit' />
+                                <Button text='Delete Task' onClick={async () => {
+                                    const res = await supabase.from('project_tickets').delete().eq('id', task.id);
+                                    res.error && createToast(res.error.message, true);
+                                    !res.error && createToast('Deleted Task', false);
+                                    if (!res.error)
+                                        setShow(false);
+                                }} className='text-red-500 bg-transparent hover:bg-red-500 hover:text-zinc-100 w-fit' />
+                            </div>
                             {
                                 (isFetchingMetadata || !creatorOfTask || !majorFeatures) &&
                                 <div className='flex-grow w-full flex items-center justify-center'>
@@ -325,23 +354,51 @@ export default function TaskModal({ user, task, profile, show, setShow }: TaskMo
                                         }
                                     </select>
                                 </div>
+                                <div className='flex flex-col'>
+                                    <small className='text-primary font-semibold'>Category</small>
+                                    <select defaultValue={categoriesData?.find(x => x.id === task.categoryId)?.id ?? ''} className='mx-2 w-48 bg-primary text-secondary font-bold rounded text-center' onChange={async (e) => {
+                                        if (e.target.value)
+                                        {
+                                            // Set it to null because of the foreign key relation.
+                                            const res = await supabase.from('project_tickets').update({
+                                                categoryId: e.target.value,
+                                            }).eq('id', task.id);
+                                            res.error && createToast(res.error.message, true);
+                                        }
+                                        else
+                                        {
+                                            const res = await supabase.from('project_tickets').update({
+                                                categoryId: null,
+                                            }).eq('id', task.id);
+                                            res.error && createToast(res.error.message, true);
+                                        }
+                                    }}>
+                                        <option value={''} className='text-center'>General Tasks</option>
+                                        {
+                                            categoriesData?.map(category => <option value={category.id} className=''>{category.name}</option>)
+                                        }
+                                    </select>
+                                </div>
                                 <div className='flex flex-col justify-end gap-2'>
                                 {
                                     task.onBoard &&
                                     <Button text='Move to Backlog' onClick={async () => {
                                         const res = await supabase.from('project_tickets').update({
                                             onBoard: false,
+                                            position: null
                                         }).eq('id', task.id);
                                         res.error && createToast(res.error.message, true);
                                         !res.error && createToast('Moved Ticket to Backlog', false);
                                         if (!res.error)
                                             setShow(false);
-                                    }} />
+                                    }} className='w-48' />
                                 }
                                 {
                                     task.taskState === TaskState.Completed &&
                                     <Button text='Complete Task' onClick={async () => {
-                                        const res = await supabase.from('project_tickets').delete().eq('id', task.id);
+                                        const res = await supabase.from('project_tickets').update({
+                                            taskState: TaskState.Archived
+                                        }).eq('id', task.id);
                                         res.error && createToast(res.error.message, true);
                                         !res.error && createToast('Completed Task', false);
                                         if (!res.error)

@@ -30,8 +30,8 @@ export default function SignInPage()
                 <Image placeholder="blur" src={logo} alt='logo' height='600' width='500' className="mb-10" />
             </div>
             <span>Sign in to Stasia</span>
-            {/* <input value={email} onChange={(e) => setEmail(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Username" type="email" />
-            <input value={password} onChange={(e) => setPassword(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Password" type='password' /> */}
+            <input value={email} onChange={(e) => setEmail(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Username" type="email" />
+            <input value={password} onChange={(e) => setPassword(e.target.value)} className="pb-2 bg-transparent text-zinc-100 font-semibold outline-none border-b-2 border-b-primary h-10 mb-4 w-full" placeholder="Password" type='password' />
             {
                 isSigningIn &&
                 <div className="mx-auto">
@@ -39,6 +39,22 @@ export default function SignInPage()
                 </div>
             }
             {
+                !isSigningIn &&
+                <Button text="Login to Stasia" onClick={async () => {
+                    setIsSigningIn(true);
+                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error)
+                    {
+                        toast.error(error.message);
+                    }
+                    else
+                    {
+                        router.push('/');
+                    }
+                    setIsSigningIn(false);
+                }} />
+            }
+            {/* {
                 !isSigningIn &&
                 <>
                 <button className="w-full p-2 bg-secondary text-primary font-bold rounded flex flex-row gap-4 items-center justify-center transition hover:bg-primary hover:text-secondary"
@@ -63,7 +79,7 @@ export default function SignInPage()
                     <span>Sign In With Google</span>
                 </button>
                 </>
-            }
+            } */}
         </div>
     </div>
 }
